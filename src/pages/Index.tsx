@@ -3,70 +3,21 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Navigation from '@/components/Navigation';
-import StudentCard from '@/components/StudentCard';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
-  // Sample student data
-  const sampleStudents = [
-    {
-      id: '1',
-      name: 'Ahmad Fadli',
-      grade: '5',
-      class: 'A',
-      studyGroup: 'Ustadz Rahman',
-      memorization: {
-        progress: 75,
-        status: 'inProgress' as const,
-        currentSurah: 'Al-Baqarah (Ayah 150)'
-      },
-      tilawati: {
-        progress: 90,
-        status: 'inProgress' as const,
-        currentLevel: 'Level 6'
-      }
-    },
-    {
-      id: '2',
-      name: 'Siti Aisyah',
-      grade: '4',
-      class: 'B',
-      studyGroup: 'Ustadzah Fatimah',
-      memorization: {
-        progress: 45,
-        status: 'inProgress' as const,
-        currentSurah: 'Al-Imran (Ayah 20)'
-      },
-      tilawati: {
-        progress: 100,
-        status: 'completed' as const,
-        currentLevel: 'Level 6 - Completed'
-      }
-    },
-    {
-      id: '3',
-      name: 'Muhammad Hakim',
-      grade: '6',
-      class: 'A',
-      studyGroup: 'Ustadz Rahman',
-      memorization: {
-        progress: 25,
-        status: 'inProgress' as const,
-        currentSurah: 'Al-Fatihah'
-      },
-      tilawati: {
-        progress: 60,
-        status: 'inProgress' as const,
-        currentLevel: 'Level 4'
-      }
+  const handleGetStarted = () => {
+    if (user) {
+      navigate('/dashboard');
+    } else {
+      navigate('/auth');
     }
-  ];
-
-  const handleViewDetails = (studentId: string) => {
-    console.log('Viewing details for student:', studentId);
-    // Navigate to student details page
   };
 
   return (
@@ -93,8 +44,12 @@ const Index = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
-            <Button size="lg" className="bg-islamic-500 hover:bg-islamic-600 text-white px-8 py-3 text-lg">
-              {t('button.getStarted')}
+            <Button 
+              size="lg" 
+              className="bg-islamic-500 hover:bg-islamic-600 text-white px-8 py-3 text-lg"
+              onClick={handleGetStarted}
+            >
+              {user ? 'Go to Dashboard' : t('button.getStarted')}
             </Button>
           </div>
         </div>
@@ -164,28 +119,6 @@ const Index = () => {
               </CardDescription>
             </CardContent>
           </Card>
-        </div>
-      </section>
-
-      {/* Sample Students Section */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold font-sf-pro text-foreground mb-4">
-            {t('common.students')} Overview
-          </h2>
-          <p className="text-lg text-muted-foreground font-sf-text">
-            Monitor your students' progress at a glance
-          </p>
-        </div>
-        
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sampleStudents.map((student) => (
-            <StudentCard
-              key={student.id}
-              student={student}
-              onViewDetails={handleViewDetails}
-            />
-          ))}
         </div>
       </section>
 
