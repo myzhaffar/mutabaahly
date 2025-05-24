@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Navigation from '@/components/Navigation';
-import StudentCard from '@/components/StudentCard';
 import AddStudentDialog from '@/components/AddStudentDialog';
 import SearchAndFilter from '@/components/SearchAndFilter';
+import StatsCards from '@/components/dashboard/StatsCards';
+import StudentsGrid from '@/components/dashboard/StudentsGrid';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, BookOpen, Award, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
 
 interface Student {
   id: string;
@@ -61,44 +61,81 @@ const Dashboard = () => {
 
   const fetchStudents = async () => {
     try {
-      // Fetch students with their progress
+      // Fetch students
       const { data: studentsData, error: studentsError } = await supabase
         .from('students')
-        .select(`
-          id,
-          name,
-          grade,
-          group_name,
-          teacher,
-          photo,
-          hafalan_progress (
-            percentage,
-            last_surah
-          ),
-          tilawah_progress (
-            percentage,
-            jilid
-          )
-        `);
+        .select('*');
 
       if (studentsError) {
         console.error('Error fetching students:', studentsError);
         return;
       }
 
-      const formattedStudents = studentsData?.map(student => ({
-        ...student,
-        hafalan_progress: student.hafalan_progress?.[0] || null,
-        tilawah_progress: student.tilawah_progress?.[0] || null
-      })) || [];
+      // For each student, fetch their progress entries and calculate dynamic progress
+      const studentsWithProgress = await Promise.all(
+        (studentsData || []).map(async (student) => {
+          // Fetch hafalan progress entries
+          const { data: hafalanEntries } = await supabase
+            .from('progress_entries')
+            .select('*')
+            .eq('student_id', student.id)
+            .eq('type', 'hafalan');
 
-      setStudents(formattedStudents);
+          // Fetch tilawah progress entries
+          const { data: tilawahEntries } = await supabase
+            .from('progress_entries')
+            .select('*')
+            .eq('student_id', student.id)
+            .eq('type', 'tilawah');
+
+          // Calculate progress based on entries
+          const hafalanProgress = calculateHafalanProgress(hafalanEntries || []);
+          const tilawahProgress = calculateTilawahProgress(tilawahEntries || []);
+
+          // Update progress in database
+          if (hafalanEntries && hafalanEntries.length > 0) {
+            await supabase
+              .from('hafalan_progress')
+              .upsert({
+                student_id: student.id,
+                percentage: hafalanProgress.percentage,
+                last_surah: hafalanProgress.last_surah,
+                updated_at: new Date().toISOString()
+              });
+          }
+
+          if (tilawahEntries && tilawahEntries.length > 0) {
+            await supabase
+              .from('tilawah_progress')
+              .upsert({
+                student_id: student.id,
+                percentage: tilawahProgress.percentage,
+                jilid: tilawahProgress.jilid,
+                updated_at: new Date().toISOString()
+              });
+          }
+
+          return {
+            ...student,
+            hafalan_progress: hafalanProgress.percentage > 0 ? {
+              percentage: hafalanProgress.percentage,
+              last_surah: hafalanProgress.last_surah
+            } : null,
+            tilawah_progress: tilawahProgress.percentage > 0 ? {
+              percentage: tilawahProgress.percentage,
+              jilid: tilawahProgress.jilid
+            } : null
+          };
+        })
+      );
+
+      setStudents(studentsWithProgress);
       
       // Calculate stats
-      const totalStudents = formattedStudents.length;
-      const avgHafalan = formattedStudents.reduce((sum, s) => sum + (s.hafalan_progress?.percentage || 0), 0) / totalStudents;
-      const avgTilawah = formattedStudents.reduce((sum, s) => sum + (s.tilawah_progress?.percentage || 0), 0) / totalStudents;
-      const completed = formattedStudents.filter(s => 
+      const totalStudents = studentsWithProgress.length;
+      const avgHafalan = studentsWithProgress.reduce((sum, s) => sum + (s.hafalan_progress?.percentage || 0), 0) / totalStudents;
+      const avgTilawah = studentsWithProgress.reduce((sum, s) => sum + (s.tilawah_progress?.percentage || 0), 0) / totalStudents;
+      const completed = studentsWithProgress.filter(s => 
         (s.hafalan_progress?.percentage || 0) === 100 && 
         (s.tilawah_progress?.percentage || 0) === 100
       ).length;
@@ -117,7 +154,6 @@ const Dashboard = () => {
     }
   };
 
-  // Filter and search functionality
   useEffect(() => {
     let filtered = students;
 
@@ -211,63 +247,7 @@ const Dashboard = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-white shadow-sm border-l-4 border-l-blue-500">
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-3 rounded-full bg-blue-100 mr-4">
-                  <Users className="h-6 w-6 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total Students</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalStudents}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white shadow-sm border-l-4 border-l-green-500">
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-3 rounded-full bg-green-100 mr-4">
-                  <BookOpen className="h-6 w-6 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Avg. Tilawah</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.avgTilawahProgress}%</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white shadow-sm border-l-4 border-l-islamic-500">
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-3 rounded-full bg-islamic-100 mr-4">
-                  <Award className="h-6 w-6 text-islamic-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Avg. Hafalan</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.avgHafalanProgress}%</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white shadow-sm border-l-4 border-l-gold-500">
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-3 rounded-full bg-gold-100 mr-4">
-                  <TrendingUp className="h-6 w-6 text-gold-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Completed</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.completedStudents}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <StatsCards stats={stats} />
 
         {/* Search and Filter Section */}
         <div className="mb-6">
@@ -292,51 +272,12 @@ const Dashboard = () => {
             )}
           </div>
           
-          {filteredStudents.length === 0 ? (
-            <Card className="bg-white shadow-sm">
-              <CardContent className="p-12 text-center">
-                <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  {students.length === 0 ? 'No Students Found' : 'No Students Match Your Filters'}
-                </h3>
-                <p className="text-gray-600">
-                  {students.length === 0
-                    ? (profile?.role === 'teacher' 
-                        ? 'Start by adding students to your class.' 
-                        : 'No students assigned to your account.')
-                    : 'Try adjusting your search or filter criteria.'}
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredStudents.map((student) => (
-                <StudentCard
-                  key={student.id}
-                  student={{
-                    id: student.id,
-                    name: student.name,
-                    grade: student.grade || 'N/A',
-                    class: student.group_name,
-                    studyGroup: student.teacher,
-                    memorization: {
-                      progress: student.hafalan_progress?.percentage || 0,
-                      status: (student.hafalan_progress?.percentage || 0) === 100 ? 'completed' : 
-                              (student.hafalan_progress?.percentage || 0) > 0 ? 'inProgress' : 'notStarted',
-                      currentSurah: student.hafalan_progress?.last_surah || 'Not started'
-                    },
-                    tilawati: {
-                      progress: student.tilawah_progress?.percentage || 0,
-                      status: (student.tilawah_progress?.percentage || 0) === 100 ? 'completed' : 
-                              (student.tilawah_progress?.percentage || 0) > 0 ? 'inProgress' : 'notStarted',
-                      currentLevel: student.tilawah_progress?.jilid || 'Not started'
-                    }
-                  }}
-                  onViewDetails={handleViewDetails}
-                />
-              ))}
-            </div>
-          )}
+          <StudentsGrid
+            students={students}
+            filteredStudents={filteredStudents}
+            onViewDetails={handleViewDetails}
+            userRole={profile?.role || 'teacher'}
+          />
         </div>
       </div>
     </div>

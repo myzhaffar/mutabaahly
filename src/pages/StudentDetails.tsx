@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +10,7 @@ import { ArrowLeft, BookOpen, Award } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import Navigation from '@/components/Navigation';
 import AddProgressDialog from '@/components/AddProgressDialog';
+import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
 
 interface Student {
   id: string;
@@ -65,23 +65,6 @@ const StudentDetails = () => {
       if (studentError) throw studentError;
       setStudent(studentData);
 
-      // Fetch progress data
-      const { data: hafalanData } = await supabase
-        .from('hafalan_progress')
-        .select('percentage, last_surah')
-        .eq('student_id', id)
-        .single();
-
-      const { data: tilawahData } = await supabase
-        .from('tilawah_progress')
-        .select('percentage, jilid')
-        .eq('student_id', id)
-        .single();
-
-      setProgressData({
-        hafalan_progress: hafalanData,
-        tilawah_progress: tilawahData
-      });
     } catch (error) {
       console.error('Error fetching student data:', error);
     } finally {
@@ -104,6 +87,39 @@ const StudentDetails = () => {
 
       setHafalanEntries(hafalan);
       setTilawahEntries(tilawah);
+
+      // Calculate dynamic progress
+      const hafalanProgress = calculateHafalanProgress(hafalan);
+      const tilawahProgress = calculateTilawahProgress(tilawah);
+
+      setProgressData({
+        hafalan_progress: hafalanProgress.percentage > 0 ? hafalanProgress : null,
+        tilawah_progress: tilawahProgress.percentage > 0 ? tilawahProgress : null
+      });
+
+      // Update progress in database
+      if (hafalan.length > 0) {
+        await supabase
+          .from('hafalan_progress')
+          .upsert({
+            student_id: id,
+            percentage: hafalanProgress.percentage,
+            last_surah: hafalanProgress.last_surah,
+            updated_at: new Date().toISOString()
+          });
+      }
+
+      if (tilawah.length > 0) {
+        await supabase
+          .from('tilawah_progress')
+          .upsert({
+            student_id: id,
+            percentage: tilawahProgress.percentage,
+            jilid: tilawahProgress.jilid,
+            updated_at: new Date().toISOString()
+          });
+      }
+
     } catch (error) {
       console.error('Error fetching progress entries:', error);
     }
