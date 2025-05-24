@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +11,10 @@ import { ArrowLeft, BookOpen, Award } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import Navigation from '@/components/Navigation';
 import AddProgressDialog from '@/components/AddProgressDialog';
+import EditStudentDialog from '@/components/EditStudentDialog';
+import DeleteStudentDialog from '@/components/DeleteStudentDialog';
+import EditProgressDialog from '@/components/EditProgressDialog';
+import DeleteProgressDialog from '@/components/DeleteProgressDialog';
 import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
 
 interface Student {
@@ -130,6 +135,14 @@ const StudentDetails = () => {
     fetchProgressEntries();
   };
 
+  const handleStudentUpdated = () => {
+    fetchStudentData();
+  };
+
+  const handleStudentDeleted = () => {
+    navigate('/dashboard');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -163,17 +176,27 @@ const StudentDetails = () => {
       
       <div className="container mx-auto px-6 py-8">
         {/* Header */}
-        <div className="flex items-center mb-6">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate('/dashboard')}
-            className="mr-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Button>
-          <h1 className="text-3xl font-bold text-gray-900">Student Details</h1>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/dashboard')}
+              className="mr-4"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Dashboard
+            </Button>
+            <h1 className="text-3xl font-bold text-gray-900">Student Details</h1>
+          </div>
+          <div className="flex space-x-2">
+            <EditStudentDialog student={student} onStudentUpdated={handleStudentUpdated} />
+            <DeleteStudentDialog 
+              studentId={student.id} 
+              studentName={student.name} 
+              onStudentDeleted={handleStudentDeleted} 
+            />
+          </div>
         </div>
 
         {/* Student Overview Card */}
@@ -269,12 +292,13 @@ const StudentDetails = () => {
                       <TableHead>Surah</TableHead>
                       <TableHead>Verse/Ayat</TableHead>
                       <TableHead>Notes</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {hafalanEntries.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center text-gray-500">
+                        <TableCell colSpan={5} className="text-center text-gray-500">
                           No hafalan progress recorded yet
                         </TableCell>
                       </TableRow>
@@ -285,6 +309,16 @@ const StudentDetails = () => {
                           <TableCell>{entry.surah_or_jilid || '-'}</TableCell>
                           <TableCell>{entry.ayat_or_page || '-'}</TableCell>
                           <TableCell>{entry.notes || '-'}</TableCell>
+                          <TableCell>
+                            <div className="flex space-x-1">
+                              <EditProgressDialog entry={entry} onProgressUpdated={handleProgressAdded} />
+                              <DeleteProgressDialog 
+                                entryId={entry.id} 
+                                entryType="hafalan" 
+                                onProgressDeleted={handleProgressAdded} 
+                              />
+                            </div>
+                          </TableCell>
                         </TableRow>
                       ))
                     )}
@@ -300,12 +334,13 @@ const StudentDetails = () => {
                       <TableHead>Jilid/Level</TableHead>
                       <TableHead>Page/Verse</TableHead>
                       <TableHead>Notes</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {tilawahEntries.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center text-gray-500">
+                        <TableCell colSpan={5} className="text-center text-gray-500">
                           No tilawati progress recorded yet
                         </TableCell>
                       </TableRow>
@@ -316,6 +351,16 @@ const StudentDetails = () => {
                           <TableCell>{entry.surah_or_jilid || '-'}</TableCell>
                           <TableCell>{entry.ayat_or_page || '-'}</TableCell>
                           <TableCell>{entry.notes || '-'}</TableCell>
+                          <TableCell>
+                            <div className="flex space-x-1">
+                              <EditProgressDialog entry={entry} onProgressUpdated={handleProgressAdded} />
+                              <DeleteProgressDialog 
+                                entryId={entry.id} 
+                                entryType="tilawah" 
+                                onProgressDeleted={handleProgressAdded} 
+                              />
+                            </div>
+                          </TableCell>
                         </TableRow>
                       ))
                     )}

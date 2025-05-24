@@ -4,31 +4,41 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus } from 'lucide-react';
+import { Edit } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import FileUpload from '@/components/ui/file-upload';
 
-interface AddStudentDialogProps {
-  onStudentAdded: () => void;
+interface Student {
+  id: string;
+  name: string;
+  grade: string;
+  group_name: string;
+  teacher: string;
+  photo: string | null;
 }
 
-const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) => {
+interface EditStudentDialogProps {
+  student: Student;
+  onStudentUpdated: () => void;
+}
+
+const EditStudentDialog: React.FC<EditStudentDialogProps> = ({ student, onStudentUpdated }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
-    name: '',
-    grade: '',
-    group_name: '',
-    teacher: ''
+    name: student.name,
+    grade: student.grade || '',
+    group_name: student.group_name,
+    teacher: student.teacher
   });
   const { toast } = useToast();
 
   const uploadImage = async (file: File): Promise<string | null> => {
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
+      const fileName = `${student.id}-${Math.random()}.${fileExt}`;
       const filePath = `student-photos/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
@@ -53,9 +63,9 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
     setLoading(true);
 
     try {
-      let photoUrl = null;
+      let photoUrl = student.photo;
 
-      // Upload photo if selected
+      // Upload new photo if selected
       if (selectedFile) {
         photoUrl = await uploadImage(selectedFile);
         if (!photoUrl) {
@@ -65,27 +75,26 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
 
       const { error } = await supabase
         .from('students')
-        .insert([{
+        .update({
           ...formData,
           photo: photoUrl
-        }]);
+        })
+        .eq('id', student.id);
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Student added successfully!",
+        description: "Student updated successfully!",
       });
 
-      setFormData({ name: '', grade: '', group_name: '', teacher: '' });
-      setSelectedFile(null);
       setOpen(false);
-      onStudentAdded();
+      onStudentUpdated();
     } catch (error) {
-      console.error('Error adding student:', error);
+      console.error('Error updating student:', error);
       toast({
         title: "Error",
-        description: "Failed to add student. Please try again.",
+        description: "Failed to update student. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -100,20 +109,21 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-islamic-500 hover:bg-islamic-600">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Student
+        <Button variant="outline" size="sm">
+          <Edit className="h-4 w-4 mr-2" />
+          Edit
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Student</DialogTitle>
+          <DialogTitle>Edit Student</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="photo">Profile Photo</Label>
             <FileUpload
               onFileSelect={setSelectedFile}
+              currentImage={student.photo}
             />
           </div>
           <div className="space-y-2">
@@ -157,7 +167,7 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? 'Adding...' : 'Add Student'}
+              {loading ? 'Updating...' : 'Update Student'}
             </Button>
           </div>
         </form>
@@ -166,4 +176,4 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
   );
 };
 
-export default AddStudentDialog;
+export default EditStudentDialog;
