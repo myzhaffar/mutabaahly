@@ -4,6 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import Navigation from '@/components/Navigation';
 import StudentCard from '@/components/StudentCard';
 import AddStudentDialog from '@/components/AddStudentDialog';
+import SearchAndFilter from '@/components/SearchAndFilter';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, BookOpen, Award, TrendingUp } from 'lucide-react';
@@ -26,12 +27,25 @@ interface Student {
   } | null;
 }
 
+interface FilterState {
+  grades: string[];
+  classes: string[];
+  teachers: string[];
+}
+
 const Dashboard = () => {
   const { user, profile } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [students, setStudents] = useState<Student[]>([]);
+  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filters, setFilters] = useState<FilterState>({
+    grades: [],
+    classes: [],
+    teachers: []
+  });
   const [stats, setStats] = useState({
     totalStudents: 0,
     avgHafalanProgress: 0,
@@ -103,6 +117,58 @@ const Dashboard = () => {
     }
   };
 
+  // Filter and search functionality
+  useEffect(() => {
+    let filtered = students;
+
+    // Apply search filter
+    if (searchTerm) {
+      filtered = filtered.filter(student =>
+        student.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Apply grade filter
+    if (filters.grades.length > 0) {
+      filtered = filtered.filter(student =>
+        filters.grades.includes(student.grade || 'N/A')
+      );
+    }
+
+    // Apply class filter
+    if (filters.classes.length > 0) {
+      filtered = filtered.filter(student =>
+        filters.classes.includes(student.group_name)
+      );
+    }
+
+    // Apply teacher filter
+    if (filters.teachers.length > 0) {
+      filtered = filtered.filter(student =>
+        filters.teachers.includes(student.teacher)
+      );
+    }
+
+    setFilteredStudents(filtered);
+  }, [students, searchTerm, filters]);
+
+  // Get unique values for filter options
+  const getFilterOptions = () => {
+    const grades = [...new Set(students.map(s => s.grade || 'N/A'))].sort();
+    const classes = [...new Set(students.map(s => s.group_name))].sort();
+    const teachers = [...new Set(students.map(s => s.teacher))].sort();
+    
+    return { grades, classes, teachers };
+  };
+
+  const handleSearchChange = (search: string) => {
+    setSearchTerm(search);
+  };
+
+  const handleFiltersChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
+  };
+
   const handleViewDetails = (studentId: string) => {
     navigate(`/student/${studentId}`);
   };
@@ -121,6 +187,8 @@ const Dashboard = () => {
       </div>
     );
   }
+
+  const { grades, classes, teachers } = getFilterOptions();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -201,25 +269,48 @@ const Dashboard = () => {
           </Card>
         </div>
 
+        {/* Search and Filter Section */}
+        <div className="mb-6">
+          <SearchAndFilter
+            onSearchChange={handleSearchChange}
+            onFiltersChange={handleFiltersChange}
+            availableGrades={grades}
+            availableClasses={classes}
+            availableTeachers={teachers}
+            currentFilters={filters}
+          />
+        </div>
+
         {/* Students Section */}
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Students Overview</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Students Overview</h2>
+            {filteredStudents.length !== students.length && (
+              <span className="text-sm text-gray-600">
+                Showing {filteredStudents.length} of {students.length} students
+              </span>
+            )}
+          </div>
           
-          {students.length === 0 ? (
+          {filteredStudents.length === 0 ? (
             <Card className="bg-white shadow-sm">
               <CardContent className="p-12 text-center">
                 <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No Students Found</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  {students.length === 0 ? 'No Students Found' : 'No Students Match Your Filters'}
+                </h3>
                 <p className="text-gray-600">
-                  {profile?.role === 'teacher' 
-                    ? 'Start by adding students to your class.' 
-                    : 'No students assigned to your account.'}
+                  {students.length === 0
+                    ? (profile?.role === 'teacher' 
+                        ? 'Start by adding students to your class.' 
+                        : 'No students assigned to your account.')
+                    : 'Try adjusting your search or filter criteria.'}
                 </p>
               </CardContent>
             </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {students.map((student) => (
+              {filteredStudents.map((student) => (
                 <StudentCard
                   key={student.id}
                   student={{
