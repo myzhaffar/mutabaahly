@@ -1,12 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Navigation from '@/components/Navigation';
 import StudentCard from '@/components/StudentCard';
+import AddStudentDialog from '@/components/AddStudentDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, BookOpen, Award, TrendingUp } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface Student {
   id: string;
@@ -28,6 +29,7 @@ interface Student {
 const Dashboard = () => {
   const { user, profile } = useAuth();
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -102,8 +104,11 @@ const Dashboard = () => {
   };
 
   const handleViewDetails = (studentId: string) => {
-    console.log('View details for student:', studentId);
-    // TODO: Navigate to student details page
+    navigate(`/student/${studentId}`);
+  };
+
+  const handleStudentAdded = () => {
+    fetchStudents();
   };
 
   if (loading) {
@@ -123,13 +128,18 @@ const Dashboard = () => {
       
       <div className="container mx-auto px-6 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {profile?.full_name}
-          </h1>
-          <p className="text-gray-600">
-            {profile?.role === 'teacher' ? 'Teacher Dashboard' : 'Parent Dashboard'}
-          </p>
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Welcome back, {profile?.full_name}
+            </h1>
+            <p className="text-gray-600">
+              {profile?.role === 'teacher' ? 'Teacher Dashboard' : 'Parent Dashboard'}
+            </p>
+          </div>
+          {profile?.role === 'teacher' && (
+            <AddStudentDialog onStudentAdded={handleStudentAdded} />
+          )}
         </div>
 
         {/* Stats Cards */}
