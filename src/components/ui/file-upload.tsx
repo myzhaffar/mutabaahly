@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Upload, X } from 'lucide-react';
@@ -56,7 +55,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, currentImage, cla
             type="button"
             variant="destructive"
             size="sm"
-            className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+            className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full"
             onClick={handleRemove}
           >
             <X className="h-3 w-3" />

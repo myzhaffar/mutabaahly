@@ -1,4 +1,3 @@
-
 // Quran data with surah names and verse counts
 export const quranSurahs = [
   { number: 1, name: "Al-Fatihah", verses: 7 },
@@ -124,10 +123,23 @@ export const TOTAL_QURAN_VERSES = 6236;
 export const TOTAL_TILAWATI_PAGES = 44;
 
 export const getSurahByName = (name: string) => {
-  return quranSurahs.find(surah => 
-    surah.name.toLowerCase() === name.toLowerCase() ||
-    surah.name.toLowerCase().includes(name.toLowerCase())
-  );
+  // Normalize the input name
+  const normalizedInput = name
+    .toLowerCase()
+    .replace(/[''`-]/g, '') // Remove special characters
+    .replace(/^(al|at|an|ar|ad|as|ash|az)[\s-]*/i, ''); // Remove Arabic article prefixes
+
+  return quranSurahs.find(surah => {
+    // Normalize the surah name
+    const normalizedSurah = surah.name
+      .toLowerCase()
+      .replace(/[''`-]/g, '')
+      .replace(/^(al|at|an|ar|ad|as|ash|az)[\s-]*/i, '');
+
+    return normalizedSurah === normalizedInput ||
+           normalizedSurah.includes(normalizedInput) ||
+           normalizedInput.includes(normalizedSurah);
+  });
 };
 
 export const getSurahByNumber = (number: number) => {

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -8,11 +7,11 @@ import { Edit } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import FileUpload from '@/components/ui/file-upload';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Student {
   id: string;
   name: string;
-  grade: string;
   group_name: string;
   teacher: string;
   photo: string | null;
@@ -29,11 +28,16 @@ const EditStudentDialog: React.FC<EditStudentDialogProps> = ({ student, onStuden
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     name: student.name,
-    grade: student.grade || '',
     group_name: student.group_name,
     teacher: student.teacher
   });
   const { toast } = useToast();
+  const { profile } = useAuth();
+
+  // Return null if user is not a teacher
+  if (profile?.role !== 'teacher') {
+    return null;
+  }
 
   const uploadImage = async (file: File): Promise<string | null> => {
     try {
@@ -60,6 +64,17 @@ const EditStudentDialog: React.FC<EditStudentDialogProps> = ({ student, onStuden
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Double-check role before submitting
+    if (profile?.role !== 'teacher') {
+      toast({
+        title: "Error",
+        description: "You don't have permission to edit students.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -109,7 +124,7 @@ const EditStudentDialog: React.FC<EditStudentDialogProps> = ({ student, onStuden
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" id="edit-student-trigger">
           <Edit className="h-4 w-4 mr-2" />
           Edit
         </Button>
@@ -133,15 +148,6 @@ const EditStudentDialog: React.FC<EditStudentDialogProps> = ({ student, onStuden
               value={formData.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
               required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="grade">Grade</Label>
-            <Input
-              id="grade"
-              value={formData.grade}
-              onChange={(e) => handleInputChange('grade', e.target.value)}
-              placeholder="e.g., Grade 3"
             />
           </div>
           <div className="space-y-2">

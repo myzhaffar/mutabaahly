@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import FileUpload from '@/components/ui/file-upload';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AddStudentDialogProps {
   onStudentAdded: () => void;
@@ -24,6 +24,12 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
     teacher: ''
   });
   const { toast } = useToast();
+  const { profile } = useAuth();
+
+  // Return null if user is not a teacher
+  if (profile?.role !== 'teacher') {
+    return null;
+  }
 
   const uploadImage = async (file: File): Promise<string | null> => {
     try {
@@ -50,6 +56,17 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Double-check role before submitting
+    if (profile?.role !== 'teacher') {
+      toast({
+        title: "Error",
+        description: "You don't have permission to add students.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {

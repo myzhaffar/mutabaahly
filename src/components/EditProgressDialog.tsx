@@ -1,13 +1,14 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Edit } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { quranSurahs } from '@/utils/quranData';
 
 interface ProgressEntry {
   id: string;
@@ -95,12 +96,30 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
             <Label htmlFor="surah_or_jilid">
               {entry.type === 'hafalan' ? 'Surah' : 'Jilid/Level'}
             </Label>
-            <Input
-              id="surah_or_jilid"
-              value={formData.surah_or_jilid}
-              onChange={(e) => handleInputChange('surah_or_jilid', e.target.value)}
-              placeholder={entry.type === 'hafalan' ? 'e.g., Al-Fatihah' : 'e.g., Jilid 1'}
-            />
+            {entry.type === 'hafalan' ? (
+              <Select 
+                value={formData.surah_or_jilid} 
+                onValueChange={(value) => handleInputChange('surah_or_jilid', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a surah" />
+                </SelectTrigger>
+                <SelectContent>
+                  {quranSurahs.map((surah) => (
+                    <SelectItem key={surah.number} value={surah.name}>
+                      {surah.name} ({surah.verses} verses)
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input
+                id="surah_or_jilid"
+                value={formData.surah_or_jilid}
+                onChange={(e) => handleInputChange('surah_or_jilid', e.target.value)}
+                placeholder="e.g., Jilid 1"
+              />
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="ayat_or_page">

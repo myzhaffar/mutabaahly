@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -7,10 +6,12 @@ import StudentDetailsHeader from '@/components/student-details/StudentDetailsHea
 import StudentOverviewCard from '@/components/student-details/StudentOverviewCard';
 import DailyProgressTabs from '@/components/student-details/DailyProgressTabs';
 import { useStudentDetails } from '@/hooks/useStudentDetails';
+import { useAuth } from '@/contexts/AuthContext';
 
 const StudentDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { profile } = useAuth();
   
   const {
     student,
@@ -59,14 +60,16 @@ const StudentDetails = () => {
       <div className="container mx-auto px-6 py-8">
         <StudentDetailsHeader
           student={student}
-          onStudentUpdated={refetchData}
-          onStudentDeleted={handleStudentDeleted}
+          userRole={profile?.role || 'parent'}
+          profile={profile}
         />
 
         <StudentOverviewCard
           student={student}
           progressData={progressData}
           onProgressAdded={refetchData}
+          onStudentUpdated={refetchData}
+          onStudentDeleted={handleStudentDeleted}
         />
 
         <DailyProgressTabs

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect } from 'react';
 
@@ -21,7 +19,6 @@ const Auth = () => {
   
   const { signIn, signUp, user } = useAuth();
   const { t } = useLanguage();
-  const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -77,13 +74,13 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-islamic-50 to-background dark:from-gray-900 dark:to-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-islamic-50 via-accent-50 to-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-islamic-500 to-islamic-600 rounded-full mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-islamic-500 to-accent-500 rounded-full mb-4">
             <span className="text-white text-2xl font-bold">Q</span>
           </div>
-          <h1 className="text-2xl font-bold font-sf-pro text-islamic-700 dark:text-islamic-400">
+          <h1 className="text-2xl font-bold font-sf-pro text-islamic-700">
             {t('home.title')}
           </h1>
         </div>
@@ -157,7 +154,7 @@ const Auth = () => {
               
               <Button 
                 type="submit" 
-                className="w-full bg-islamic-500 hover:bg-islamic-600"
+                className="w-full bg-islamic-600 hover:bg-islamic-700 text-white"
                 disabled={loading}
               >
                 {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
@@ -168,7 +165,7 @@ const Auth = () => {
               <button
                 type="button"
                 onClick={() => setIsLogin(!isLogin)}
-                className="text-islamic-600 hover:text-islamic-700 text-sm font-medium"
+                className="text-accent-600 hover:text-accent-700 text-sm font-medium"
               >
                 {isLogin 
                   ? "Don't have an account? Sign up" 
@@ -177,17 +174,6 @@ const Auth = () => {
             </div>
           </CardContent>
         </Card>
-
-        <div className="flex justify-center mt-6">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleTheme}
-            className="font-sf-text"
-          >
-            {theme === 'light' ? '🌙' : '☀️'}
-          </Button>
-        </div>
       </div>
     </div>
   );

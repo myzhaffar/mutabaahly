@@ -1,10 +1,7 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
-import EditStudentDialog from '@/components/EditStudentDialog';
-import DeleteStudentDialog from '@/components/DeleteStudentDialog';
 
 interface Student {
   id: string;
@@ -17,38 +14,31 @@ interface Student {
 
 interface StudentDetailsHeaderProps {
   student: Student;
-  onStudentUpdated: () => void;
-  onStudentDeleted: () => void;
+  userRole: string;
+  profile?: { role: string };
 }
 
 const StudentDetailsHeader: React.FC<StudentDetailsHeaderProps> = ({
   student,
-  onStudentUpdated,
-  onStudentDeleted
+  userRole,
+  profile,
 }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex items-center justify-between mb-6">
-      <div className="flex items-center">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-6">
+      {/* Left Section - Back Button and Title */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full sm:w-auto">
         <Button
           variant="outline"
           size="sm"
           onClick={() => navigate('/dashboard')}
-          className="mr-4"
+          className="w-fit"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
         </Button>
-        <h1 className="text-3xl font-bold text-gray-900">Student Details</h1>
-      </div>
-      <div className="flex space-x-2">
-        <EditStudentDialog student={student} onStudentUpdated={onStudentUpdated} />
-        <DeleteStudentDialog 
-          studentId={student.id} 
-          studentName={student.name} 
-          onStudentDeleted={onStudentDeleted} 
-        />
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Student Details</h1>
       </div>
     </div>
   );

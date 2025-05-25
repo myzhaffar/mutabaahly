@@ -1,14 +1,11 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const Navigation = () => {
   const { language, setLanguage, t } = useLanguage();
-  const { theme, toggleTheme } = useTheme();
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -33,10 +30,10 @@ const Navigation = () => {
             className="flex items-center space-x-2 cursor-pointer" 
             onClick={handleLogoClick}
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-islamic-500 to-islamic-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-islamic-500 to-accent-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">Q</span>
             </div>
-            <span className="font-sf-pro font-semibold text-xl text-islamic-700 dark:text-islamic-400">
+            <span className="font-sf-pro font-semibold text-xl text-islamic-700">
               Al-Quran Progress
             </span>
           </div>
@@ -47,7 +44,7 @@ const Navigation = () => {
                 {/* User Info */}
                 <div className="hidden md:flex items-center space-x-2 text-sm text-muted-foreground">
                   <span>{profile?.full_name}</span>
-                  <span className="text-islamic-600">({profile?.role})</span>
+                  <span className="text-accent-600">({profile?.role})</span>
                 </div>
 
                 {/* Sign Out Button */}
@@ -55,7 +52,7 @@ const Navigation = () => {
                   variant="outline"
                   size="sm"
                   onClick={handleSignOut}
-                  className="font-sf-text"
+                  className="font-sf-text border-islamic-200 hover:bg-islamic-50 text-islamic-700"
                 >
                   Sign Out
                 </Button>
@@ -65,7 +62,7 @@ const Navigation = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => navigate('/auth')}
-                className="font-sf-text"
+                className="font-sf-text border-islamic-200 hover:bg-islamic-50 text-islamic-700"
               >
                 Sign In
               </Button>
@@ -76,19 +73,9 @@ const Navigation = () => {
               variant="outline"
               size="sm"
               onClick={() => setLanguage(language === 'en' ? 'id' : 'en')}
-              className="font-sf-text"
+              className="font-sf-text border-accent-200 hover:bg-accent-50 text-accent-700"
             >
               {language === 'en' ? 'ID' : 'EN'}
-            </Button>
-            
-            {/* Theme Toggle */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={toggleTheme}
-              className="font-sf-text"
-            >
-              {theme === 'light' ? '🌙' : '☀️'}
             </Button>
           </div>
         </div>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,9 +11,9 @@ interface StudentCardProps {
   student: {
     id: string;
     name: string;
-    grade: string;
     class: string;
     studyGroup: string;
+    photo?: string;
     memorization: {
       progress: number;
       status: 'completed' | 'inProgress' | 'notStarted';
@@ -32,16 +31,16 @@ interface StudentCardProps {
 const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => {
   const { t } = useLanguage();
 
-  const getStatusColor = (status: string) => {
+  const getStatusVariant = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'bg-green-500 text-white';
+        return 'success';
       case 'inProgress':
-        return 'bg-blue-500 text-white';
+        return 'info';
       case 'notStarted':
-        return 'bg-gray-400 text-white';
+        return 'neutral';
       default:
-        return 'bg-gray-400 text-white';
+        return 'neutral';
     }
   };
 
@@ -59,18 +58,22 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => 
   };
 
   const getProgressColor = (progress: number) => {
-    if (progress >= 80) return 'bg-green-500';
+    if (progress >= 80) return 'bg-islamic-500';
     if (progress >= 60) return 'bg-blue-500';
-    if (progress >= 40) return 'bg-yellow-500';
-    return 'bg-red-500';
+    if (progress >= 40) return 'bg-accent-500';
+    return 'bg-gray-500';
   };
 
   return (
     <Card className="bg-white hover:shadow-xl transition-all duration-300 border-0 shadow-md rounded-xl overflow-hidden">
-      <CardHeader className="pb-4 bg-gradient-to-r from-islamic-50 to-blue-50">
+      <CardHeader className="pb-4 bg-gradient-to-r from-islamic-50 to-accent-50">
         <div className="flex items-center space-x-4">
           <Avatar className="h-16 w-16 border-3 border-white shadow-lg">
-            <AvatarImage src="/placeholder.svg" alt={student.name} />
+            <AvatarImage 
+              src={student.photo || '/avatars/placeholder.png'} 
+              alt={student.name}
+              className="object-cover"
+            />
             <AvatarFallback className="bg-islamic-500 text-white text-lg font-semibold">
               {student.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
             </AvatarFallback>
@@ -80,12 +83,13 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => 
             <CardTitle className="text-lg font-bold text-gray-900 mb-1">
               {student.name}
             </CardTitle>
-            <div className="flex flex-wrap gap-1">
-              <Badge variant="secondary" className="text-xs bg-white/80 text-gray-700">
-                Grade {student.grade}
-              </Badge>
-              <Badge variant="outline" className="text-xs border-islamic-200 text-islamic-700">
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline" size="sm" className="border-islamic-200 text-islamic-700">
                 {student.class}
+              </Badge>
+              <Badge variant="secondary" size="sm" className="bg-accent/10 text-accent-foreground/80">
+                <User className="h-3 w-3 mr-1" />
+                {student.studyGroup}
               </Badge>
             </div>
           </div>
@@ -93,15 +97,6 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => 
       </CardHeader>
       
       <CardContent className="p-6 space-y-5">
-        {/* Teacher Badge */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <User className="h-4 w-4" />
-            <span className="font-medium">Teacher:</span>
-            <span>{student.studyGroup}</span>
-          </div>
-        </div>
-
         {/* Al-Quran Memorization Progress */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
@@ -111,7 +106,11 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => 
                 Al-Quran Memorization
               </span>
             </div>
-            <Badge className={`text-xs ${getStatusColor(student.memorization.status)}`}>
+            <Badge 
+              variant={getStatusVariant(student.memorization.status)}
+              size="sm"
+              className="whitespace-nowrap"
+            >
               {getStatusText(student.memorization.status)}
             </Badge>
           </div>
@@ -139,12 +138,16 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <BookOpen className="h-5 w-5 text-blue-600" />
+              <BookOpen className="h-5 w-5 text-accent-600" />
               <span className="text-sm font-semibold text-gray-800">
                 Tilawati Reading
               </span>
             </div>
-            <Badge className={`text-xs ${getStatusColor(student.tilawati.status)}`}>
+            <Badge 
+              variant={getStatusVariant(student.tilawati.status)}
+              size="sm"
+              className="whitespace-nowrap"
+            >
               {getStatusText(student.tilawati.status)}
             </Badge>
           </div>
@@ -170,7 +173,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => 
         
         <Button 
           onClick={() => onViewDetails(student.id)}
-          className="w-full mt-6 bg-gradient-to-r from-islamic-500 to-islamic-600 hover:from-islamic-600 hover:to-islamic-700 text-white shadow-lg rounded-lg font-medium transition-all duration-300"
+          className="w-full mt-6 bg-gradient-to-r from-islamic-500 to-accent-500 hover:from-islamic-600 hover:to-accent-600 text-white shadow-lg rounded-full font-medium transition-all duration-300"
         >
           View Details
         </Button>

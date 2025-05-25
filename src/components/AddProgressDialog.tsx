@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { quranSurahs } from '@/utils/quranData';
 
 interface AddProgressDialogProps {
   studentId: string;
@@ -18,6 +19,7 @@ interface AddProgressDialogProps {
 const AddProgressDialog: React.FC<AddProgressDialogProps> = ({ studentId, onProgressAdded }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { profile } = useAuth();
   const [formData, setFormData] = useState({
     type: '',
     date: new Date().toISOString().split('T')[0],
@@ -27,11 +29,26 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({ studentId, onProg
   });
   const { toast } = useToast();
 
+  // Check if user is authorized (teacher)
+  if (profile?.role !== 'teacher') {
+    return null;
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // Verify role again before submission
+      if (profile?.role !== 'teacher') {
+        toast({
+          title: "Unauthorized",
+          description: "Only teachers can add progress entries.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from('progress_entries')
         .insert([{
@@ -112,12 +129,30 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({ studentId, onProg
             <Label htmlFor="surah_or_jilid">
               {formData.type === 'hafalan' ? 'Surah' : 'Jilid/Level'}
             </Label>
-            <Input
-              id="surah_or_jilid"
-              value={formData.surah_or_jilid}
-              onChange={(e) => handleInputChange('surah_or_jilid', e.target.value)}
-              placeholder={formData.type === 'hafalan' ? 'e.g., Al-Fatihah' : 'e.g., Jilid 1'}
-            />
+            {formData.type === 'hafalan' ? (
+              <Select 
+                value={formData.surah_or_jilid} 
+                onValueChange={(value) => handleInputChange('surah_or_jilid', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a surah" />
+                </SelectTrigger>
+                <SelectContent>
+                  {quranSurahs.map((surah) => (
+                    <SelectItem key={surah.number} value={surah.name}>
+                      {surah.name} ({surah.verses} verses)
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input
+                id="surah_or_jilid"
+                value={formData.surah_or_jilid}
+                onChange={(e) => handleInputChange('surah_or_jilid', e.target.value)}
+                placeholder="e.g., Jilid 1"
+              />
+            )}
           </div>
 
           <div className="space-y-2">

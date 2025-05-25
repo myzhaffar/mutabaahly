@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   AlertDialog,
@@ -15,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface DeleteStudentDialogProps {
   studentId: string;
@@ -29,8 +29,24 @@ const DeleteStudentDialog: React.FC<DeleteStudentDialogProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { profile } = useAuth();
+
+  // Return null if user is not a teacher
+  if (profile?.role !== 'teacher') {
+    return null;
+  }
 
   const handleDelete = async () => {
+    // Double-check role before deleting
+    if (profile?.role !== 'teacher') {
+      toast({
+        title: "Error",
+        description: "You don't have permission to delete students.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -81,7 +97,7 @@ const DeleteStudentDialog: React.FC<DeleteStudentDialogProps> = ({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive" size="sm">
+        <Button variant="destructive" size="sm" id="delete-student-trigger">
           <Trash2 className="h-4 w-4 mr-2" />
           Delete
         </Button>
