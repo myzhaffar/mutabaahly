@@ -43,26 +43,26 @@ export const calculateHafalanProgress = (entries: ProgressEntry[]) => {
   // Process all entries for the current surah
   for (const entry of currentSurahEntries) {
     if (entry.ayat_or_page) {
-      const ayatRange = entry.ayat_or_page;
-      
-      if (ayatRange.includes('-')) {
+        const ayatRange = entry.ayat_or_page;
+
+        if (ayatRange.includes('-')) {
         // Handle verse range (e.g., "1-5")
-        const [start, end] = ayatRange.split('-').map(num => parseInt(num.trim()));
-        if (!isNaN(start) && !isNaN(end) && end >= start) {
+          const [start, end] = ayatRange.split('-').map(num => parseInt(num.trim()));
+          if (!isNaN(start) && !isNaN(end) && end >= start) {
           // Add all verses in the range to the set
           for (let verse = start; verse <= end; verse++) {
             if (verse <= surahData.verses) { // Only add if within surah's verse count
               memorizedVerses.add(verse);
             }
           }
-        }
-      } else {
+          }
+        } else {
         // Handle single verse
         const verse = parseInt(ayatRange);
         if (!isNaN(verse) && verse <= surahData.verses) {
           memorizedVerses.add(verse);
-        }
       }
+    }
     }
   }
 
@@ -95,11 +95,11 @@ export const calculateTilawahProgress = (entries: ProgressEntry[]) => {
 
   if (latestEntry) {
     currentJilid = latestEntry.surah_or_jilid;
-    
+
     // Parse the page number from the latest entry
     if (latestEntry.ayat_or_page) {
       const pageRange = latestEntry.ayat_or_page;
-      
+
       if (pageRange.includes('-')) {
         // If it's a range, take the higher number
         const [_, end] = pageRange.split('-').map(num => parseInt(num.trim()));
@@ -111,7 +111,7 @@ export const calculateTilawahProgress = (entries: ProgressEntry[]) => {
         const page = parseInt(pageRange);
         if (!isNaN(page)) {
           currentPage = page;
-        }
+    }
       }
     }
   }

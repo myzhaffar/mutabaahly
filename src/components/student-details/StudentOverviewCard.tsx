@@ -57,11 +57,11 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
           {/* Avatar Section */}
           <div className="flex items-center justify-center mb-4 lg:mb-0">
             <Avatar className="h-24 w-24 sm:h-28 sm:w-28 lg:h-32 lg:w-32">
-              <AvatarImage src={student.photo || ''} alt={student.name} />
+            <AvatarImage src={student.photo || ''} alt={student.name} />
               <AvatarFallback className="text-xl sm:text-2xl font-semibold bg-muted">
-                {student.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+              {student.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
           </div>
           
           {/* Content Section */}
@@ -81,8 +81,8 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
                       <User className="h-3 w-3 mr-1" />
                       {student.teacher}
                     </Badge>
-                  </div>
-                </div>
+              </div>
+              </div>
                 {isTeacher && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -129,23 +129,23 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {/* Hafalan Progress */}
                 <div className="bg-islamic-100/10 dark:bg-islamic-950/50 p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex items-center mb-3">
+                <div className="flex items-center mb-3">
                     <Award className="h-6 w-6 text-islamic-600 dark:text-islamic-400 mr-2" />
                     <h3 className="font-semibold text-islamic-900 dark:text-islamic-100">Hafalan Progress</h3>
-                  </div>
+                </div>
                   <div className="space-y-3">
-                    <Progress 
+                <Progress 
                       value={hafalanPercentage} 
                       className="h-2.5"
-                    />
+                />
                     <div className="flex justify-between items-center">
                       <p className="text-sm font-medium text-foreground">
                         {hafalanPercentage}% completed
-                      </p>
+                </p>
                       <p className="text-sm text-muted-foreground">
                         {hafalanLastSurah}
-                      </p>
-                    </div>
+                </p>
+              </div>
                   </div>
                 </div>
 
@@ -156,17 +156,17 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
                     <h3 className="font-semibold text-green-900 dark:text-green-100">Tilawati Progress</h3>
                   </div>
                   <div className="space-y-3">
-                    <Progress 
+                <Progress 
                       value={tilawahPercentage} 
                       className="h-2.5"
-                    />
+                />
                     <div className="flex justify-between items-center">
                       <p className="text-sm font-medium text-foreground">
                         {tilawahPercentage}% completed
-                      </p>
+                </p>
                       <p className="text-sm text-muted-foreground">
                         {tilawahJilid}
-                      </p>
+                </p>
                     </div>
                   </div>
                 </div>

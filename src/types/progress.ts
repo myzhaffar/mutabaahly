@@ -2,7 +2,7 @@ export interface ProgressEntry {
   id: string;
   student_id: string;
   date: string;
-  type: 'hafalan' | 'tilawah';
+  type: string;
   surah_or_jilid: string | null;
   ayat_or_page: string | null;
   notes: string | null;

@@ -74,62 +74,91 @@ const Dashboard = () => {
       // For each student, fetch their progress entries and calculate dynamic progress
       const studentsWithProgress = await Promise.all(
         (studentsData || []).map(async (student) => {
-          // Fetch hafalan progress entries
-          const { data: hafalanEntries } = await supabase
-            .from('progress_entries')
-            .select('*')
-            .eq('student_id', student.id)
-            .eq('type', 'hafalan');
+          try {
+            // Fetch hafalan progress entries
+            const { data: hafalanEntries, error: hafalanError } = await supabase
+              .from('progress_entries')
+              .select('*')
+              .eq('student_id', student.id)
+              .eq('type', 'hafalan');
 
-          // Fetch tilawah progress entries
-          const { data: tilawahEntries } = await supabase
-            .from('progress_entries')
-            .select('*')
-            .eq('student_id', student.id)
-            .eq('type', 'tilawah');
+            if (hafalanError) {
+              console.error(`Error fetching hafalan entries for student ${student.id} (${student.name}):`, hafalanError);
+              // Potentially skip this student's progress update or handle error appropriately
+            }
 
-          // Calculate progress based on entries
-          const hafalanProgress = calculateHafalanProgress(hafalanEntries || []);
-          const tilawahProgress = calculateTilawahProgress(tilawahEntries || []);
+            // Fetch tilawah progress entries
+            const { data: tilawahEntries, error: tilawahError } = await supabase
+              .from('progress_entries')
+              .select('*')
+              .eq('student_id', student.id)
+              .eq('type', 'tilawah');
 
-          // Update progress in database
-          if (hafalanEntries && hafalanEntries.length > 0) {
-            await supabase
-              .from('hafalan_progress')
-              .upsert({
-                student_id: student.id,
+            if (tilawahError) {
+              console.error(`Error fetching tilawah entries for student ${student.id} (${student.name}):`, tilawahError);
+              // Potentially skip this student's progress update
+            }
+
+            // Calculate progress based on entries
+            const hafalanProgress = calculateHafalanProgress(hafalanEntries || []);
+            const tilawahProgress = calculateTilawahProgress(tilawahEntries || []);
+
+            // Update progress in database
+            // Only attempt upsert if entries were successfully fetched and exist
+            if (hafalanEntries && hafalanEntries.length > 0 && !hafalanError) {
+              const { error: upsertHafalanError } = await supabase
+                .from('hafalan_progress')
+                .upsert({
+                  student_id: student.id,
+                  percentage: hafalanProgress.percentage,
+                  last_surah: hafalanProgress.last_surah,
+                  updated_at: new Date().toISOString()
+                });
+              if (upsertHafalanError) {
+                console.error(`Error upserting hafalan progress for student ${student.id} (${student.name}):`, upsertHafalanError);
+              }
+            }
+
+            if (tilawahEntries && tilawahEntries.length > 0 && !tilawahError) {
+              const { error: upsertTilawahError } = await supabase
+                .from('tilawah_progress')
+                .upsert({
+                  student_id: student.id,
+                  percentage: tilawahProgress.percentage,
+                  jilid: tilawahProgress.jilid,
+                  updated_at: new Date().toISOString()
+                });
+              if (upsertTilawahError) {
+                console.error(`Error upserting tilawah progress for student ${student.id} (${student.name}):`, upsertTilawahError);
+              }
+            }
+
+            return {
+              ...student,
+              hafalan_progress: hafalanProgress.percentage > 0 ? {
                 percentage: hafalanProgress.percentage,
-                last_surah: hafalanProgress.last_surah,
-                updated_at: new Date().toISOString()
-              });
-          }
-
-          if (tilawahEntries && tilawahEntries.length > 0) {
-            await supabase
-              .from('tilawah_progress')
-              .upsert({
-                student_id: student.id,
+                last_surah: hafalanProgress.last_surah
+              } : null,
+              tilawah_progress: tilawahProgress.percentage > 0 ? {
                 percentage: tilawahProgress.percentage,
-                jilid: tilawahProgress.jilid,
-                updated_at: new Date().toISOString()
-              });
+                jilid: tilawahProgress.jilid
+              } : null
+            };
+          } catch (error) {
+            console.error(`Failed to process or update progress for student ${student.id} (${student.name}):`, error);
+            // Return the original student object if an error occurs during processing
+            // This ensures the student still appears in the list.
+            // Add null progress fields to satisfy the Student type
+            return { 
+              ...student,
+              hafalan_progress: null,
+              tilawah_progress: null
+            };
           }
-
-          return {
-            ...student,
-            hafalan_progress: hafalanProgress.percentage > 0 ? {
-              percentage: hafalanProgress.percentage,
-              last_surah: hafalanProgress.last_surah
-            } : null,
-            tilawah_progress: tilawahProgress.percentage > 0 ? {
-              percentage: tilawahProgress.percentage,
-              jilid: tilawahProgress.jilid
-            } : null
-          };
         })
       );
 
-      setStudents(studentsWithProgress);
+      setStudents(studentsWithProgress as Student[]); // Explicitly cast to Student[]
       
       // Calculate stats
       const totalStudents = studentsWithProgress.length;
