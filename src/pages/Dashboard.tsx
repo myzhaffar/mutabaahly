@@ -9,6 +9,7 @@ import StudentsGrid from '@/components/dashboard/StudentsGrid';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
+import TeacherLayout from '@/components/layouts/TeacherLayout';
 
 interface Student {
   id: string;
@@ -34,12 +35,12 @@ interface FilterState {
 }
 
 const Dashboard = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [students, setStudents] = useState<Student[]>([]);
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<FilterState>({
     grades: [],
@@ -56,8 +57,10 @@ const Dashboard = () => {
   useEffect(() => {
     if (user && profile) {
       fetchStudents();
+    } else if (!authLoading && !user) {
+      navigate('/auth');
     }
-  }, [user, profile]);
+  }, [user, profile, authLoading, navigate]);
 
   const fetchStudents = async () => {
     try {
@@ -179,7 +182,7 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error in fetchStudents:', error);
     } finally {
-      setLoading(false);
+      setDataLoading(false);
     }
   };
 
@@ -242,43 +245,31 @@ const Dashboard = () => {
     fetchStudents();
   };
 
-  if (loading) {
+  if (authLoading || dataLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <div className="flex items-center justify-center h-96">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-islamic-500"></div>
-        </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-islamic-500"></div>
       </div>
     );
   }
 
   const { grades, classes, teachers } = getFilterOptions();
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      
-      <div className="container mx-auto px-6 py-8">
-        {/* Header */}
+  if (profile?.role === 'teacher') {
+    return (
+      <TeacherLayout>
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Welcome back, {profile?.full_name}
             </h1>
-            <p className="text-gray-600">
-              {profile?.role === 'teacher' ? 'Teacher Dashboard' : 'Parent Dashboard'}
-            </p>
+            <p className="text-gray-600">Teacher Dashboard</p>
           </div>
-          {profile?.role === 'teacher' && (
-            <AddStudentDialog onStudentAdded={handleStudentAdded} />
-          )}
+          <AddStudentDialog onStudentAdded={handleStudentAdded} />
         </div>
 
-        {/* Stats Cards */}
         <StatsCards stats={stats} />
 
-        {/* Search and Filter Section */}
         <div className="mb-6">
           <SearchAndFilter
             onSearchChange={handleSearchChange}
@@ -290,7 +281,6 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Students Section */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Students Overview</h2>
@@ -306,6 +296,43 @@ const Dashboard = () => {
             filteredStudents={filteredStudents}
             onViewDetails={handleViewDetails}
             userRole={profile?.role || 'teacher'}
+          />
+        </div>
+      </TeacherLayout>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navigation />
+      
+      <div className="container mx-auto px-6 py-8">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Welcome back, {profile?.full_name}
+            </h1>
+            <p className="text-gray-600">Parent Dashboard</p>
+          </div>
+        </div>
+
+        <StatsCards stats={stats} />
+
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">My Children&apos;s Overview</h2>
+             {filteredStudents.length !== students.length && (
+              <span className="text-sm text-gray-600">
+                Showing {filteredStudents.length} of {students.length} students
+              </span>
+            )}
+          </div>
+          
+          <StudentsGrid
+            students={students}
+            filteredStudents={filteredStudents}
+            onViewDetails={handleViewDetails}
+            userRole={profile?.role || 'parent'}
           />
         </div>
       </div>

@@ -10,9 +10,11 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import StudentDetails from "./pages/StudentDetails";
+import TeacherTestManagement from "./pages/TeacherTestManagement";
+import ParentTestView from "./pages/ParentTestView";
+import StudentManagement from "./pages/StudentManagement";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
-import AppRoutes from '@/routes';
 
 const queryClient = new QueryClient();
 
@@ -24,7 +26,7 @@ const App: React.FC = () => {
             <AuthProvider>
               <Toaster />
               <Sonner />
-            <Router>
+              <Router>
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
@@ -44,10 +46,34 @@ const App: React.FC = () => {
                       </ProtectedRoute>
                     } 
                   />
+                  <Route 
+                    path="/students" 
+                    element={
+                      <ProtectedRoute requiredRole="teacher">
+                        <StudentManagement />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/tests/manage" 
+                    element={
+                      <ProtectedRoute requiredRole="teacher">
+                        <TeacherTestManagement />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/tests/view" 
+                    element={
+                      <ProtectedRoute requiredRole="parent">
+                        <ParentTestView />
+                      </ProtectedRoute>
+                    } 
+                  />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
-            </Router>
+              </Router>
             </AuthProvider>
           </LanguageProvider>
       </TooltipProvider>

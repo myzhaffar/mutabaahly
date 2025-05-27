@@ -41,6 +41,18 @@ const Navigation = () => {
           <div className="flex items-center space-x-4">
             {user ? (
               <>
+                {/* Parent-specific "Tes Level" Link */}
+                {profile?.role === 'parent' && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate('/tests/view')}
+                    className="font-sf-text text-islamic-700 hover:bg-islamic-50"
+                  >
+                    Tes Level Anak
+                  </Button>
+                )}
+
                 {/* User Info */}
                 <div className="hidden md:flex items-center space-x-2 text-sm text-muted-foreground">
                   <span>{profile?.full_name}</span>
