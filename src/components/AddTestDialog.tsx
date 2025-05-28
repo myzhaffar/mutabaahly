@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -105,7 +104,7 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
       return;
     }
 
-    // Create the test data object that matches the expected database schema
+    // Create the test data object that matches the database schema
     const testData = {
       student_id: studentId,
       class_name: className,
@@ -115,6 +114,8 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
       status,
       notes: notes || null,
     };
+
+    console.log('Submitting test data:', testData);
 
     try {
       let result;
@@ -146,6 +147,8 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
         }
         result = data;
       }
+      
+      console.log('Database result:', result);
       
       if (result) {
         // Transform the result to match our TilawatiTest interface

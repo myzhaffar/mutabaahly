@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
@@ -49,6 +48,7 @@ const ParentTestView: React.FC = () => {
   const { data: tests, isLoading } = useQuery({
     queryKey: ['parent-tests', filters],
     queryFn: async () => {
+      console.log('Fetching tests with filters:', filters);
       let query = supabase
         .from('tilawati_level_tests')
         .select('*');
@@ -70,6 +70,8 @@ const ParentTestView: React.FC = () => {
         console.error('Error fetching tests:', error);
         throw error;
       }
+
+      console.log('Raw test data from database:', data);
 
       // Transform the data to match our TilawatiTest interface
       return (data || []).map(test => ({
