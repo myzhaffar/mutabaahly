@@ -1,30 +1,16 @@
 
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { format } from 'date-fns';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { useToast } from '@/components/ui/use-toast';
 import AddTestDialog from '@/components/AddTestDialog';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
+import TestFilters from '@/components/test-management/TestFilters';
+import TestTable from '@/components/test-management/TestTable';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { fetchTestsWithFilters } from '@/utils/testQueries';
 import type { TilawatiTest, TestStatus, TilawatiJilid, StudentForTest } from '@/types/tilawati';
 
 interface TestFilters {
@@ -33,15 +19,6 @@ interface TestFilters {
   jilidLevel?: TilawatiJilid | 'all';
   date?: string;
 }
-
-const JILID_OPTIONS: TilawatiJilid[] = [
-  "Jilid 1", "Jilid 2", "Jilid 3", "Jilid 4", "Jilid 5", "Jilid 6",
-  "Ghorib", "Tajwid", "Al-Quran", "Evaluasi"
-];
-
-const STATUS_OPTIONS: TestStatus[] = [
-  'scheduled', 'passed', 'failed', 'pending_retake', 'cancelled'
-];
 
 const TeacherTestManagement: React.FC = () => {
   const { profile } = useAuth();
@@ -77,61 +54,10 @@ const TeacherTestManagement: React.FC = () => {
     enabled: !!profile?.id,
   });
 
-  // Fetch tests with filters using raw SQL to bypass type issues
+  // Fetch tests with filters
   const { data: tests, isLoading, refetch } = useQuery({
     queryKey: ['tilawati-tests', filters],
-    queryFn: async () => {
-      console.log('Fetching tests with filters:', filters);
-      
-      let sql = 'SELECT * FROM tilawati_level_tests WHERE 1=1';
-      const params: any[] = [];
-      let paramIndex = 1;
-
-      // Apply filters
-      if (filters.status && filters.status !== 'all') {
-        sql += ` AND status = $${paramIndex}`;
-        params.push(filters.status);
-        paramIndex++;
-      }
-      if (filters.date) {
-        sql += ` AND date = $${paramIndex}`;
-        params.push(filters.date);
-        paramIndex++;
-      }
-      if (filters.jilidLevel && filters.jilidLevel !== 'all') {
-        sql += ` AND tilawati_level = $${paramIndex}`;
-        params.push(filters.jilidLevel);
-        paramIndex++;
-      }
-
-      sql += ' ORDER BY created_at DESC';
-
-      const { data, error } = await supabase.rpc('execute_sql', {
-        sql,
-        params
-      });
-
-      if (error) {
-        console.error('Error fetching tests:', error);
-        throw error;
-      }
-
-      console.log('Raw test data from database:', data);
-
-      // Transform the data to match our TilawatiTest interface
-      return (data || []).map((test: any) => ({
-        id: test.id,
-        date: test.date,
-        student_id: test.student_id,
-        class_name: test.class_name,
-        tilawati_level: test.tilawati_level as TilawatiJilid,
-        status: test.status as TestStatus,
-        munaqisy: test.munaqisy,
-        notes: test.notes,
-        created_at: test.created_at || new Date().toISOString(),
-        updated_at: test.updated_at || new Date().toISOString(),
-      })) as TilawatiTest[];
-    },
+    queryFn: () => fetchTestsWithFilters(filters),
     enabled: !!profile?.id,
   });
 
@@ -163,7 +89,7 @@ const TeacherTestManagement: React.FC = () => {
     });
   };
 
-  const handleFilterChange = (key: keyof TestFilters, value: string | undefined) => {
+  const handleFilterChange = (key: string, value: string | undefined) => {
     setFilters(prev => ({
       ...prev,
       [key]: value === 'all' ? undefined : value,
@@ -174,6 +100,11 @@ const TeacherTestManagement: React.FC = () => {
   const getStudentName = (studentId: string) => {
     const student = students?.find(s => s.id === studentId);
     return student?.name || 'Unknown Student';
+  };
+
+  const handleEditTest = (test: TilawatiTest) => {
+    setSelectedTest(test);
+    setIsAddDialogOpen(true);
   };
 
   return (
@@ -187,117 +118,22 @@ const TeacherTestManagement: React.FC = () => {
           </Button>
         </div>
 
-        {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Input
-            placeholder="Cari nama siswa..."
-            value={filters.searchTerm || ''}
-            onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
-          />
-          <Select
-            value={filters.status || undefined}
-            onValueChange={(value) => handleFilterChange('status', value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Filter Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Status</SelectItem>
-              {STATUS_OPTIONS.map((status) => (
-                <SelectItem key={status} value={status}>
-                  {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select
-            value={filters.jilidLevel || undefined}
-            onValueChange={(value) => handleFilterChange('jilidLevel', value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Filter Jilid" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Jilid</SelectItem>
-              {JILID_OPTIONS.map((jilid) => (
-                <SelectItem key={jilid} value={jilid}>{jilid}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Input
-            type="date"
-            value={filters.date || ''}
-            onChange={(e) => handleFilterChange('date', e.target.value)}
-            placeholder="Filter Tanggal"
-          />
-        </div>
+        <TestFilters
+          searchTerm={filters.searchTerm}
+          status={filters.status}
+          jilidLevel={filters.jilidLevel}
+          date={filters.date}
+          onFilterChange={handleFilterChange}
+          showDateFilter={true}
+        />
 
-        {/* Tests Table */}
-        <div className="rounded-md border overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="whitespace-nowrap">Tanggal</TableHead>
-                <TableHead className="whitespace-nowrap">Nama Siswa</TableHead>
-                <TableHead className="whitespace-nowrap">Kelas</TableHead>
-                <TableHead className="whitespace-nowrap">Level Tilawati</TableHead>
-                <TableHead className="whitespace-nowrap">Munaqisy</TableHead>
-                <TableHead className="whitespace-nowrap">Status</TableHead>
-                <TableHead className="whitespace-nowrap">Catatan</TableHead>
-                <TableHead className="text-right whitespace-nowrap">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center">
-                    Loading...
-                  </TableCell>
-                </TableRow>
-              ) : tests?.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center">
-                    Tidak ada data tes yang ditemukan.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                tests?.map((test) => (
-                  <TableRow key={test.id}>
-                    <TableCell className="whitespace-nowrap">{format(new Date(test.date), 'dd/MM/yyyy')}</TableCell>
-                    <TableCell className="whitespace-nowrap">{getStudentName(test.student_id)}</TableCell>
-                    <TableCell className="whitespace-nowrap">{test.class_name || '-'}</TableCell>
-                    <TableCell className="whitespace-nowrap">{test.tilawati_level}</TableCell>
-                    <TableCell className="whitespace-nowrap">{test.munaqisy}</TableCell>
-                    <TableCell className="whitespace-nowrap">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        test.status === 'passed' ? 'bg-green-100 text-green-800' :
-                        test.status === 'failed' ? 'bg-red-100 text-red-800' :
-                        test.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
-                        test.status === 'pending_retake' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {test.status.charAt(0).toUpperCase() + test.status.slice(1).replace('_', ' ')}
-                      </span>
-                    </TableCell>
-                    <TableCell className="max-w-xs truncate">{test.notes || '-'}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedTest(test);
-                          setIsAddDialogOpen(true);
-                        }}
-                      >
-                        Edit
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+        <TestTable
+          tests={tests || []}
+          isLoading={isLoading}
+          onEditTest={handleEditTest}
+          showStudentName={true}
+          getStudentName={getStudentName}
+        />
 
         {/* Add/Edit Test Dialog */}
         {isAddDialogOpen && (

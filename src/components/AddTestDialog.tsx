@@ -22,8 +22,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { saveTest } from '@/utils/testQueries';
 import type { StudentForTest, TilawatiTest, TilawatiJilid, TestStatus } from '@/types/tilawati';
 
 interface AddTestDialogProps {
@@ -105,75 +105,20 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
       return;
     }
 
-    // Create the test data object using raw SQL approach to bypass type issues
-    console.log('Submitting test data:', {
-      student_id: studentId,
-      class_name: className,
-      tilawati_level: tilawatiLevel,
-      date: testDate,
-      munaqisy,
-      status,
-      notes: notes || null,
-    });
-
     try {
-      let result;
-      if (currentTest?.id) {
-        // Update existing test using raw SQL to bypass type issues
-        const { data, error: updateError } = await supabase.rpc('execute_sql', {
-          sql: `
-            UPDATE tilawati_level_tests 
-            SET student_id = $1, class_name = $2, tilawati_level = $3, date = $4, 
-                munaqisy = $5, status = $6, notes = $7, updated_at = NOW()
-            WHERE id = $8
-            RETURNING *
-          `,
-          params: [studentId, className, tilawatiLevel, testDate, munaqisy, status, notes, currentTest.id]
-        });
+      const testData = {
+        student_id: studentId,
+        class_name: className,
+        tilawati_level: tilawatiLevel as TilawatiJilid,
+        date: testDate,
+        munaqisy,
+        status,
+        notes: notes || '',
+      };
 
-        if (updateError) {
-          console.error('Update error:', updateError);
-          throw updateError;
-        }
-        result = data?.[0];
-      } else {
-        // Create new test using raw SQL to bypass type issues
-        const { data, error: insertError } = await supabase.rpc('execute_sql', {
-          sql: `
-            INSERT INTO tilawati_level_tests (student_id, class_name, tilawati_level, date, munaqisy, status, notes)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
-            RETURNING *
-          `,
-          params: [studentId, className, tilawatiLevel, testDate, munaqisy, status, notes]
-        });
-
-        if (insertError) {
-          console.error('Insert error:', insertError);
-          throw insertError;
-        }
-        result = data?.[0];
-      }
-      
-      console.log('Database result:', result);
-      
-      if (result) {
-        // Transform the result to match our TilawatiTest interface
-        const transformedResult: TilawatiTest = {
-          id: result.id,
-          date: result.date,
-          student_id: result.student_id,
-          class_name: result.class_name,
-          tilawati_level: result.tilawati_level as TilawatiJilid,
-          status: result.status as TestStatus,
-          munaqisy: result.munaqisy,
-          notes: result.notes,
-          created_at: result.created_at || new Date().toISOString(),
-          updated_at: result.updated_at || new Date().toISOString(),
-        };
-        
-        onTestAddedOrUpdated(transformedResult);
-        onClose();
-      }
+      const result = await saveTest(testData, currentTest?.id);
+      onTestAddedOrUpdated(result);
+      onClose();
     } catch (error) {
       console.error("Error saving test:", error);
       setError(error instanceof Error ? error.message : "An unexpected error occurred.");

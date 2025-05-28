@@ -1,30 +1,13 @@
 
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { format } from 'date-fns';
-import { Calendar, BookOpen, User, Clock } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import ParentLayout from '@/components/layouts/ParentLayout';
-import { supabase } from '@/integrations/supabase/client';
+import TestStatsCards from '@/components/test-management/TestStatsCards';
+import TestFilters from '@/components/test-management/TestFilters';
+import TestTable from '@/components/test-management/TestTable';
+import { fetchTestsWithFilters } from '@/utils/testQueries';
 import { useAuth } from '@/contexts/AuthContext';
-import type { TilawatiTest, TestStatus, TilawatiJilid } from '@/types/tilawati';
+import type { TestStatus, TilawatiJilid } from '@/types/tilawati';
 
 interface TestFilters {
   status?: TestStatus | 'all';
@@ -32,79 +15,18 @@ interface TestFilters {
   jilidLevel?: TilawatiJilid | 'all';
 }
 
-const JILID_OPTIONS: TilawatiJilid[] = [
-  "Jilid 1", "Jilid 2", "Jilid 3", "Jilid 4", "Jilid 5", "Jilid 6",
-  "Ghorib", "Tajwid", "Al-Quran", "Evaluasi"
-];
-
-const STATUS_OPTIONS: TestStatus[] = [
-  'scheduled', 'passed', 'failed', 'pending_retake', 'cancelled'
-];
-
 const ParentTestView: React.FC = () => {
   const { profile } = useAuth();
   const [filters, setFilters] = useState<TestFilters>({});
 
-  // Fetch children's tests using raw query to bypass type issues
+  // Fetch children's tests
   const { data: tests, isLoading } = useQuery({
     queryKey: ['parent-tests', filters],
-    queryFn: async () => {
-      console.log('Fetching tests with filters:', filters);
-      
-      // Use raw SQL query to bypass type issues
-      let sql = 'SELECT * FROM tilawati_level_tests WHERE 1=1';
-      const params: any[] = [];
-      let paramIndex = 1;
-
-      // Apply filters
-      if (filters.status && filters.status !== 'all') {
-        sql += ` AND status = $${paramIndex}`;
-        params.push(filters.status);
-        paramIndex++;
-      }
-      if (filters.jilidLevel && filters.jilidLevel !== 'all') {
-        sql += ` AND tilawati_level = $${paramIndex}`;
-        params.push(filters.jilidLevel);
-        paramIndex++;
-      }
-      if (filters.searchTerm) {
-        sql += ` AND class_name ILIKE $${paramIndex}`;
-        params.push(`%${filters.searchTerm}%`);
-        paramIndex++;
-      }
-
-      sql += ' ORDER BY created_at DESC';
-
-      const { data, error } = await supabase.rpc('execute_sql', {
-        sql,
-        params
-      });
-
-      if (error) {
-        console.error('Error fetching tests:', error);
-        throw error;
-      }
-
-      console.log('Raw test data from database:', data);
-
-      // Transform the data to match our TilawatiTest interface
-      return (data || []).map((test: any) => ({
-        id: test.id,
-        date: test.date,
-        student_id: test.student_id,
-        class_name: test.class_name,
-        tilawati_level: test.tilawati_level as TilawatiJilid,
-        status: test.status as TestStatus,
-        munaqisy: test.munaqisy,
-        notes: test.notes,
-        created_at: test.created_at || new Date().toISOString(),
-        updated_at: test.updated_at || new Date().toISOString(),
-      })) as TilawatiTest[];
-    },
+    queryFn: () => fetchTestsWithFilters(filters),
     enabled: !!profile?.id,
   });
 
-  const handleFilterChange = (key: keyof TestFilters, value: string | undefined) => {
+  const handleFilterChange = (key: string, value: string | undefined) => {
     setFilters(prev => ({
       ...prev,
       [key]: value === 'all' ? undefined : value,
@@ -123,22 +45,6 @@ const ParentTestView: React.FC = () => {
     };
   }, [tests]);
 
-  const getStatusBadge = (status: TestStatus) => {
-    const variants = {
-      scheduled: 'bg-blue-100 text-blue-800',
-      passed: 'bg-green-100 text-green-800',
-      failed: 'bg-red-100 text-red-800',
-      pending_retake: 'bg-yellow-100 text-yellow-800',
-      cancelled: 'bg-gray-100 text-gray-800'
-    };
-    
-    return (
-      <Badge className={variants[status]}>
-        {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
-      </Badge>
-    );
-  };
-
   return (
     <ParentLayout>
       <div className="space-y-6">
@@ -146,133 +52,19 @@ const ParentTestView: React.FC = () => {
           <h1 className="text-xl lg:text-2xl font-bold">Tes Kenaikan Level Anak</h1>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs lg:text-sm font-medium">Total Tes</CardTitle>
-              <BookOpen className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-lg lg:text-2xl font-bold">{stats.total}</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs lg:text-sm font-medium">Lulus</CardTitle>
-              <User className="h-4 w-4 text-green-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-lg lg:text-2xl font-bold text-green-600">{stats.passed}</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs lg:text-sm font-medium">Terjadwal</CardTitle>
-              <Clock className="h-4 w-4 text-blue-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-lg lg:text-2xl font-bold text-blue-600">{stats.scheduled}</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs lg:text-sm font-medium">Belum Lulus</CardTitle>
-              <Calendar className="h-4 w-4 text-red-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-lg lg:text-2xl font-bold text-red-600">{stats.failed}</div>
-            </CardContent>
-          </Card>
-        </div>
+        <TestStatsCards stats={stats} />
 
-        {/* Filters */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <Input
-            placeholder="Cari nama kelas..."
-            value={filters.searchTerm || ''}
-            onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
-          />
-          <Select
-            value={filters.status || undefined}
-            onValueChange={(value) => handleFilterChange('status', value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Filter Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Status</SelectItem>
-              {STATUS_OPTIONS.map((status) => (
-                <SelectItem key={status} value={status}>
-                  {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select
-            value={filters.jilidLevel || undefined}
-            onValueChange={(value) => handleFilterChange('jilidLevel', value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Filter Jilid" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Jilid</SelectItem>
-              {JILID_OPTIONS.map((jilid) => (
-                <SelectItem key={jilid} value={jilid}>{jilid}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <TestFilters
+          searchTerm={filters.searchTerm}
+          status={filters.status}
+          jilidLevel={filters.jilidLevel}
+          onFilterChange={handleFilterChange}
+        />
 
-        {/* Tests Table */}
-        <Card>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="whitespace-nowrap">Tanggal</TableHead>
-                    <TableHead className="whitespace-nowrap">Kelas</TableHead>
-                    <TableHead className="whitespace-nowrap">Level Tilawati</TableHead>
-                    <TableHead className="whitespace-nowrap">Munaqisy</TableHead>
-                    <TableHead className="whitespace-nowrap">Status</TableHead>
-                    <TableHead className="whitespace-nowrap">Catatan</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoading ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center">
-                        Loading...
-                      </TableCell>
-                    </TableRow>
-                  ) : tests?.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center">
-                        Tidak ada data tes yang ditemukan.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    tests?.map((test) => (
-                      <TableRow key={test.id}>
-                        <TableCell className="whitespace-nowrap">{format(new Date(test.date), 'dd/MM/yyyy')}</TableCell>
-                        <TableCell>{test.class_name || '-'}</TableCell>
-                        <TableCell>{test.tilawati_level}</TableCell>
-                        <TableCell>{test.munaqisy}</TableCell>
-                        <TableCell>{getStatusBadge(test.status)}</TableCell>
-                        <TableCell className="max-w-xs truncate">{test.notes || '-'}</TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+        <TestTable
+          tests={tests || []}
+          isLoading={isLoading}
+        />
       </div>
     </ParentLayout>
   );
