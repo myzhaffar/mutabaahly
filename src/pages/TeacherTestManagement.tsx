@@ -26,7 +26,6 @@ import TeacherLayout from '@/components/layouts/TeacherLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import type { TilawatiTest, TestStatus, TilawatiJilid, StudentForTest } from '@/types/tilawati';
-import { Database } from '@/types/database';
 
 interface TestFilters {
   status?: TestStatus | 'all';
@@ -63,16 +62,10 @@ const TeacherTestManagement: React.FC = () => {
         .select(`
           id,
           name,
-          current_tilawati_jilid,
-          class_id,
-          class:class_id (
-            name
-          )
+          group_name,
+          teacher
         `)
-        .or(`teacher_id.eq.${profile.id},class_id.in.(select class_id from class_teachers where teacher_id = ${profile.id})`)
-        .returns<(Database['public']['Tables']['students']['Row'] & {
-          class: { name: string } | null;
-        })[]>();
+        .eq('teacher', profile.full_name);
 
       if (error) {
         console.error('Error fetching students:', error);
@@ -83,18 +76,11 @@ const TeacherTestManagement: React.FC = () => {
       return (data || []).map(student => ({
         id: student.id,
         name: student.name,
-        current_tilawati_jilid: student.current_tilawati_jilid,
-        class_name: student.class?.name || '',
-        class_id: student.class_id
+        class_name: student.group_name || '',
       }));
     },
     enabled: !!profile?.id,
   });
-
-  // Log students data when it changes
-  useEffect(() => {
-    console.log('Students data updated:', students);
-  }, [students]);
 
   // Fetch tests with filters
   const { data: tests, isLoading, refetch } = useQuery({
@@ -106,17 +92,11 @@ const TeacherTestManagement: React.FC = () => {
           id,
           date,
           student_id,
-          class_id,
+          class_name,
           tilawati_level,
           status,
           munaqisy,
-          notes,
-          student:student_id (
-            name
-          ),
-          class:class_id (
-            name
-          )
+          notes
         `);
 
       // Apply filters
@@ -124,15 +104,10 @@ const TeacherTestManagement: React.FC = () => {
         query = query.eq('status', filters.status);
       }
       if (filters.date) {
-        query = query
-          .gte('date', `${filters.date}T00:00:00`)
-          .lte('date', `${filters.date}T23:59:59`);
+        query = query.eq('date', filters.date);
       }
       if (filters.jilidLevel && filters.jilidLevel !== 'all') {
         query = query.eq('tilawati_level', filters.jilidLevel);
-      }
-      if (filters.searchTerm) {
-        query = query.textSearch('student.name', filters.searchTerm);
       }
 
       const { data, error } = await query.order('date', { ascending: true });
@@ -151,32 +126,22 @@ const TeacherTestManagement: React.FC = () => {
   const { data: studentsForTest } = useQuery({
     queryKey: ['students-for-test'],
     queryFn: async () => {
-      type StudentWithClass = Database['public']['Tables']['students']['Row'] & {
-        class: { name: string } | null;
-      };
-
       const { data: students, error } = await supabase
         .from('students')
         .select(`
           id,
           name,
-          current_tilawati_jilid,
-          class_id,
-          class:class_id (
-            name
-          )
+          group_name,
+          teacher
         `)
-        .order('name')
-        .returns<StudentWithClass[]>();
+        .order('name');
 
       if (error) throw error;
 
       return (students || []).map(student => ({
         id: student.id,
         name: student.name,
-        current_tilawati_jilid: student.current_tilawati_jilid,
-        class_name: student.class?.name || '',
-        class_id: student.class_id
+        class_name: student.group_name || '',
       })) as StudentForTest[];
     },
     enabled: !!profile?.id,
@@ -285,8 +250,8 @@ const TeacherTestManagement: React.FC = () => {
                 tests?.map((test) => (
                   <TableRow key={test.id}>
                     <TableCell>{format(new Date(test.date), 'dd/MM/yyyy')}</TableCell>
-                    <TableCell>{test.student?.name}</TableCell>
-                    <TableCell>{test.class?.name || '-'}</TableCell>
+                    <TableCell>{test.student_id}</TableCell>
+                    <TableCell>{test.class_name || '-'}</TableCell>
                     <TableCell>{test.tilawati_level}</TableCell>
                     <TableCell>{test.munaqisy}</TableCell>
                     <TableCell>
@@ -325,12 +290,12 @@ const TeacherTestManagement: React.FC = () => {
             isOpen={isAddDialogOpen}
             onClose={() => {
               setIsAddDialogOpen(false);
-              setSelectedTest(undefined);
+              setSelectedTest(null);
             }}
             onTestAddedOrUpdated={(test) => {
               refetch();
               setIsAddDialogOpen(false);
-              setSelectedTest(undefined);
+              setSelectedTest(null);
             }}
             currentTest={selectedTest}
             students={studentsForTest || []}

@@ -25,10 +25,7 @@ export interface TilawatiTest {
   student?: {
     name: string;
   };
-  class_id?: string;
-  class?: {
-    name: string;
-  };
+  class_name: string;
   tilawati_level: TilawatiJilid;
   status: TestStatus;
   munaqisy: string;

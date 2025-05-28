@@ -72,7 +72,6 @@ const ParentTestView: React.FC = () => {
         query = query.eq('tilawati_level', filters.jilidLevel);
       }
       if (filters.searchTerm) {
-        // Note: We'll need to join with students table for name search
         query = query.ilike('class_name', `%${filters.searchTerm}%`);
       }
 

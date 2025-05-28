@@ -62,7 +62,6 @@ const StudentsGrid: React.FC<StudentsGridProps> = ({
           student={{
             id: student.id,
             name: student.name,
-            grade: student.grade || 'N/A',
             class: student.group_name,
             studyGroup: student.teacher,
             memorization: {

@@ -84,7 +84,7 @@ const TestResultsTable: React.FC<TestResultsTableProps> = ({
               <TableCell className="font-medium px-4 py-3 text-sm text-gray-800 whitespace-nowrap">
                 {test.student?.name || test.student_id} 
               </TableCell>
-              <TableCell className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">{test.class?.name || '-'}</TableCell>
+              <TableCell className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">{test.class_name || '-'}</TableCell>
               <TableCell className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">{test.tilawati_level}</TableCell>
               <TableCell className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">{formatDate(test.date)}</TableCell>
               <TableCell className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">{test.munaqisy || '-'}</TableCell>
@@ -128,4 +128,4 @@ const TestResultsTable: React.FC<TestResultsTableProps> = ({
   );
 };
 
-export default TestResultsTable; 
+export default TestResultsTable;

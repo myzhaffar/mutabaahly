@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
@@ -15,7 +16,13 @@ import { useToast } from '@/components/ui/use-toast';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import type { StudentForTest, TilawatiJilid } from '@/types/tilawati';
+
+interface Student {
+  id: string;
+  name: string;
+  group_name: string;
+  teacher: string;
+}
 
 const StudentManagement: React.FC = () => {
   const { profile } = useAuth();
@@ -31,22 +38,19 @@ const StudentManagement: React.FC = () => {
       const { data, error } = await supabase
         .from('students')
         .select(`
-          *,
-          classes:class_id (
-            name
-          )
+          id,
+          name,
+          group_name,
+          teacher
         `)
-        .or(`teacher_id.eq.${profile.id},class_id.in.(select class_id from class_teachers where teacher_id = ${profile.id})`);
+        .eq('teacher', profile.full_name);
 
       if (error) {
         console.error('Error fetching students:', error);
         throw error;
       }
 
-      return (data || []).map(student => ({
-        ...student,
-        class_name: student.classes?.name || '-'
-      })) as StudentForTest[];
+      return data as Student[];
     },
     enabled: !!profile?.id,
   });
@@ -89,7 +93,7 @@ const StudentManagement: React.FC = () => {
               <TableRow>
                 <TableHead>Nama Siswa</TableHead>
                 <TableHead>Kelas</TableHead>
-                <TableHead>Jilid Saat Ini</TableHead>
+                <TableHead>Guru</TableHead>
                 <TableHead className="text-right">Aksi</TableHead>
               </TableRow>
             </TableHeader>
@@ -110,8 +114,8 @@ const StudentManagement: React.FC = () => {
                 filteredStudents?.map((student) => (
                   <TableRow key={student.id}>
                     <TableCell>{student.name}</TableCell>
-                    <TableCell>{student.class_name || '-'}</TableCell>
-                    <TableCell>{student.current_tilawati_jilid || '-'}</TableCell>
+                    <TableCell>{student.group_name || '-'}</TableCell>
+                    <TableCell>{student.teacher || '-'}</TableCell>
                     <TableCell className="text-right">
                       <Button
                         variant="ghost"
@@ -137,4 +141,4 @@ const StudentManagement: React.FC = () => {
   );
 };
 
-export default StudentManagement; 
+export default StudentManagement;
