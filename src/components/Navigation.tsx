@@ -1,12 +1,14 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+"use client";
 
-const Navigation = () => {
-  const { language, setLanguage, t } = useLanguage();
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+
+const Navigation: React.FC = () => {
   const { user, profile, signOut } = useAuth();
+  const { t, toggleLanguage, language } = useLanguage();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -14,82 +16,70 @@ const Navigation = () => {
     navigate('/');
   };
 
-  const handleLogoClick = () => {
-    if (user) {
-      navigate('/dashboard');
-    } else {
-      navigate('/');
-    }
-  };
-
   return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div 
-            className="flex items-center space-x-2 cursor-pointer" 
-            onClick={handleLogoClick}
-          >
-            <div className="w-8 h-8 bg-gradient-to-br from-islamic-500 to-accent-500 rounded-lg flex items-center justify-center">
+    <nav className="bg-white border-b border-islamic-200 px-6 py-4 shadow-sm">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Link to={profile?.role === 'teacher' ? '/dashboard' : '/'} className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-islamic-600 to-accent-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">Q</span>
             </div>
             <span className="font-sf-pro font-semibold text-xl text-islamic-700">
-              Al-Quran Progress
+              {t('home.title')}
             </span>
-          </div>
+          </Link>
           
-          <div className="flex items-center space-x-4">
-            {user ? (
-              <>
-                {/* Parent-specific "Tes Level" Link */}
-                {profile?.role === 'parent' && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => navigate('/tests/view')}
-                    className="font-sf-text text-islamic-700 hover:bg-islamic-50"
-                  >
-                    Tes Level Anak
-                  </Button>
-                )}
-
-                {/* User Info */}
-                <div className="hidden md:flex items-center space-x-2 text-sm text-muted-foreground">
-                  <span>{profile?.full_name}</span>
-                  <span className="text-accent-600">({profile?.role})</span>
-                </div>
-
-                {/* Sign Out Button */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSignOut}
-                  className="font-sf-text border-islamic-200 hover:bg-islamic-50 text-islamic-700"
-                >
-                  Sign Out
-                </Button>
-              </>
-            ) : (
+          {/* Parent Navigation Items */}
+          {profile?.role === 'parent' && (
+            <div className="hidden md:flex space-x-6 ml-8">
+              <Link
+                to="/"
+                className="text-islamic-600 hover:text-islamic-800 font-medium transition-colors"
+              >
+                Home
+              </Link>
+              <Link
+                to="/tests/view"
+                className="text-islamic-600 hover:text-islamic-800 font-medium transition-colors"
+              >
+                Tes Level
+              </Link>
+            </div>
+          )}
+        </div>
+        
+        <div className="flex items-center space-x-4">
+          {user ? (
+            <>
+              <span className="text-islamic-700 font-medium">
+                {profile?.full_name}
+              </span>
               <Button
                 variant="outline"
-                size="sm"
-                onClick={() => navigate('/auth')}
+                onClick={handleSignOut}
                 className="font-sf-text border-islamic-200 hover:bg-islamic-50 text-islamic-700"
               >
-                Sign In
+                {t('nav.signOut')}
               </Button>
-            )}
-            
-            {/* Language Toggle */}
+            </>
+          ) : (
             <Button
               variant="outline"
-              size="sm"
-              onClick={() => setLanguage(language === 'en' ? 'id' : 'en')}
-              className="font-sf-text border-accent-200 hover:bg-accent-50 text-accent-700"
+              onClick={() => navigate('/auth')}
+              className="font-sf-text border-islamic-200 hover:bg-islamic-50 text-islamic-700"
             >
-              {language === 'en' ? 'ID' : 'EN'}
+              {t('nav.signIn')}
             </Button>
-          </div>
+          )}
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleLanguage}
+            className="font-sf-text text-islamic-600 hover:text-islamic-800"
+          >
+            {language === 'id' ? 'EN' : 'ID'}
+          </Button>
         </div>
       </div>
     </nav>

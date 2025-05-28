@@ -183,15 +183,70 @@ export type Database = {
           },
         ]
       }
+      tilawati_level_tests: {
+        Row: {
+          class_name: string
+          created_at: string | null
+          date: string
+          id: string
+          munaqisy: string
+          notes: string | null
+          status: Database["public"]["Enums"]["test_status"]
+          student_id: string
+          tilawati_level: string
+          updated_at: string | null
+        }
+        Insert: {
+          class_name: string
+          created_at?: string | null
+          date: string
+          id?: string
+          munaqisy: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["test_status"]
+          student_id: string
+          tilawati_level: string
+          updated_at?: string | null
+        }
+        Update: {
+          class_name?: string
+          created_at?: string | null
+          date?: string
+          id?: string
+          munaqisy?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["test_status"]
+          student_id?: string
+          tilawati_level?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tilawati_level_tests_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_schedule_tilawati_test: {
+        Args: { student_uuid: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      test_status:
+        | "scheduled"
+        | "passed"
+        | "failed"
+        | "pending_retake"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -306,6 +361,14 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      test_status: [
+        "scheduled",
+        "passed",
+        "failed",
+        "pending_retake",
+        "cancelled",
+      ],
+    },
   },
 } as const

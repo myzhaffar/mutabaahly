@@ -1,3 +1,4 @@
+
 // src/types/tilawati.ts
 
 // Student information relevant for test management and dialogs
@@ -54,4 +55,4 @@ export interface Student {
   };
   created_at: string;
   updated_at: string;
-} 
+}

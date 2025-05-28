@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Link, useLocation } from 'react-router-dom';
@@ -55,4 +56,4 @@ const TeacherSidebar = () => {
   );
 };
 
-export default TeacherSidebar; 
+export default TeacherSidebar;
