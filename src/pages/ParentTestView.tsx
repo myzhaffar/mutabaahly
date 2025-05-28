@@ -60,9 +60,8 @@ const ParentTestView: React.FC = () => {
           status,
           munaqisy,
           notes,
-          student:student_id (
-            name
-          )
+          created_at,
+          updated_at
         `);
 
       // Apply filters
@@ -73,7 +72,8 @@ const ParentTestView: React.FC = () => {
         query = query.eq('tilawati_level', filters.jilidLevel);
       }
       if (filters.searchTerm) {
-        query = query.textSearch('student.name', filters.searchTerm);
+        // Note: We'll need to join with students table for name search
+        query = query.ilike('class_name', `%${filters.searchTerm}%`);
       }
 
       const { data, error } = await query.order('date', { ascending: false });
@@ -176,7 +176,7 @@ const ParentTestView: React.FC = () => {
         {/* Filters */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Input
-            placeholder="Cari nama anak..."
+            placeholder="Cari nama kelas..."
             value={filters.searchTerm || ''}
             onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
           />
@@ -219,7 +219,6 @@ const ParentTestView: React.FC = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Tanggal</TableHead>
-                  <TableHead>Nama Anak</TableHead>
                   <TableHead>Kelas</TableHead>
                   <TableHead>Level Tilawati</TableHead>
                   <TableHead>Munaqisy</TableHead>
@@ -230,13 +229,13 @@ const ParentTestView: React.FC = () => {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center">
+                    <TableCell colSpan={6} className="text-center">
                       Loading...
                     </TableCell>
                   </TableRow>
                 ) : tests?.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center">
+                    <TableCell colSpan={6} className="text-center">
                       Tidak ada data tes yang ditemukan.
                     </TableCell>
                   </TableRow>
@@ -244,7 +243,6 @@ const ParentTestView: React.FC = () => {
                   tests?.map((test) => (
                     <TableRow key={test.id}>
                       <TableCell>{format(new Date(test.date), 'dd/MM/yyyy')}</TableCell>
-                      <TableCell className="font-medium">{test.student?.name}</TableCell>
                       <TableCell>{test.class_name || '-'}</TableCell>
                       <TableCell>{test.tilawati_level}</TableCell>
                       <TableCell>{test.munaqisy}</TableCell>

@@ -10,7 +10,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogClose,
-} from '@/components/ui/dialog'; // Assuming shadcn/ui dialog
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,12 +20,11 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'; // Assuming shadcn/ui select
-import { Textarea } from '@/components/ui/textarea'; // Assuming shadcn/ui textarea
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import type { StudentForTest, TilawatiTest, TilawatiJilid, TestStatus } from '@/types/tilawati';
-import { Database } from '@/types/database';
 
 interface AddTestDialogProps {
   isOpen: boolean;
@@ -53,6 +52,7 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
 }) => {
   const { profile } = useAuth();
   const [studentId, setStudentId] = useState('');
+  const [className, setClassName] = useState('');
   const [tilawatiLevel, setTilawatiLevel] = useState<TilawatiJilid | ''>('');
   const [testDate, setTestDate] = useState('');
   const [munaqisy, setMunaqisy] = useState(profile?.full_name || '');
@@ -64,6 +64,7 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
   useEffect(() => {
     if (currentTest) {
       setStudentId(currentTest.student_id);
+      setClassName(currentTest.class_name || '');
       setTilawatiLevel(currentTest.tilawati_level);
       setTestDate(currentTest.date ? new Date(currentTest.date).toISOString().substring(0, 10) : '');
       setMunaqisy(currentTest.munaqisy);
@@ -72,6 +73,7 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
     } else {
       // Reset form for new entry
       setStudentId('');
+      setClassName('');
       setTilawatiLevel('');
       setTestDate('');
       setMunaqisy(profile?.full_name || '');
@@ -80,16 +82,12 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
     }
   }, [currentTest, isOpen, profile?.full_name]);
 
-  // Log students prop when it changes
-  useEffect(() => {
-    console.log('AddTestDialog students prop:', students);
-  }, [students]);
-
   useEffect(() => {
     if (studentId && !currentTest) {
-      console.log('Selected student changed:', studentId);
       const selectedStudent = students.find(s => s.id === studentId);
-      console.log('Found student:', selectedStudent);
+      if (selectedStudent?.class_name) {
+        setClassName(selectedStudent.class_name);
+      }
       if (selectedStudent?.current_tilawati_jilid) {
         setTilawatiLevel(selectedStudent.current_tilawati_jilid);
       }
@@ -101,47 +99,20 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
     setIsLoading(true);
     setError(null);
 
-    if (!studentId || !tilawatiLevel || !testDate || !munaqisy) {
-      setError("Siswa, Level Tilawati, Tanggal Tes, dan Munaqisy harus diisi.");
+    if (!studentId || !tilawatiLevel || !testDate || !munaqisy || !className) {
+      setError("Semua field wajib harus diisi.");
       setIsLoading(false);
       return;
     }
 
-    // Get student's class_id
-    type StudentWithClass = Database['public']['Tables']['students']['Row'] & {
-      class: { name: string } | null;
-    };
-
-    type TilawatiTestWithRefs = Database['public']['Tables']['tilawati_level_tests']['Row'] & {
-      student: { name: string } | null;
-      class: { name: string } | null;
-    };
-
-    const { data: studentData, error: studentError } = await supabase
-      .from('students')
-      .select(`
-        id,
-        class_id
-      `)
-      .eq('id', studentId)
-      .single()
-      .returns<StudentWithClass>();
-
-    if (studentError) {
-      console.error("Error fetching student data:", studentError);
-      setError("Gagal mengambil data siswa.");
-      setIsLoading(false);
-      return;
-    }
-
-    const testData: Database['public']['Tables']['tilawati_level_tests']['Insert'] = {
+    const testData = {
       student_id: studentId,
+      class_name: className,
       tilawati_level: tilawatiLevel,
-      date: new Date(testDate).toISOString(),
+      date: testDate,
       munaqisy,
       status,
       notes: notes || null,
-      class_id: studentData?.class_id || null
     };
 
     try {
@@ -152,17 +123,8 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
           .from('tilawati_level_tests')
           .update(testData)
           .eq('id', currentTest.id)
-          .select(`
-            *,
-            student:student_id (
-              name
-            ),
-            class:class_id (
-              name
-            )
-          `)
-          .single()
-          .returns<TilawatiTestWithRefs>();
+          .select('*')
+          .single();
 
         if (updateError) throw updateError;
         result = data;
@@ -171,28 +133,15 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
         const { data, error: insertError } = await supabase
           .from('tilawati_level_tests')
           .insert(testData)
-          .select(`
-            *,
-            student:student_id (
-              name
-            ),
-            class:class_id (
-              name
-            )
-          `)
-          .single()
-          .returns<TilawatiTestWithRefs>();
+          .select('*')
+          .single();
 
         if (insertError) throw insertError;
         result = data;
       }
       
       if (result) {
-        onTestAddedOrUpdated({
-          ...result,
-          student: result.student,
-          class: result.class
-        } as TilawatiTest);
+        onTestAddedOrUpdated(result as TilawatiTest);
         onClose();
       }
     } catch (error) {
@@ -228,6 +177,16 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="className">Nama Kelas</Label>
+              <Input
+                id="className"
+                value={className}
+                onChange={(e) => setClassName(e.target.value)}
+                placeholder="Nama Kelas"
+              />
             </div>
 
             <div>

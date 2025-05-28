@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -8,7 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 const Navigation: React.FC = () => {
   const { user, profile, signOut } = useAuth();
-  const { t, toggleLanguage, language } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -75,7 +76,6 @@ const Navigation: React.FC = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={toggleLanguage}
             className="font-sf-text text-islamic-600 hover:text-islamic-800"
           >
             {language === 'id' ? 'EN' : 'ID'}
