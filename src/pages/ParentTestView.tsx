@@ -51,18 +51,7 @@ const ParentTestView: React.FC = () => {
     queryFn: async () => {
       let query = supabase
         .from('tilawati_level_tests')
-        .select(`
-          id,
-          date,
-          student_id,
-          class_name,
-          tilawati_level,
-          status,
-          munaqisy,
-          notes,
-          created_at,
-          updated_at
-        `);
+        .select('*');
 
       // Apply filters
       if (filters.status && filters.status !== 'all') {
@@ -75,14 +64,26 @@ const ParentTestView: React.FC = () => {
         query = query.ilike('class_name', `%${filters.searchTerm}%`);
       }
 
-      const { data, error } = await query.order('date', { ascending: false });
+      const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching tests:', error);
         throw error;
       }
 
-      return data as TilawatiTest[];
+      // Transform the data to match our TilawatiTest interface
+      return (data || []).map(test => ({
+        id: test.id,
+        date: test.date,
+        student_id: test.student_id,
+        class_name: test.class_name,
+        tilawati_level: test.tilawati_level as TilawatiJilid,
+        status: test.status as TestStatus,
+        munaqisy: test.munaqisy,
+        notes: test.notes,
+        created_at: test.created_at || new Date().toISOString(),
+        updated_at: test.updated_at || new Date().toISOString(),
+      })) as TilawatiTest[];
     },
     enabled: !!profile?.id,
   });

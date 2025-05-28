@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { Plus } from 'lucide-react';
@@ -59,12 +59,7 @@ const TeacherTestManagement: React.FC = () => {
       console.log('Fetching students for teacher:', profile.id);
       const { data, error } = await supabase
         .from('students')
-        .select(`
-          id,
-          name,
-          group_name,
-          teacher
-        `)
+        .select('*')
         .eq('teacher', profile.full_name);
 
       if (error) {
@@ -88,16 +83,7 @@ const TeacherTestManagement: React.FC = () => {
     queryFn: async () => {
       let query = supabase
         .from('tilawati_level_tests')
-        .select(`
-          id,
-          date,
-          student_id,
-          class_name,
-          tilawati_level,
-          status,
-          munaqisy,
-          notes
-        `);
+        .select('*');
 
       // Apply filters
       if (filters.status && filters.status !== 'all') {
@@ -110,14 +96,26 @@ const TeacherTestManagement: React.FC = () => {
         query = query.eq('tilawati_level', filters.jilidLevel);
       }
 
-      const { data, error } = await query.order('date', { ascending: true });
+      const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching tests:', error);
         throw error;
       }
 
-      return data as TilawatiTest[];
+      // Transform the data to match our TilawatiTest interface
+      return (data || []).map(test => ({
+        id: test.id,
+        date: test.date,
+        student_id: test.student_id,
+        class_name: test.class_name,
+        tilawati_level: test.tilawati_level as TilawatiJilid,
+        status: test.status as TestStatus,
+        munaqisy: test.munaqisy,
+        notes: test.notes,
+        created_at: test.created_at || new Date().toISOString(),
+        updated_at: test.updated_at || new Date().toISOString(),
+      })) as TilawatiTest[];
     },
     enabled: !!profile?.id,
   });
@@ -128,12 +126,7 @@ const TeacherTestManagement: React.FC = () => {
     queryFn: async () => {
       const { data: students, error } = await supabase
         .from('students')
-        .select(`
-          id,
-          name,
-          group_name,
-          teacher
-        `)
+        .select('*')
         .order('name');
 
       if (error) throw error;
@@ -160,6 +153,12 @@ const TeacherTestManagement: React.FC = () => {
       ...prev,
       [key]: value === 'all' ? undefined : value,
     }));
+  };
+
+  // Get student name by ID
+  const getStudentName = (studentId: string) => {
+    const student = students?.find(s => s.id === studentId);
+    return student?.name || 'Unknown Student';
   };
 
   return (
@@ -250,7 +249,7 @@ const TeacherTestManagement: React.FC = () => {
                 tests?.map((test) => (
                   <TableRow key={test.id}>
                     <TableCell>{format(new Date(test.date), 'dd/MM/yyyy')}</TableCell>
-                    <TableCell>{test.student_id}</TableCell>
+                    <TableCell>{getStudentName(test.student_id)}</TableCell>
                     <TableCell>{test.class_name || '-'}</TableCell>
                     <TableCell>{test.tilawati_level}</TableCell>
                     <TableCell>{test.munaqisy}</TableCell>

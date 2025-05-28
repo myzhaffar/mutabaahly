@@ -105,6 +105,7 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
       return;
     }
 
+    // Create the test data object that matches the expected database schema
     const testData = {
       student_id: studentId,
       class_name: className,
@@ -126,7 +127,10 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
           .select('*')
           .single();
 
-        if (updateError) throw updateError;
+        if (updateError) {
+          console.error('Update error:', updateError);
+          throw updateError;
+        }
         result = data;
       } else {
         // Create new test
@@ -136,12 +140,29 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
           .select('*')
           .single();
 
-        if (insertError) throw insertError;
+        if (insertError) {
+          console.error('Insert error:', insertError);
+          throw insertError;
+        }
         result = data;
       }
       
       if (result) {
-        onTestAddedOrUpdated(result as TilawatiTest);
+        // Transform the result to match our TilawatiTest interface
+        const transformedResult: TilawatiTest = {
+          id: result.id,
+          date: result.date,
+          student_id: result.student_id,
+          class_name: result.class_name,
+          tilawati_level: result.tilawati_level as TilawatiJilid,
+          status: result.status as TestStatus,
+          munaqisy: result.munaqisy,
+          notes: result.notes,
+          created_at: result.created_at || new Date().toISOString(),
+          updated_at: result.updated_at || new Date().toISOString(),
+        };
+        
+        onTestAddedOrUpdated(transformedResult);
         onClose();
       }
     } catch (error) {
