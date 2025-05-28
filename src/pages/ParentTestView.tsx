@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
@@ -127,56 +128,56 @@ const ParentTestView: React.FC = () => {
 
   return (
     <ParentLayout>
-      <div className="container mx-auto py-6 space-y-6">
+      <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Tes Kenaikan Level Anak</h1>
+          <h1 className="text-xl lg:text-2xl font-bold">Tes Kenaikan Level Anak</h1>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Tes</CardTitle>
+              <CardTitle className="text-xs lg:text-sm font-medium">Total Tes</CardTitle>
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
+              <div className="text-lg lg:text-2xl font-bold">{stats.total}</div>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Lulus</CardTitle>
+              <CardTitle className="text-xs lg:text-sm font-medium">Lulus</CardTitle>
               <User className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.passed}</div>
+              <div className="text-lg lg:text-2xl font-bold text-green-600">{stats.passed}</div>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Terjadwal</CardTitle>
+              <CardTitle className="text-xs lg:text-sm font-medium">Terjadwal</CardTitle>
               <Clock className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.scheduled}</div>
+              <div className="text-lg lg:text-2xl font-bold text-blue-600">{stats.scheduled}</div>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Belum Lulus</CardTitle>
+              <CardTitle className="text-xs lg:text-sm font-medium">Belum Lulus</CardTitle>
               <Calendar className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">{stats.failed}</div>
+              <div className="text-lg lg:text-2xl font-bold text-red-600">{stats.failed}</div>
             </CardContent>
           </Card>
         </div>
 
         {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <Input
             placeholder="Cari nama kelas..."
             value={filters.searchTerm || ''}
@@ -217,44 +218,46 @@ const ParentTestView: React.FC = () => {
         {/* Tests Table */}
         <Card>
           <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Tanggal</TableHead>
-                  <TableHead>Kelas</TableHead>
-                  <TableHead>Level Tilawati</TableHead>
-                  <TableHead>Munaqisy</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Catatan</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center">
-                      Loading...
-                    </TableCell>
+                    <TableHead className="whitespace-nowrap">Tanggal</TableHead>
+                    <TableHead className="whitespace-nowrap">Kelas</TableHead>
+                    <TableHead className="whitespace-nowrap">Level Tilawati</TableHead>
+                    <TableHead className="whitespace-nowrap">Munaqisy</TableHead>
+                    <TableHead className="whitespace-nowrap">Status</TableHead>
+                    <TableHead className="whitespace-nowrap">Catatan</TableHead>
                   </TableRow>
-                ) : tests?.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center">
-                      Tidak ada data tes yang ditemukan.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  tests?.map((test) => (
-                    <TableRow key={test.id}>
-                      <TableCell>{format(new Date(test.date), 'dd/MM/yyyy')}</TableCell>
-                      <TableCell>{test.class_name || '-'}</TableCell>
-                      <TableCell>{test.tilawati_level}</TableCell>
-                      <TableCell>{test.munaqisy}</TableCell>
-                      <TableCell>{getStatusBadge(test.status)}</TableCell>
-                      <TableCell>{test.notes || '-'}</TableCell>
+                </TableHeader>
+                <TableBody>
+                  {isLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center">
+                        Loading...
+                      </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+                  ) : tests?.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center">
+                        Tidak ada data tes yang ditemukan.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    tests?.map((test) => (
+                      <TableRow key={test.id}>
+                        <TableCell className="whitespace-nowrap">{format(new Date(test.date), 'dd/MM/yyyy')}</TableCell>
+                        <TableCell>{test.class_name || '-'}</TableCell>
+                        <TableCell>{test.tilawati_level}</TableCell>
+                        <TableCell>{test.munaqisy}</TableCell>
+                        <TableCell>{getStatusBadge(test.status)}</TableCell>
+                        <TableCell className="max-w-xs truncate">{test.notes || '-'}</TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       </div>

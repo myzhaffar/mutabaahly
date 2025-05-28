@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Navigation from '@/components/Navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,7 +14,7 @@ const ParentLayout: React.FC<ParentLayoutProps> = ({ children }) => {
 
   React.useEffect(() => {
     if (!loading && profile?.role !== 'parent') {
-      navigate('/dashboard'); // Or to an unauthorized page or login
+      navigate('/dashboard');
     }
   }, [loading, profile, navigate]);
 
@@ -26,18 +27,17 @@ const ParentLayout: React.FC<ParentLayoutProps> = ({ children }) => {
   }
 
   if (profile?.role !== 'parent') {
-    // This is a fallback, useEffect should handle redirection
     return null;
   }
 
   return (
     <div className="min-h-screen bg-gray-100">
       <Navigation />
-      <main className="container mx-auto py-6">
+      <main className="container mx-auto py-4 px-4 lg:py-6">
         {children}
       </main>
     </div>
   );
 };
 
-export default ParentLayout; 
+export default ParentLayout;

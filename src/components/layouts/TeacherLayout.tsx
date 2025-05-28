@@ -1,6 +1,6 @@
+
 import React from 'react';
 import TeacherSidebar from '@/components/TeacherSidebar';
-import Navigation from '@/components/Navigation'; // Main top navigation
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,7 +14,7 @@ const TeacherLayout: React.FC<TeacherLayoutProps> = ({ children }) => {
 
   React.useEffect(() => {
     if (!loading && profile?.role !== 'teacher') {
-      navigate('/dashboard'); // Or to an unauthorized page or login
+      navigate('/dashboard');
     }
   }, [loading, profile, navigate]);
 
@@ -27,16 +27,14 @@ const TeacherLayout: React.FC<TeacherLayoutProps> = ({ children }) => {
   }
 
   if (profile?.role !== 'teacher') {
-    // This is a fallback, useEffect should handle redirection
     return null; 
   }
 
   return (
     <div className="flex min-h-screen bg-gray-100">
       <TeacherSidebar />
-      <div className="flex-1 flex flex-col ml-64"> {/* Adjust ml-64 to match sidebar width */}
-        <Navigation /> {/* Existing top navigation */}
-        <main className="flex-1 p-6">
+      <div className="flex-1 lg:ml-64"> {/* Responsive margin for sidebar */}
+        <main className="p-4 lg:p-6">
           {children}
         </main>
       </div>
@@ -44,4 +42,4 @@ const TeacherLayout: React.FC<TeacherLayoutProps> = ({ children }) => {
   );
 };
 
-export default TeacherLayout; 
+export default TeacherLayout;
