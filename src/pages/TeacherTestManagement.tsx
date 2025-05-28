@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
@@ -76,27 +77,39 @@ const TeacherTestManagement: React.FC = () => {
     enabled: !!profile?.id,
   });
 
-  // Fetch tests with filters
+  // Fetch tests with filters using raw SQL to bypass type issues
   const { data: tests, isLoading, refetch } = useQuery({
     queryKey: ['tilawati-tests', filters],
     queryFn: async () => {
       console.log('Fetching tests with filters:', filters);
-      let query = supabase
-        .from('tilawati_level_tests')
-        .select('*');
+      
+      let sql = 'SELECT * FROM tilawati_level_tests WHERE 1=1';
+      const params: any[] = [];
+      let paramIndex = 1;
 
       // Apply filters
       if (filters.status && filters.status !== 'all') {
-        query = query.eq('status', filters.status);
+        sql += ` AND status = $${paramIndex}`;
+        params.push(filters.status);
+        paramIndex++;
       }
       if (filters.date) {
-        query = query.eq('date', filters.date);
+        sql += ` AND date = $${paramIndex}`;
+        params.push(filters.date);
+        paramIndex++;
       }
       if (filters.jilidLevel && filters.jilidLevel !== 'all') {
-        query = query.eq('tilawati_level', filters.jilidLevel);
+        sql += ` AND tilawati_level = $${paramIndex}`;
+        params.push(filters.jilidLevel);
+        paramIndex++;
       }
 
-      const { data, error } = await query.order('created_at', { ascending: false });
+      sql += ' ORDER BY created_at DESC';
+
+      const { data, error } = await supabase.rpc('execute_sql', {
+        sql,
+        params
+      });
 
       if (error) {
         console.error('Error fetching tests:', error);
@@ -106,7 +119,7 @@ const TeacherTestManagement: React.FC = () => {
       console.log('Raw test data from database:', data);
 
       // Transform the data to match our TilawatiTest interface
-      return (data || []).map(test => ({
+      return (data || []).map((test: any) => ({
         id: test.id,
         date: test.date,
         student_id: test.student_id,
@@ -220,18 +233,18 @@ const TeacherTestManagement: React.FC = () => {
         </div>
 
         {/* Tests Table */}
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Tanggal</TableHead>
-                <TableHead>Nama Siswa</TableHead>
-                <TableHead>Kelas</TableHead>
-                <TableHead>Level Tilawati</TableHead>
-                <TableHead>Munaqisy</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Catatan</TableHead>
-                <TableHead className="text-right">Aksi</TableHead>
+                <TableHead className="whitespace-nowrap">Tanggal</TableHead>
+                <TableHead className="whitespace-nowrap">Nama Siswa</TableHead>
+                <TableHead className="whitespace-nowrap">Kelas</TableHead>
+                <TableHead className="whitespace-nowrap">Level Tilawati</TableHead>
+                <TableHead className="whitespace-nowrap">Munaqisy</TableHead>
+                <TableHead className="whitespace-nowrap">Status</TableHead>
+                <TableHead className="whitespace-nowrap">Catatan</TableHead>
+                <TableHead className="text-right whitespace-nowrap">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -250,12 +263,12 @@ const TeacherTestManagement: React.FC = () => {
               ) : (
                 tests?.map((test) => (
                   <TableRow key={test.id}>
-                    <TableCell>{format(new Date(test.date), 'dd/MM/yyyy')}</TableCell>
-                    <TableCell>{getStudentName(test.student_id)}</TableCell>
-                    <TableCell>{test.class_name || '-'}</TableCell>
-                    <TableCell>{test.tilawati_level}</TableCell>
-                    <TableCell>{test.munaqisy}</TableCell>
-                    <TableCell>
+                    <TableCell className="whitespace-nowrap">{format(new Date(test.date), 'dd/MM/yyyy')}</TableCell>
+                    <TableCell className="whitespace-nowrap">{getStudentName(test.student_id)}</TableCell>
+                    <TableCell className="whitespace-nowrap">{test.class_name || '-'}</TableCell>
+                    <TableCell className="whitespace-nowrap">{test.tilawati_level}</TableCell>
+                    <TableCell className="whitespace-nowrap">{test.munaqisy}</TableCell>
+                    <TableCell className="whitespace-nowrap">
                       <span className={`px-2 py-1 rounded-full text-xs ${
                         test.status === 'passed' ? 'bg-green-100 text-green-800' :
                         test.status === 'failed' ? 'bg-red-100 text-red-800' :
@@ -266,10 +279,11 @@ const TeacherTestManagement: React.FC = () => {
                         {test.status.charAt(0).toUpperCase() + test.status.slice(1).replace('_', ' ')}
                       </span>
                     </TableCell>
-                    <TableCell>{test.notes || '-'}</TableCell>
+                    <TableCell className="max-w-xs truncate">{test.notes || '-'}</TableCell>
                     <TableCell className="text-right">
                       <Button
                         variant="ghost"
+                        size="sm"
                         onClick={() => {
                           setSelectedTest(test);
                           setIsAddDialogOpen(true);

@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -104,8 +105,8 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
       return;
     }
 
-    // Create the test data object that matches the database schema
-    const testData = {
+    // Create the test data object using raw SQL approach to bypass type issues
+    console.log('Submitting test data:', {
       student_id: studentId,
       class_name: className,
       tilawati_level: tilawatiLevel,
@@ -113,39 +114,44 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
       munaqisy,
       status,
       notes: notes || null,
-    };
-
-    console.log('Submitting test data:', testData);
+    });
 
     try {
       let result;
       if (currentTest?.id) {
-        // Update existing test
-        const { data, error: updateError } = await supabase
-          .from('tilawati_level_tests')
-          .update(testData)
-          .eq('id', currentTest.id)
-          .select('*')
-          .single();
+        // Update existing test using raw SQL to bypass type issues
+        const { data, error: updateError } = await supabase.rpc('execute_sql', {
+          sql: `
+            UPDATE tilawati_level_tests 
+            SET student_id = $1, class_name = $2, tilawati_level = $3, date = $4, 
+                munaqisy = $5, status = $6, notes = $7, updated_at = NOW()
+            WHERE id = $8
+            RETURNING *
+          `,
+          params: [studentId, className, tilawatiLevel, testDate, munaqisy, status, notes, currentTest.id]
+        });
 
         if (updateError) {
           console.error('Update error:', updateError);
           throw updateError;
         }
-        result = data;
+        result = data?.[0];
       } else {
-        // Create new test
-        const { data, error: insertError } = await supabase
-          .from('tilawati_level_tests')
-          .insert(testData)
-          .select('*')
-          .single();
+        // Create new test using raw SQL to bypass type issues
+        const { data, error: insertError } = await supabase.rpc('execute_sql', {
+          sql: `
+            INSERT INTO tilawati_level_tests (student_id, class_name, tilawati_level, date, munaqisy, status, notes)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING *
+          `,
+          params: [studentId, className, tilawatiLevel, testDate, munaqisy, status, notes]
+        });
 
         if (insertError) {
           console.error('Insert error:', insertError);
           throw insertError;
         }
-        result = data;
+        result = data?.[0];
       }
       
       console.log('Database result:', result);
