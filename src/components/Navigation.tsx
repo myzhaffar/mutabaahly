@@ -6,24 +6,23 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Menu, X, ChevronRight } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Menu, X, ChevronDown } from 'lucide-react';
 
 const Navigation: React.FC = () => {
   const { user, profile, signOut } = useAuth();
-  const { t, language } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isBreadcrumbHovered, setIsBreadcrumbHovered] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
+  };
+
+  const handleLanguageSwitch = () => {
+    setLanguage(language === 'id' ? 'en' : 'id');
   };
 
   // Close mobile menu when route changes
@@ -54,7 +53,7 @@ const Navigation: React.FC = () => {
     <nav className="bg-white border-b border-islamic-200 shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center h-16">
-          {/* Left side: Logo, Title and Breadcrumb Menu */}
+          {/* Left side: Logo and Breadcrumb Menu */}
           <div className="flex items-center space-x-4">
             <Link 
               to={profile?.role === 'teacher' ? '/dashboard' : '/'} 
@@ -70,85 +69,76 @@ const Navigation: React.FC = () => {
 
             {/* Breadcrumb Dropdown Menu - Desktop only */}
             {breadcrumbItems.length > 0 && (
-              <div className="hidden lg:block">
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="flex items-center space-x-2 text-sm text-islamic-600 hover:text-islamic-800 transition-colors">
-                    <ChevronRight className="h-4 w-4 text-islamic-400" />
-                    <span>{breadcrumbItems[breadcrumbItems.length - 1]?.label}</span>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-56">
-                    {breadcrumbItems.map((item) => (
-                      <DropdownMenuItem key={item.path} asChild>
-                        <Link 
+              <div 
+                className="hidden lg:block relative"
+                onMouseEnter={() => setIsBreadcrumbHovered(true)}
+                onMouseLeave={() => setIsBreadcrumbHovered(false)}
+              >
+                <div className="flex items-center space-x-2 text-sm text-islamic-600 hover:text-islamic-800 transition-colors cursor-pointer">
+                  <span>/</span>
+                  <span>{breadcrumbItems[breadcrumbItems.length - 1]?.label}</span>
+                  <ChevronDown className="h-4 w-4 text-islamic-400" />
+                </div>
+                
+                {/* Dropdown Menu */}
+                {isBreadcrumbHovered && (
+                  <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-islamic-200 rounded-lg shadow-lg z-50">
+                    <div className="py-2">
+                      {breadcrumbItems.map((item) => (
+                        <Link
+                          key={item.path}
                           to={item.path}
-                          className={`w-full ${item.isLast ? 'font-medium text-islamic-800' : 'text-islamic-600'}`}
+                          className={`block px-4 py-2 text-sm hover:bg-islamic-50 transition-colors ${
+                            item.isLast ? 'font-medium text-islamic-800' : 'text-islamic-600'
+                          }`}
                         >
                           {item.label}
                         </Link>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
 
-          {/* Right side: Navigation and Controls */}
+          {/* Right side: Auth and Language Controls */}
           <div className="flex items-center space-x-4">
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex lg:items-center lg:space-x-6">
-              {/* Parent Navigation Items */}
-              {profile?.role === 'parent' && (
-                <div className="flex space-x-6">
-                  <Link
-                    to="/"
-                    className="text-islamic-600 hover:text-islamic-800 font-medium transition-colors"
-                  >
-                    Home
-                  </Link>
-                  <Link
-                    to="/tests/view"
-                    className="text-islamic-600 hover:text-islamic-800 font-medium transition-colors"
-                  >
-                    Tes Level
-                  </Link>
-                </div>
-              )}
-              
-              <div className="flex items-center space-x-4">
-                {user ? (
-                  <>
-                    <span className="text-islamic-700 font-medium">
-                      {profile?.full_name}
-                    </span>
-                    <Button
-                      variant="outline"
-                      onClick={handleSignOut}
-                      className="font-sf-text border-islamic-200 hover:bg-islamic-50 text-islamic-700"
-                      size="sm"
-                    >
-                      {t('nav.signOut')}
-                    </Button>
-                  </>
-                ) : (
+            {/* Desktop Controls */}
+            <div className="hidden lg:flex lg:items-center lg:space-x-4">
+              {user ? (
+                <>
+                  <span className="text-islamic-700 font-medium">
+                    {profile?.full_name}
+                  </span>
                   <Button
                     variant="outline"
-                    onClick={() => navigate('/auth')}
+                    onClick={handleSignOut}
                     className="font-sf-text border-islamic-200 hover:bg-islamic-50 text-islamic-700"
                     size="sm"
                   >
-                    {t('nav.signIn')}
+                    {t('nav.signOut')}
                   </Button>
-                )}
-                
+                </>
+              ) : (
                 <Button
-                  variant="ghost"
+                  variant="outline"
+                  onClick={() => navigate('/auth')}
+                  className="font-sf-text border-islamic-200 hover:bg-islamic-50 text-islamic-700"
                   size="sm"
-                  className="font-sf-text text-islamic-600 hover:text-islamic-800"
                 >
-                  {language === 'id' ? 'EN' : 'ID'}
+                  {t('nav.signIn')}
                 </Button>
-              </div>
+              )}
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLanguageSwitch}
+                className="font-sf-text text-islamic-600 hover:text-islamic-800"
+              >
+                {language === 'id' ? 'EN' : 'ID'}
+              </Button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -191,25 +181,6 @@ const Navigation: React.FC = () => {
                 </div>
               </div>
             )}
-
-            {profile?.role === 'parent' && (
-              <div className="flex flex-col space-y-2">
-                <Link
-                  to="/"
-                  className="text-islamic-600 hover:text-islamic-800 font-medium transition-colors px-3 py-2 rounded-md hover:bg-islamic-50"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Home
-                </Link>
-                <Link
-                  to="/tests/view"
-                  className="text-islamic-600 hover:text-islamic-800 font-medium transition-colors px-3 py-2 rounded-md hover:bg-islamic-50"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Tes Level
-                </Link>
-              </div>
-            )}
             
             <div className="flex flex-col space-y-2 pt-2 border-t border-islamic-100">
               {user ? (
@@ -246,6 +217,10 @@ const Navigation: React.FC = () => {
               <Button
                 variant="ghost"
                 size="sm"
+                onClick={() => {
+                  handleLanguageSwitch();
+                  setIsMobileMenuOpen(false);
+                }}
                 className="font-sf-text text-islamic-600 hover:text-islamic-800 w-full justify-start px-3"
               >
                 {language === 'id' ? 'EN' : 'ID'}
