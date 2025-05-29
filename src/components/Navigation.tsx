@@ -7,6 +7,12 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Menu, X, ChevronRight } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navigation: React.FC = () => {
   const { user, profile, signOut } = useAuth();
@@ -25,36 +31,31 @@ const Navigation: React.FC = () => {
     setIsMobileMenuOpen(false);
   }, [navigate]);
 
-  // Generate breadcrumbs
-  const getBreadcrumbs = () => {
+  // Generate breadcrumb menu items
+  const getBreadcrumbMenuItems = () => {
     const paths = location.pathname.split('/').filter(Boolean);
-    if (paths.length === 0) return null;
+    if (paths.length === 0) return [];
 
-    return (
-      <div className="flex items-center space-x-2 text-sm">
-        {paths.map((path, index) => {
-          const isLast = index === paths.length - 1;
-          const formattedPath = path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, ' ');
-          
-          return (
-            <React.Fragment key={path}>
-              <span className={`${isLast ? 'text-islamic-800 font-medium' : 'text-islamic-600'}`}>
-                {formattedPath}
-              </span>
-              {!isLast && <ChevronRight className="h-4 w-4 text-islamic-400" />}
-            </React.Fragment>
-          );
-        })}
-      </div>
-    );
+    return paths.map((path, index) => {
+      const fullPath = '/' + paths.slice(0, index + 1).join('/');
+      const formattedPath = path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, ' ');
+      
+      return {
+        path: fullPath,
+        label: formattedPath,
+        isLast: index === paths.length - 1
+      };
+    });
   };
+
+  const breadcrumbItems = getBreadcrumbMenuItems();
 
   return (
     <nav className="bg-white border-b border-islamic-200 shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center h-16">
-          {/* Left side: Logo and Title */}
-          <div className="flex items-center">
+          {/* Left side: Logo, Title and Breadcrumb Menu */}
+          <div className="flex items-center space-x-4">
             <Link 
               to={profile?.role === 'teacher' ? '/dashboard' : '/'} 
               className="flex items-center space-x-2"
@@ -66,15 +67,34 @@ const Navigation: React.FC = () => {
                 {t('home.title')}
               </span>
             </Link>
+
+            {/* Breadcrumb Dropdown Menu - Desktop only */}
+            {breadcrumbItems.length > 0 && (
+              <div className="hidden lg:block">
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="flex items-center space-x-2 text-sm text-islamic-600 hover:text-islamic-800 transition-colors">
+                    <ChevronRight className="h-4 w-4 text-islamic-400" />
+                    <span>{breadcrumbItems[breadcrumbItems.length - 1]?.label}</span>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-56">
+                    {breadcrumbItems.map((item) => (
+                      <DropdownMenuItem key={item.path} asChild>
+                        <Link 
+                          to={item.path}
+                          className={`w-full ${item.isLast ? 'font-medium text-islamic-800' : 'text-islamic-600'}`}
+                        >
+                          {item.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            )}
           </div>
 
-          {/* Right side: Breadcrumbs, Navigation, and Controls */}
+          {/* Right side: Navigation and Controls */}
           <div className="flex items-center space-x-4">
-            {/* Breadcrumbs - Desktop only */}
-            <div className="hidden lg:block">
-              {getBreadcrumbs()}
-            </div>
-
             {/* Desktop Navigation */}
             <div className="hidden lg:flex lg:items-center lg:space-x-6">
               {/* Parent Navigation Items */}
@@ -153,9 +173,24 @@ const Navigation: React.FC = () => {
         >
           <div className="px-4 pt-2 pb-4 space-y-3">
             {/* Mobile Breadcrumbs */}
-            <div className="border-b border-islamic-100 pb-2">
-              {getBreadcrumbs()}
-            </div>
+            {breadcrumbItems.length > 0 && (
+              <div className="border-b border-islamic-100 pb-2">
+                <div className="flex flex-col space-y-1">
+                  {breadcrumbItems.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={`text-sm px-2 py-1 rounded hover:bg-islamic-50 transition-colors ${
+                        item.isLast ? 'text-islamic-800 font-medium' : 'text-islamic-600'
+                      }`}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {profile?.role === 'parent' && (
               <div className="flex flex-col space-y-2">

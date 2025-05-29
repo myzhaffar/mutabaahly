@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Link, useLocation } from 'react-router-dom';
@@ -20,10 +21,9 @@ const TeacherSidebar = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const sidebar = document.getElementById('teacher-sidebar');
-      const menuButton = document.getElementById('mobile-menu-button');
       
-      if (isMobileMenuOpen && sidebar && menuButton) {
-        if (!sidebar.contains(event.target as Node) && !menuButton.contains(event.target as Node)) {
+      if (isMobileMenuOpen && sidebar) {
+        if (!sidebar.contains(event.target as Node)) {
           setIsMobileMenuOpen(false);
         }
       }
@@ -46,16 +46,6 @@ const TeacherSidebar = () => {
 
   return (
     <>
-      {/* Mobile menu button */}
-      <button
-        id="mobile-menu-button"
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-islamic-700 text-white rounded-md shadow-lg hover:bg-islamic-800 transition-colors"
-        aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
-      >
-        {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-      </button>
-
       {/* Backdrop */}
       {isMobileMenuOpen && (
         <div 
