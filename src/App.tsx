@@ -20,20 +20,11 @@ import { useAuth } from '@/contexts/AuthContext';
 const queryClient = new QueryClient();
 
 function AppContent() {
-  const location = useLocation();
   const { profile } = useAuth();
   
-  // Don't show main navigation for teacher routes
-  const isTeacherRoute = profile?.role === 'teacher' && (
-    location.pathname === '/dashboard' || 
-    location.pathname.startsWith('/tests/manage') ||
-    location.pathname.startsWith('/students') ||
-    location.pathname === '/profile'
-  );
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-islamic-50 to-islamic-100">
-      {!isTeacherRoute && <Navigation />}
+      <Navigation />
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/auth" element={<Auth />} />
