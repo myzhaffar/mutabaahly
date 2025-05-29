@@ -1,8 +1,9 @@
-import { createClient } from '@supabase/supabase-js';
-import { Database } from '@/types/database';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+import { createClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/database';
+
+const supabaseUrl = 'https://isyhakwwgdozgtlquzis.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlzeWhha3d3Z2Rvemd0bHF1emlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NTY3NzcsImV4cCI6MjA2MjUzMjc3N30.-2Ya944q8mgJzRAuhMpRAWgxWVmt2yc3CqM0jjgFuuY';
 
 export const supabase = createClient<Database>(
   supabaseUrl,
@@ -12,4 +13,4 @@ export const supabase = createClient<Database>(
       schema: 'public'
     }
   }
-); 
+);
