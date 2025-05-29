@@ -1,5 +1,5 @@
-
 import { supabase } from '@/lib/supabase';
+import type { TilawatiTest, TilawatiJilid, TestStatus } from '@/types/tilawati';
 
 export interface TestRecord {
   id: string;
@@ -15,19 +15,6 @@ export interface TestRecord {
   updated_at: string;
   student_name?: string;
   class_name?: string;
-}
-
-export interface TilawatiTest {
-  id: string;
-  student_id: string;
-  class_name: string;
-  tilawati_level: string;
-  date: string;
-  munaqisy: string;
-  status: 'scheduled' | 'passed' | 'failed' | 'pending_retake' | 'cancelled';
-  notes?: string;
-  created_at: string;
-  updated_at: string;
 }
 
 export const fetchTestsForTeacher = async (teacherId: string): Promise<TestRecord[]> => {
@@ -107,10 +94,10 @@ export const fetchTestsWithFilters = async (filters: any): Promise<TilawatiTest[
 export const saveTest = async (testData: {
   student_id: string;
   class_name: string;
-  tilawati_level: string;
+  tilawati_level: TilawatiJilid;
   date: string;
   munaqisy: string;
-  status: string;
+  status: TestStatus;
   notes: string;
 }, testId?: string): Promise<TilawatiTest> => {
   try {
