@@ -34,7 +34,7 @@ const TeacherLayout: React.FC<TeacherLayoutProps> = ({ children }) => {
     <div className="flex min-h-screen bg-gray-100">
       <TeacherSidebar />
       <div className="flex-1 transition-all duration-300 ease-in-out lg:ml-64">
-        <main className="p-4 lg:p-8 pt-20 lg:pt-8">
+        <main className="p-4 lg:p-8">
           <div className="max-w-7xl mx-auto">
             <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
               {children}

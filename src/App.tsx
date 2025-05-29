@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import { Toaster as HotToaster } from 'react-hot-toast';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -14,8 +15,55 @@ import Profile from '@/pages/Profile';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import TeacherTestManagement from '@/pages/TeacherTestManagement';
 import ParentTestView from '@/pages/ParentTestView';
+import { useAuth } from '@/contexts/AuthContext';
 
 const queryClient = new QueryClient();
+
+function AppContent() {
+  const location = useLocation();
+  const { profile } = useAuth();
+  
+  // Don't show main navigation for teacher routes
+  const isTeacherRoute = profile?.role === 'teacher' && (
+    location.pathname === '/dashboard' || 
+    location.pathname.startsWith('/tests/manage') ||
+    location.pathname.startsWith('/students') ||
+    location.pathname === '/profile'
+  );
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-islamic-50 to-islamic-100">
+      {!isTeacherRoute && <Navigation />}
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/dashboard" element={
+          <ProtectedRoute requiredRole="teacher">
+            <Dashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        } />
+        <Route path="/tests/manage" element={
+          <ProtectedRoute requiredRole="teacher">
+            <TeacherTestManagement />
+          </ProtectedRoute>
+        } />
+        <Route path="/tests/view" element={
+          <ProtectedRoute requiredRole="parent">
+            <ParentTestView />
+          </ProtectedRoute>
+        } />
+      </Routes>
+      <Toaster />
+      <Sonner />
+      <HotToaster />
+    </div>
+  );
+}
 
 function App() {
   return (
@@ -24,36 +72,7 @@ function App() {
         <LanguageProvider>
           <AuthProvider>
             <Router>
-              <div className="min-h-screen bg-gradient-to-br from-islamic-50 to-islamic-100">
-                <Navigation />
-                <Routes>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/dashboard" element={
-                    <ProtectedRoute requiredRole="teacher">
-                      <Dashboard />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/profile" element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/tests/manage" element={
-                    <ProtectedRoute requiredRole="teacher">
-                      <TeacherTestManagement />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/tests/view" element={
-                    <ProtectedRoute requiredRole="parent">
-                      <ParentTestView />
-                    </ProtectedRoute>
-                  } />
-                </Routes>
-                <Toaster />
-                <Sonner />
-                <HotToaster />
-              </div>
+              <AppContent />
             </Router>
           </AuthProvider>
         </LanguageProvider>
