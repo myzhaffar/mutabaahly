@@ -33,7 +33,7 @@ const ParentLayout: React.FC<ParentLayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-100">
       <Navigation />
-      <main className="container mx-auto py-4 px-4 lg:py-6">
+      <main className="container mx-auto py-4 px-4 lg:py-6 pt-20">
         {children}
       </main>
     </div>

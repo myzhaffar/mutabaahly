@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from 'react';
@@ -49,7 +50,7 @@ const Navigation: React.FC = () => {
   };
 
   return (
-    <nav className="bg-white border-b border-islamic-200 shadow-sm fixed top-0 left-0 right-0 z-50">
+    <nav className="bg-white border-b border-islamic-200 shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center h-16">
           {/* Left side: Logo and Title */}
@@ -61,74 +62,79 @@ const Navigation: React.FC = () => {
               <div className="w-9 h-9 bg-gradient-to-br from-islamic-600 to-accent-600 rounded-lg flex items-center justify-center shadow-sm">
                 <span className="text-white font-bold text-xl">Q</span>
               </div>
-              <span className="font-sf-pro font-semibold text-base text-islamic-700">
+              <span className="font-sf-pro font-semibold text-base text-islamic-700 hidden sm:block">
                 {t('home.title')}
               </span>
             </Link>
           </div>
 
-          {/* Center/Right: Desktop Navigation */}
-          <div className="hidden lg:flex lg:items-center lg:space-x-6">
-            {/* Parent Navigation Items */}
-            {profile?.role === 'parent' && (
-              <div className="flex space-x-6">
-                <Link
-                  to="/"
-                  className="text-islamic-600 hover:text-islamic-800 font-medium transition-colors"
-                >
-                  Home
-                </Link>
-                <Link
-                  to="/tests/view"
-                  className="text-islamic-600 hover:text-islamic-800 font-medium transition-colors"
-                >
-                  Tes Level
-                </Link>
-              </div>
-            )}
-            
-            <div className="flex items-center space-x-4">
-              {user ? (
-                <>
-                  <span className="text-islamic-700 font-medium">
-                    {profile?.full_name}
-                  </span>
+          {/* Right side: Breadcrumbs, Navigation, and Controls */}
+          <div className="flex items-center space-x-4">
+            {/* Breadcrumbs - Desktop only */}
+            <div className="hidden lg:block">
+              {getBreadcrumbs()}
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex lg:items-center lg:space-x-6">
+              {/* Parent Navigation Items */}
+              {profile?.role === 'parent' && (
+                <div className="flex space-x-6">
+                  <Link
+                    to="/"
+                    className="text-islamic-600 hover:text-islamic-800 font-medium transition-colors"
+                  >
+                    Home
+                  </Link>
+                  <Link
+                    to="/tests/view"
+                    className="text-islamic-600 hover:text-islamic-800 font-medium transition-colors"
+                  >
+                    Tes Level
+                  </Link>
+                </div>
+              )}
+              
+              <div className="flex items-center space-x-4">
+                {user ? (
+                  <>
+                    <span className="text-islamic-700 font-medium">
+                      {profile?.full_name}
+                    </span>
+                    <Button
+                      variant="outline"
+                      onClick={handleSignOut}
+                      className="font-sf-text border-islamic-200 hover:bg-islamic-50 text-islamic-700"
+                      size="sm"
+                    >
+                      {t('nav.signOut')}
+                    </Button>
+                  </>
+                ) : (
                   <Button
                     variant="outline"
-                    onClick={handleSignOut}
+                    onClick={() => navigate('/auth')}
                     className="font-sf-text border-islamic-200 hover:bg-islamic-50 text-islamic-700"
                     size="sm"
                   >
-                    {t('nav.signOut')}
+                    {t('nav.signIn')}
                   </Button>
-                </>
-              ) : (
+                )}
+                
                 <Button
-                  variant="outline"
-                  onClick={() => navigate('/auth')}
-                  className="font-sf-text border-islamic-200 hover:bg-islamic-50 text-islamic-700"
+                  variant="ghost"
                   size="sm"
+                  className="font-sf-text text-islamic-600 hover:text-islamic-800"
                 >
-                  {t('nav.signIn')}
+                  {language === 'id' ? 'EN' : 'ID'}
                 </Button>
-              )}
-              
-              <Button
-                variant="ghost"
-                size="sm"
-                className="font-sf-text text-islamic-600 hover:text-islamic-800"
-              >
-                {language === 'id' ? 'EN' : 'ID'}
-              </Button>
+              </div>
             </div>
-          </div>
 
-          {/* Right side: Mobile only - Breadcrumbs and Menu Button */}
-          <div className="flex items-center space-x-4 lg:hidden">
-            {getBreadcrumbs()}
+            {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-islamic-700 hover:text-islamic-800 hover:bg-islamic-50 transition-colors"
+              className="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-islamic-700 hover:text-islamic-800 hover:bg-islamic-50 transition-colors"
               aria-expanded={isMobileMenuOpen}
               aria-label="Toggle menu"
             >
@@ -146,6 +152,11 @@ const Navigation: React.FC = () => {
           `}
         >
           <div className="px-4 pt-2 pb-4 space-y-3">
+            {/* Mobile Breadcrumbs */}
+            <div className="border-b border-islamic-100 pb-2">
+              {getBreadcrumbs()}
+            </div>
+
             {profile?.role === 'parent' && (
               <div className="flex flex-col space-y-2">
                 <Link

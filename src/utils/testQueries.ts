@@ -1,137 +1,136 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import type { TilawatiTest, TestStatus, TilawatiJilid } from '@/types/tilawati';
+import { supabase } from '@/lib/supabase';
 
-interface TestFilters {
-  status?: TestStatus | 'all';
-  searchTerm?: string;
-  jilidLevel?: TilawatiJilid | 'all';
-  date?: string;
+export interface TestRecord {
+  id: string;
+  student_id: string;
+  current_jilid: string;
+  target_jilid: string;
+  test_date: string;
+  examiner_name: string;
+  status: 'scheduled' | 'passed' | 'failed' | 'pending_retake' | 'cancelled';
+  score?: number;
+  notes: string;
+  created_at: string;
+  updated_at: string;
+  student_name?: string;
+  class_name?: string;
 }
 
-export const fetchTestsWithFilters = async (filters: TestFilters): Promise<TilawatiTest[]> => {
-  console.log('Fetching tests with filters:', filters);
-  
-  let sql = 'SELECT * FROM tilawati_level_tests WHERE 1=1';
-  const params: any[] = [];
-  let paramIndex = 1;
+export const fetchTestsForTeacher = async (teacherId: string): Promise<TestRecord[]> => {
+  try {
+    const { data, error } = await supabase.rpc('get_tests_for_teacher', {
+      teacher_id: teacherId
+    });
 
-  // Apply filters
-  if (filters.status && filters.status !== 'all') {
-    sql += ` AND status = $${paramIndex}`;
-    params.push(filters.status);
-    paramIndex++;
-  }
-  if (filters.jilidLevel && filters.jilidLevel !== 'all') {
-    sql += ` AND tilawati_level = $${paramIndex}`;
-    params.push(filters.jilidLevel);
-    paramIndex++;
-  }
-  if (filters.searchTerm) {
-    sql += ` AND class_name ILIKE $${paramIndex}`;
-    params.push(`%${filters.searchTerm}%`);
-    paramIndex++;
-  }
-  if (filters.date) {
-    sql += ` AND date = $${paramIndex}`;
-    params.push(filters.date);
-    paramIndex++;
-  }
+    if (error) {
+      console.error('Error fetching tests:', error);
+      throw error;
+    }
 
-  sql += ' ORDER BY created_at DESC';
-
-  const { data, error } = await supabase.rpc('execute_sql', {
-    sql,
-    params
-  });
-
-  if (error) {
-    console.error('Error fetching tests:', error);
+    return data || [];
+  } catch (error) {
+    console.error('Error in fetchTestsForTeacher:', error);
     throw error;
   }
-
-  console.log('Raw test data from database:', data);
-
-  // Transform the data to match our TilawatiTest interface
-  return (data || []).map((test: any) => ({
-    id: test.id,
-    date: test.date,
-    student_id: test.student_id,
-    class_name: test.class_name,
-    tilawati_level: test.tilawati_level as TilawatiJilid,
-    status: test.status as TestStatus,
-    munaqisy: test.munaqisy,
-    notes: test.notes,
-    created_at: test.created_at || new Date().toISOString(),
-    updated_at: test.updated_at || new Date().toISOString(),
-  })) as TilawatiTest[];
 };
 
-export const saveTest = async (testData: {
+export const fetchTestsForParent = async (parentId: string): Promise<TestRecord[]> => {
+  try {
+    const { data, error } = await supabase.rpc('get_tests_for_parent', {
+      parent_id: parentId
+    });
+
+    if (error) {
+      console.error('Error fetching tests for parent:', error);
+      throw error;
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Error in fetchTestsForParent:', error);
+    throw error;
+  }
+};
+
+export const createTest = async (testData: {
   student_id: string;
-  class_name: string;
-  tilawati_level: TilawatiJilid;
-  date: string;
-  munaqisy: string;
-  status: TestStatus;
+  current_jilid: string;
+  target_jilid: string;
+  test_date: string;
+  examiner_name: string;
+  status: string;
   notes: string;
-}, existingTestId?: string): Promise<TilawatiTest> => {
-  console.log('Submitting test data:', testData);
-
-  let result;
-  if (existingTestId) {
-    // Update existing test
-    const { data, error } = await supabase.rpc('execute_sql', {
-      sql: `
-        UPDATE tilawati_level_tests 
-        SET student_id = $1, class_name = $2, tilawati_level = $3, date = $4, 
-            munaqisy = $5, status = $6, notes = $7, updated_at = NOW()
-        WHERE id = $8
-        RETURNING *
-      `,
-      params: [testData.student_id, testData.class_name, testData.tilawati_level, testData.date, testData.munaqisy, testData.status, testData.notes, existingTestId]
-    });
+}): Promise<TestRecord> => {
+  try {
+    const { data, error } = await supabase
+      .from('tilawati_level_tests')
+      .insert([testData])
+      .select()
+      .single();
 
     if (error) {
-      console.error('Update error:', error);
+      console.error('Error creating test:', error);
       throw error;
     }
-    result = Array.isArray(data) ? data[0] : data;
-  } else {
-    // Create new test
-    const { data, error } = await supabase.rpc('execute_sql', {
-      sql: `
-        INSERT INTO tilawati_level_tests (student_id, class_name, tilawati_level, date, munaqisy, status, notes)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
-        RETURNING *
-      `,
-      params: [testData.student_id, testData.class_name, testData.tilawati_level, testData.date, testData.munaqisy, testData.status, testData.notes]
-    });
+
+    if (!data) {
+      throw new Error('No data returned from test creation');
+    }
+
+    return data as TestRecord;
+  } catch (error) {
+    console.error('Error in createTest:', error);
+    throw error;
+  }
+};
+
+export const updateTest = async (testId: string, updates: {
+  current_jilid?: string;
+  target_jilid?: string;
+  test_date?: string;
+  examiner_name?: string;
+  status?: string;
+  score?: number;
+  notes?: string;
+}): Promise<TestRecord> => {
+  try {
+    const { data, error } = await supabase
+      .from('tilawati_level_tests')
+      .update(updates)
+      .eq('id', testId)
+      .select()
+      .single();
 
     if (error) {
-      console.error('Insert error:', error);
+      console.error('Error updating test:', error);
       throw error;
     }
-    result = Array.isArray(data) ? data[0] : data;
-  }
-  
-  console.log('Database result:', result);
-  
-  if (!result) {
-    throw new Error('No data returned from database operation');
-  }
 
-  // Transform the result to match our TilawatiTest interface
-  return {
-    id: result.id,
-    date: result.date,
-    student_id: result.student_id,
-    class_name: result.class_name,
-    tilawati_level: result.tilawati_level as TilawatiJilid,
-    status: result.status as TestStatus,
-    munaqisy: result.munaqisy,
-    notes: result.notes,
-    created_at: result.created_at || new Date().toISOString(),
-    updated_at: result.updated_at || new Date().toISOString(),
-  };
+    if (!data) {
+      throw new Error('No data returned from test update');
+    }
+
+    return data as TestRecord;
+  } catch (error) {
+    console.error('Error in updateTest:', error);
+    throw error;
+  }
+};
+
+export const deleteTest = async (testId: string): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from('tilawati_level_tests')
+      .delete()
+      .eq('id', testId);
+
+    if (error) {
+      console.error('Error deleting test:', error);
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error in deleteTest:', error);
+    throw error;
+  }
 };
