@@ -12,12 +12,14 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Eye } from 'lucide-react';
 import type { TilawatiTest, TestStatus } from '@/types/tilawati';
 
 interface TestTableProps {
   tests: TilawatiTest[];
   isLoading: boolean;
   onEditTest?: (test: TilawatiTest) => void;
+  onViewDetails?: (test: TilawatiTest) => void;
   showStudentName?: boolean;
   getStudentName?: (studentId: string) => string;
 }
@@ -26,6 +28,7 @@ const TestTable: React.FC<TestTableProps> = ({
   tests,
   isLoading,
   onEditTest,
+  onViewDetails,
   showStudentName = false,
   getStudentName
 }) => {
@@ -45,6 +48,22 @@ const TestTable: React.FC<TestTableProps> = ({
     );
   };
 
+  const handleViewDetails = (test: TilawatiTest) => {
+    if (onViewDetails) {
+      onViewDetails(test);
+    } else {
+      // Default behavior - show test details in an alert or modal
+      alert(`Test Details:
+Student: ${getStudentName ? getStudentName(test.student_id) : test.student_id}
+Date: ${format(new Date(test.date), 'dd/MM/yyyy')}
+Class: ${test.class_name || '-'}
+Level: ${test.tilawati_level}
+Munaqisy: ${test.munaqisy}
+Status: ${test.status}
+Notes: ${test.notes || 'No notes'}`);
+    }
+  };
+
   return (
     <Card>
       <CardContent className="p-0">
@@ -61,9 +80,7 @@ const TestTable: React.FC<TestTableProps> = ({
                 <TableHead className="whitespace-nowrap">Munaqisy</TableHead>
                 <TableHead className="whitespace-nowrap">Status</TableHead>
                 <TableHead className="whitespace-nowrap">Catatan</TableHead>
-                {onEditTest && (
-                  <TableHead className="text-right whitespace-nowrap">Aksi</TableHead>
-                )}
+                <TableHead className="text-right whitespace-nowrap">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -95,17 +112,27 @@ const TestTable: React.FC<TestTableProps> = ({
                     <TableCell>{test.munaqisy}</TableCell>
                     <TableCell>{getStatusBadge(test.status)}</TableCell>
                     <TableCell className="max-w-xs truncate">{test.notes || '-'}</TableCell>
-                    {onEditTest && (
-                      <TableCell className="text-right">
+                    <TableCell className="text-right">
+                      <div className="flex gap-2 justify-end">
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => onEditTest(test)}
+                          onClick={() => handleViewDetails(test)}
+                          className="h-8 w-8 p-0"
                         >
-                          Edit
+                          <Eye className="h-4 w-4" />
                         </Button>
-                      </TableCell>
-                    )}
+                        {onEditTest && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onEditTest(test)}
+                          >
+                            Edit
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))
               )}

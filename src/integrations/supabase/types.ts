@@ -119,6 +119,7 @@ export type Database = {
           group_name: string
           id: string
           name: string
+          parent_id: string | null
           photo: string | null
           teacher: string
           updated_at: string
@@ -129,6 +130,7 @@ export type Database = {
           group_name: string
           id?: string
           name: string
+          parent_id?: string | null
           photo?: string | null
           teacher: string
           updated_at?: string
@@ -139,11 +141,20 @@ export type Database = {
           group_name?: string
           id?: string
           name?: string
+          parent_id?: string | null
           photo?: string | null
           teacher?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "students_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tilawah_progress: {
         Row: {
@@ -187,6 +198,7 @@ export type Database = {
         Row: {
           class_name: string
           created_at: string | null
+          created_by: string | null
           date: string
           id: string
           munaqisy: string
@@ -199,6 +211,7 @@ export type Database = {
         Insert: {
           class_name: string
           created_at?: string | null
+          created_by?: string | null
           date: string
           id?: string
           munaqisy: string
@@ -211,6 +224,7 @@ export type Database = {
         Update: {
           class_name?: string
           created_at?: string | null
+          created_by?: string | null
           date?: string
           id?: string
           munaqisy?: string

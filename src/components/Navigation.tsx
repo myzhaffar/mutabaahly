@@ -6,7 +6,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Menu, X, ChevronDown, Home, Users, BookMarked, UserCircle } from 'lucide-react';
+import { Menu, X, ChevronDown, Home, Users, BookMarked, UserCircle, LogOut, LogIn } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Navigation: React.FC = () => {
@@ -168,6 +168,7 @@ const Navigation: React.FC = () => {
                   className="font-sf-text border-islamic-200 hover:bg-islamic-50 text-islamic-700"
                   size="sm"
                 >
+                  <LogOut className="h-4 w-4 mr-2" />
                   {t('nav.signOut')}
                 </Button>
               </>
@@ -178,6 +179,7 @@ const Navigation: React.FC = () => {
                 className="font-sf-text border-islamic-200 hover:bg-islamic-50 text-islamic-700"
                 size="sm"
               >
+                <LogIn className="h-4 w-4 mr-2" />
                 {t('nav.signIn')}
               </Button>
             )}

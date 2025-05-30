@@ -7,7 +7,7 @@ import TestFilters from '@/components/test-management/TestFilters';
 import TestTable from '@/components/test-management/TestTable';
 import { fetchTestsWithFilters } from '@/utils/testQueries';
 import { useAuth } from '@/contexts/AuthContext';
-import type { TestStatus, TilawatiJilid } from '@/types/tilawati';
+import type { TestStatus, TilawatiJilid, TilawatiTest } from '@/types/tilawati';
 
 interface TestFilters {
   status?: TestStatus | 'all';
@@ -31,6 +31,20 @@ const ParentTestView: React.FC = () => {
       ...prev,
       [key]: value === 'all' ? undefined : value,
     }));
+  };
+
+  const handleViewTestDetails = (test: TilawatiTest) => {
+    // Show detailed test information
+    const message = `Detail Tes Tilawati:
+
+Tanggal: ${new Date(test.date).toLocaleDateString('id-ID')}
+Kelas: ${test.class_name || '-'}
+Level Tilawati: ${test.tilawati_level}
+Penguji (Munaqisy): ${test.munaqisy}
+Status: ${test.status.charAt(0).toUpperCase() + test.status.slice(1).replace('_', ' ')}
+Catatan: ${test.notes || 'Tidak ada catatan'}`;
+
+    alert(message);
   };
 
   // Calculate stats
@@ -64,6 +78,8 @@ const ParentTestView: React.FC = () => {
         <TestTable
           tests={tests || []}
           isLoading={isLoading}
+          onViewDetails={handleViewTestDetails}
+          showStudentName={true}
         />
       </div>
     </ParentLayout>
