@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Menu, X, ChevronDown, Home, Users, BookMarked, UserCircle, LogOut, LogIn } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Navigation: React.FC = () => {
   const { user, profile, signOut } = useAuth();
@@ -33,18 +32,6 @@ const Navigation: React.FC = () => {
     { href: '/profile', label: 'Profile', icon: UserCircle },
   ];
 
-  // Parent tabs
-  const parentTabs = [
-    { value: 'tests', label: 'Test Results', href: '/tests/view' },
-    { value: 'profile', label: 'Profile', href: '/profile' },
-  ];
-
-  const getCurrentParentTab = () => {
-    if (location.pathname.startsWith('/tests/view')) return 'tests';
-    if (location.pathname === '/profile') return 'profile';
-    return 'tests';
-  };
-
   return (
     <nav className="bg-white border-b border-islamic-200 shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -64,7 +51,7 @@ const Navigation: React.FC = () => {
             </Link>
           </div>
 
-          {/* Center: Teacher dropdown menu or Parent tabs */}
+          {/* Center: Teacher dropdown menu only */}
           <div className="flex-1 flex justify-center">
             {profile?.role === 'teacher' && (
               <div className="relative">
@@ -135,23 +122,6 @@ const Navigation: React.FC = () => {
                   )}
                 </div>
               </div>
-            )}
-
-            {profile?.role === 'parent' && (
-              <Tabs value={getCurrentParentTab()} className="w-auto">
-                <TabsList className="grid w-full grid-cols-2">
-                  {parentTabs.map((tab) => (
-                    <TabsTrigger
-                      key={tab.value}
-                      value={tab.value}
-                      onClick={() => navigate(tab.href)}
-                      className="cursor-pointer"
-                    >
-                      {tab.label}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </Tabs>
             )}
           </div>
 
