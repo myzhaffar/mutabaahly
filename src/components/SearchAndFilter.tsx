@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -11,14 +10,12 @@ import { Badge } from '@/components/ui/badge';
 interface SearchAndFilterProps {
   onSearchChange: (search: string) => void;
   onFiltersChange: (filters: FilterState) => void;
-  availableGrades: string[];
   availableClasses: string[];
   availableTeachers: string[];
   currentFilters: FilterState;
 }
 
 interface FilterState {
-  grades: string[];
   classes: string[];
   teachers: string[];
 }
@@ -26,7 +23,6 @@ interface FilterState {
 const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
   onSearchChange,
   onFiltersChange,
-  availableGrades,
   availableClasses,
   availableTeachers,
   currentFilters
@@ -40,7 +36,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
     onSearchChange(value);
   };
 
-  const handleFilterChange = (type: 'grades' | 'classes' | 'teachers', value: string, checked: boolean) => {
+  const handleFilterChange = (type: 'classes' | 'teachers', value: string, checked: boolean) => {
     const newFilters = { ...currentFilters };
     
     if (checked) {
@@ -53,16 +49,16 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
   };
 
   const clearAllFilters = () => {
-    onFiltersChange({ grades: [], classes: [], teachers: [] });
+    onFiltersChange({ classes: [], teachers: [] });
     setSearchValue('');
     onSearchChange('');
   };
 
   const getActiveFiltersCount = () => {
-    return currentFilters.grades.length + currentFilters.classes.length + currentFilters.teachers.length;
+    return currentFilters.classes.length + currentFilters.teachers.length;
   };
 
-  const removeFilter = (type: 'grades' | 'classes' | 'teachers', value: string) => {
+  const removeFilter = (type: 'classes' | 'teachers', value: string) => {
     const newFilters = { ...currentFilters };
     newFilters[type] = newFilters[type].filter(item => item !== value);
     onFiltersChange(newFilters);
@@ -115,33 +111,6 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
                   Clear All
                 </Button>
               </div>
-
-              {/* Grade Filters */}
-              {availableGrades.length > 0 && (
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Grade</Label>
-                  <div className="space-y-2 max-h-32 overflow-y-auto">
-                    {availableGrades.map((grade) => (
-                      <div key={grade} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`grade-${grade}`}
-                          checked={currentFilters.grades.includes(grade)}
-                          onCheckedChange={(checked) => 
-                            handleFilterChange('grades', grade, checked as boolean)
-                          }
-                          className="rounded-full"
-                        />
-                        <Label 
-                          htmlFor={`grade-${grade}`}
-                          className="text-sm text-gray-600 cursor-pointer"
-                        >
-                          {grade}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {/* Class Filters */}
               {availableClasses.length > 0 && (
@@ -205,24 +174,6 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
       {getActiveFiltersCount() > 0 && (
         <div className="flex flex-wrap gap-2 items-center">
           <span className="text-sm text-gray-600">Active filters:</span>
-          
-          {currentFilters.grades.map((grade) => (
-            <Badge 
-              key={`grade-${grade}`} 
-              variant="secondary" 
-              className="bg-blue-100 text-blue-800 hover:bg-blue-200"
-            >
-              Grade: {grade}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-0 ml-1 hover:bg-transparent"
-                onClick={() => removeFilter('grades', grade)}
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            </Badge>
-          ))}
           
           {currentFilters.classes.map((className) => (
             <Badge 

@@ -28,7 +28,6 @@ interface Student {
 }
 
 interface FilterState {
-  grades: string[];
   classes: string[];
   teachers: string[];
 }
@@ -42,7 +41,6 @@ const Dashboard = () => {
   const [dataLoading, setDataLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<FilterState>({
-    grades: [],
     classes: [],
     teachers: []
   });
@@ -195,13 +193,6 @@ const Dashboard = () => {
       );
     }
 
-    // Apply grade filter
-    if (filters.grades.length > 0) {
-      filtered = filtered.filter(student =>
-        filters.grades.includes(student.grade || 'N/A')
-      );
-    }
-
     // Apply class filter
     if (filters.classes.length > 0) {
       filtered = filtered.filter(student =>
@@ -221,11 +212,9 @@ const Dashboard = () => {
 
   // Get unique values for filter options
   const getFilterOptions = () => {
-    const grades = [...new Set(students.map(s => s.grade || 'N/A'))].sort();
     const classes = [...new Set(students.map(s => s.group_name))].sort();
     const teachers = [...new Set(students.map(s => s.teacher))].sort();
-    
-    return { grades, classes, teachers };
+    return { classes, teachers };
   };
 
   const handleSearchChange = (search: string) => {
@@ -252,7 +241,7 @@ const Dashboard = () => {
     );
   }
 
-  const { grades, classes, teachers } = getFilterOptions();
+  const { classes, teachers } = getFilterOptions();
 
   if (profile?.role === 'teacher') {
     return (
@@ -273,7 +262,6 @@ const Dashboard = () => {
           <SearchAndFilter
             onSearchChange={handleSearchChange}
             onFiltersChange={handleFiltersChange}
-            availableGrades={grades}
             availableClasses={classes}
             availableTeachers={teachers}
             currentFilters={filters}
@@ -322,7 +310,6 @@ const Dashboard = () => {
           <SearchAndFilter
             onSearchChange={handleSearchChange}
             onFiltersChange={handleFiltersChange}
-            availableGrades={grades}
             availableClasses={classes}
             availableTeachers={teachers}
             currentFilters={filters}

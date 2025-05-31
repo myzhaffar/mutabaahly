@@ -19,7 +19,6 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     name: '',
-    grade: '',
     group_name: '',
     teacher: ''
   });
@@ -94,7 +93,7 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
         description: "Student added successfully!",
       });
 
-      setFormData({ name: '', grade: '', group_name: '', teacher: '' });
+      setFormData({ name: '', group_name: '', teacher: '' });
       setSelectedFile(null);
       setOpen(false);
       onStudentAdded();
@@ -140,15 +139,6 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
               value={formData.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
               required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="grade">Grade</Label>
-            <Input
-              id="grade"
-              value={formData.grade}
-              onChange={(e) => handleInputChange('grade', e.target.value)}
-              placeholder="e.g., Grade 3"
             />
           </div>
           <div className="space-y-2">
