@@ -80,6 +80,7 @@ export const calculateHafalanProgress = (entries: ProgressEntry[]) => {
 
 export const calculateTilawahProgress = (entries: ProgressEntry[]) => {
   if (!entries || entries.length === 0) {
+    console.log('No entries provided for progress calculation');
     return { percentage: 0, jilid: null, total_pages: 0 };
   }
 
@@ -95,29 +96,34 @@ export const calculateTilawahProgress = (entries: ProgressEntry[]) => {
 
   if (latestEntry) {
     currentJilid = latestEntry.surah_or_jilid;
+    console.log('Latest entry:', latestEntry);
 
     // Parse the page number from the latest entry
     if (latestEntry.ayat_or_page) {
       const pageRange = latestEntry.ayat_or_page;
+      console.log('Processing page range:', pageRange);
 
       if (pageRange.includes('-')) {
         // If it's a range, take the higher number
         const [_, end] = pageRange.split('-').map(num => parseInt(num.trim()));
         if (!isNaN(end)) {
           currentPage = end;
+          console.log('Found page range, using end page:', end);
         }
       } else {
         // If it's a single page
         const page = parseInt(pageRange);
         if (!isNaN(page)) {
           currentPage = page;
-    }
+          console.log('Found single page:', page);
+        }
       }
     }
   }
 
   // Calculate percentage based on current page out of 44 pages
   const percentage = Math.min(Math.round((currentPage / PAGES_PER_TILAWATI_LEVEL) * 100), 100);
+  console.log('Calculated percentage:', percentage, 'based on page', currentPage, 'out of', PAGES_PER_TILAWATI_LEVEL);
 
   return {
     percentage,

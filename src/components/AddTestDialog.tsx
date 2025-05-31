@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -127,6 +126,8 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
     }
   };
 
+  const selectedStudent = students.find(s => s.id === studentId);
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[525px] bg-white">
@@ -147,11 +148,26 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
                 <SelectContent>
                   {students.map((s) => (
                     <SelectItem key={s.id} value={s.id}>
-                      {s.name} {s.class_name ? `(${s.class_name})` : ''}
+                      {s.name} {s.class_name ? `(${s.class_name})` : ''} - {s.current_tilawati_jilid} 
+                      {s.progress_percentage !== undefined && ` - Progress: ${s.progress_percentage}%`}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {studentId && (
+                <div className="text-sm mt-1">
+                  <p className="text-muted-foreground">
+                    {students.find(s => s.id === studentId)?.is_eligible_for_test 
+                      ? "✅ Siswa telah menyelesaikan level saat ini dan siap untuk tes"
+                      : "❌ Siswa belum menyelesaikan level saat ini"}
+                  </p>
+                  {selectedStudent && (
+                    <p className="text-muted-foreground mt-1">
+                      Guru Pengajar: {selectedStudent.teacher}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
             <div>
@@ -191,8 +207,8 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
                   onChange={(e) => setTestDate(e.target.value)}
                 />
               </div>
-              <div>
-                <Label htmlFor="munaqisy">Nama Munaqisy</Label>
+              <div className="space-y-2">
+                <Label htmlFor="munaqisy">Munaqisy</Label>
                 <Input
                   id="munaqisy"
                   value={munaqisy}

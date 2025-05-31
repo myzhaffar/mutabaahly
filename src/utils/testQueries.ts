@@ -53,8 +53,16 @@ export const fetchTestsForParent = async (parentId: string): Promise<TestRecord[
   }
 };
 
-export const fetchTestsWithFilters = async (filters: any): Promise<TilawatiTest[]> => {
+interface TestFilters {
+  status?: TestStatus | 'all';
+  searchTerm?: string;
+  jilidLevel?: TilawatiJilid | 'all';
+  date?: string;
+}
+
+export const fetchTestsWithFilters = async (filters: TestFilters): Promise<TilawatiTest[]> => {
   try {
+    console.log('Fetching tests with filters:', filters);
     let query = supabase
       .from('tilawati_level_tests')
       .select('*')
@@ -84,6 +92,7 @@ export const fetchTestsWithFilters = async (filters: any): Promise<TilawatiTest[
       throw error;
     }
 
+    console.log('Fetched tests:', data);
     return data || [];
   } catch (error) {
     console.error('Error in fetchTestsWithFilters:', error);
@@ -204,6 +213,7 @@ export const updateTest = async (testId: string, updates: {
 
 export const deleteTest = async (testId: string): Promise<void> => {
   try {
+    console.log('Deleting test:', testId);
     const { error } = await supabase
       .from('tilawati_level_tests')
       .delete()
@@ -213,6 +223,8 @@ export const deleteTest = async (testId: string): Promise<void> => {
       console.error('Error deleting test:', error);
       throw error;
     }
+
+    console.log('Test deleted successfully');
   } catch (error) {
     console.error('Error in deleteTest:', error);
     throw error;

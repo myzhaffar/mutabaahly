@@ -1,4 +1,3 @@
-
 // src/types/tilawati.ts
 
 // Student information relevant for test management and dialogs
@@ -11,9 +10,12 @@ export type TestStatus = 'scheduled' | 'passed' | 'failed' | 'pending_retake' | 
 export interface StudentForTest {
   id: string;
   name: string;
-  current_tilawati_jilid?: TilawatiJilid;
+  current_tilawati_jilid: TilawatiJilid;
   class_name: string;
   class_id?: string;
+  teacher: string;
+  progress_percentage?: number;
+  is_eligible_for_test?: boolean;
 }
 
 // Represents a single Tilawati Level Test record
