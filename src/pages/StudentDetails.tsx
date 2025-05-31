@@ -1,7 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import Navigation from '@/components/Navigation';
 import StudentDetailsHeader from '@/components/student-details/StudentDetailsHeader';
 import StudentOverviewCard from '@/components/student-details/StudentOverviewCard';
 import DailyProgressTabs from '@/components/student-details/DailyProgressTabs';
@@ -28,11 +27,8 @@ const StudentDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <div className="flex items-center justify-center h-96">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-islamic-500"></div>
-        </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-islamic-500"></div>
       </div>
     );
   }
@@ -40,7 +36,6 @@ const StudentDetails = () => {
   if (!student) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navigation />
         <div className="container mx-auto px-6 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Student Not Found</h1>
@@ -55,8 +50,6 @@ const StudentDetails = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      
       <div className="container mx-auto px-6 py-8">
         <StudentDetailsHeader
           student={student}

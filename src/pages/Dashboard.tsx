@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import Navigation from '@/components/Navigation';
-import AddStudentDialog from '@/components/AddStudentDialog';
 import SearchAndFilter from '@/components/SearchAndFilter';
 import StatsCards from '@/components/dashboard/StatsCards';
 import StudentsGrid from '@/components/dashboard/StudentsGrid';
@@ -10,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
+import AddStudentDialog from '@/components/AddStudentDialog';
 
 interface Student {
   id: string;
@@ -295,33 +294,45 @@ const Dashboard = () => {
             students={students}
             filteredStudents={filteredStudents}
             onViewDetails={handleViewDetails}
-            userRole={profile?.role || 'teacher'}
+            userRole={profile?.role}
           />
         </div>
       </TeacherLayout>
     );
   }
 
+  // Parent view
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      
       <div className="container mx-auto px-6 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Welcome back, {profile?.full_name}
-            </h1>
-            <p className="text-gray-600">Parent Dashboard</p>
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Welcome back, {profile?.full_name}
+              </h1>
+              <p className="text-gray-600">Parent Dashboard</p>
+            </div>
           </div>
+          
+          <StatsCards stats={stats} />
         </div>
 
-        <StatsCards stats={stats} />
+        <div className="mb-6">
+          <SearchAndFilter
+            onSearchChange={handleSearchChange}
+            onFiltersChange={handleFiltersChange}
+            availableGrades={grades}
+            availableClasses={classes}
+            availableTeachers={teachers}
+            currentFilters={filters}
+          />
+        </div>
 
         <div className="mb-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">My Children&apos;s Overview</h2>
-             {filteredStudents.length !== students.length && (
+            <h2 className="text-2xl font-bold text-gray-900">My Children's Overview</h2>
+            {filteredStudents.length !== students.length && (
               <span className="text-sm text-gray-600">
                 Showing {filteredStudents.length} of {students.length} students
               </span>
@@ -332,7 +343,7 @@ const Dashboard = () => {
             students={students}
             filteredStudents={filteredStudents}
             onViewDetails={handleViewDetails}
-            userRole={profile?.role || 'parent'}
+            userRole={profile?.role}
           />
         </div>
       </div>

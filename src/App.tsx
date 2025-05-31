@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { Toaster as HotToaster } from 'react-hot-toast';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -12,6 +11,7 @@ import Navigation from '@/components/Navigation';
 import Dashboard from '@/pages/Dashboard';
 import Auth from '@/pages/Auth';
 import Profile from '@/pages/Profile';
+import StudentDetails from '@/pages/StudentDetails';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import TeacherTestManagement from '@/pages/TeacherTestManagement';
 import ParentTestView from '@/pages/ParentTestView';
@@ -26,16 +26,21 @@ function AppContent() {
     <div className="min-h-screen bg-gradient-to-br from-islamic-50 to-islamic-100">
       <Navigation />
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/dashboard" element={
-          <ProtectedRoute requiredRole="teacher">
+          <ProtectedRoute>
             <Dashboard />
           </ProtectedRoute>
         } />
         <Route path="/profile" element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        } />
+        <Route path="/student/:id" element={
+          <ProtectedRoute>
+            <StudentDetails />
           </ProtectedRoute>
         } />
         <Route path="/tests/manage" element={

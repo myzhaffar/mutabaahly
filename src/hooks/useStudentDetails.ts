@@ -1,16 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
+import { useAuth } from '@/contexts/AuthContext';
+import { Database } from '@/types/supabase';
 
-interface Student {
-  id: string;
-  name: string;
-  grade: string;
-  group_name: string;
-  teacher: string;
-  photo: string | null;
-}
+type Student = Database['public']['Tables']['students']['Row'];
 
 interface ProgressEntry {
   id: string;
@@ -27,6 +21,7 @@ interface ProgressData {
 }
 
 export const useStudentDetails = (id: string | undefined) => {
+  const { profile } = useAuth();
   const [student, setStudent] = useState<Student | null>(null);
   const [progressData, setProgressData] = useState<ProgressData>({
     hafalan_progress: null,
@@ -38,17 +33,32 @@ export const useStudentDetails = (id: string | undefined) => {
 
   const fetchStudentData = async () => {
     try {
+      if (!id || !profile) {
+        setStudent(null);
+        return;
+      }
+
+      // Query includes parent_id to check access
       const { data: studentData, error: studentError } = await supabase
         .from('students')
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (studentError) throw studentError;
+
+      // If no student found
+      if (!studentData) {
+        setStudent(null);
+        return;
+      }
+
+      // Set student data regardless of role
       setStudent(studentData);
 
     } catch (error) {
       console.error('Error fetching student data:', error);
+      setStudent(null);
     } finally {
       setLoading(false);
     }
@@ -56,6 +66,9 @@ export const useStudentDetails = (id: string | undefined) => {
 
   const fetchProgressEntries = async () => {
     try {
+      // Only fetch progress if student exists
+      if (!student) return;
+
       const { data: entries, error } = await supabase
         .from('progress_entries')
         .select('*')
@@ -79,27 +92,29 @@ export const useStudentDetails = (id: string | undefined) => {
         tilawah_progress: tilawahProgress.percentage > 0 ? tilawahProgress : null
       });
 
-      // Update progress in database
-      if (hafalan.length > 0) {
-        await supabase
-          .from('hafalan_progress')
-          .upsert({
-            student_id: id,
-            percentage: hafalanProgress.percentage,
-            last_surah: hafalanProgress.last_surah,
-            updated_at: new Date().toISOString()
-          });
-      }
+      // Only teachers can update progress in database
+      if (profile.role === 'teacher') {
+        if (hafalan.length > 0) {
+          await supabase
+            .from('hafalan_progress')
+            .upsert({
+              student_id: id,
+              percentage: hafalanProgress.percentage,
+              last_surah: hafalanProgress.last_surah,
+              updated_at: new Date().toISOString()
+            });
+        }
 
-      if (tilawah.length > 0) {
-        await supabase
-          .from('tilawah_progress')
-          .upsert({
-            student_id: id,
-            percentage: tilawahProgress.percentage,
-            jilid: tilawahProgress.jilid,
-            updated_at: new Date().toISOString()
-          });
+        if (tilawah.length > 0) {
+          await supabase
+            .from('tilawah_progress')
+            .upsert({
+              student_id: id,
+              percentage: tilawahProgress.percentage,
+              jilid: tilawahProgress.jilid,
+              updated_at: new Date().toISOString()
+            });
+        }
       }
 
     } catch (error) {
@@ -115,9 +130,14 @@ export const useStudentDetails = (id: string | undefined) => {
   useEffect(() => {
     if (id) {
       fetchStudentData();
+    }
+  }, [id, profile]);
+
+  useEffect(() => {
+    if (student) {
       fetchProgressEntries();
     }
-  }, [id]);
+  }, [student]);
 
   return {
     student,

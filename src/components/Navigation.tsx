@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from 'react';
@@ -139,7 +138,7 @@ const Navigation: React.FC = () => {
                   size="sm"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
-                  {t('nav.signOut')}
+                  Sign Out
                 </Button>
               </>
             ) : (
@@ -150,7 +149,7 @@ const Navigation: React.FC = () => {
                 size="sm"
               >
                 <LogIn className="h-4 w-4 mr-2" />
-                {t('nav.signIn')}
+                Sign In
               </Button>
             )}
             

@@ -1,9 +1,7 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BookOpen, Users, Award, TrendingUp, ArrowRight } from 'lucide-react';
@@ -31,8 +29,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-islamic-50 via-white to-blue-50">
-      <Navigation />
-      
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center max-w-4xl mx-auto mb-16">
