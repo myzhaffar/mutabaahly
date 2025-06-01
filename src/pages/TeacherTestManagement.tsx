@@ -7,20 +7,10 @@ import AddTestDialog from '@/components/AddTestDialog';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
 import TestFilters from '@/components/test-management/TestFilters';
 import TestTable from '@/components/test-management/TestTable';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import { fetchTestsWithFilters, deleteTest } from '@/utils/testQueries';
+import { fetchTestsWithFilters } from '@/utils/testQueries';
 import type { TilawatiTest, TestStatus, TilawatiJilid, StudentForTest } from '@/types/tilawati';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 interface TestFilters {
   status?: TestStatus | 'all';
@@ -36,7 +26,6 @@ const TeacherTestManagement: React.FC = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedTest, setSelectedTest] = useState<TilawatiTest | null>(null);
   const [filters, setFilters] = useState<TestFilters>({});
-  const [testToDelete, setTestToDelete] = useState<TilawatiTest | null>(null);
 
   // Fetch students for the teacher
   const { data: students, isLoading: isLoadingStudents, refetch: refetchStudents } = useQuery({
@@ -157,18 +146,19 @@ const TeacherTestManagement: React.FC = () => {
   });
 
   // Fetch tests with filters
-  const { data: tests, isLoading, refetch: refetchTests } = useQuery({
+  const { data: tests, isLoading } = useQuery({
     queryKey: ['tilawati-tests', filters],
     queryFn: () => fetchTestsWithFilters(filters),
     enabled: !!profile?.id,
-    staleTime: 0, // Consider data as stale immediately
-    gcTime: 0, // Don't keep unused data in cache
-    refetchOnMount: true, // Always refetch when component mounts
-    refetchOnWindowFocus: true, // Refetch when window gains focus
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const handleTestUpdate = () => {
-    refetchTests();
+    // Invalidate and refetch
+    queryClient.invalidateQueries({ queryKey: ['tilawati-tests'] });
     refetchStudents();
     toast({
       title: "Success",
@@ -187,41 +177,6 @@ const TeacherTestManagement: React.FC = () => {
   const getStudentName = (studentId: string) => {
     const student = students?.find(s => s.id === studentId);
     return student?.name || 'Unknown Student';
-  };
-
-  const handleEditTest = (test: TilawatiTest) => {
-    setSelectedTest(test);
-    setIsAddDialogOpen(true);
-  };
-
-  const handleDeleteTest = async (test: TilawatiTest) => {
-    setTestToDelete(test);
-  };
-
-  const confirmDelete = async () => {
-    if (!testToDelete) return;
-
-    try {
-      await deleteTest(testToDelete.id);
-      
-      // Force refetch the tests
-      await queryClient.invalidateQueries({ queryKey: ['tilawati-tests'] });
-      await refetchTests();
-      
-      toast({
-        title: "Success",
-        description: "Test has been deleted successfully.",
-      });
-    } catch (error) {
-      console.error('Error deleting test:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete test. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setTestToDelete(null);
-    }
   };
 
   return (
@@ -247,8 +202,7 @@ const TeacherTestManagement: React.FC = () => {
         <TestTable
           tests={tests || []}
           isLoading={isLoading}
-          onEditTest={handleEditTest}
-          onDeleteTest={handleDeleteTest}
+          onTestUpdated={handleTestUpdate}
           showStudentName={true}
           getStudentName={getStudentName}
         />
@@ -261,33 +215,11 @@ const TeacherTestManagement: React.FC = () => {
               setIsAddDialogOpen(false);
               setSelectedTest(null);
             }}
-            onTestAddedOrUpdated={(test) => {
-              refetchTests();
-              setIsAddDialogOpen(false);
-              setSelectedTest(null);
-            }}
+            onTestAddedOrUpdated={handleTestUpdate}
             currentTest={selectedTest}
             students={students || []}
           />
         )}
-
-        {/* Delete Confirmation Dialog */}
-        <AlertDialog open={!!testToDelete} onOpenChange={(open) => !open && setTestToDelete(null)}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Hapus Tes</AlertDialogTitle>
-              <AlertDialogDescription>
-                Apakah Anda yakin ingin menghapus tes ini? Tindakan ini tidak dapat dibatalkan.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Batal</AlertDialogCancel>
-              <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
-                Hapus
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
     </TeacherLayout>
   );
