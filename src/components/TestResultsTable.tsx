@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from 'react';
@@ -46,7 +45,7 @@ const TestResultsTable: React.FC<TestResultsTableProps> = ({
   onViewTestDetails,
 }) => {
   if (!tests || tests.length === 0) {
-    return <p className="text-center text-gray-500 py-8">Belum ada data tes yang terjadwal atau tercatat.</p>;
+    return <p className="text-center text-gray-500 py-8">No test data has been scheduled or recorded yet.</p>;
   }
 
   const formatDate = (dateString: string) => {
@@ -68,14 +67,14 @@ const TestResultsTable: React.FC<TestResultsTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow className="bg-gray-50 hover:bg-gray-100/50 border-b border-gray-200">
-            <TableHead className="w-[200px] px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Siswa</TableHead>
-            <TableHead className="px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Kelas</TableHead>
-            <TableHead className="px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Level Tilawati</TableHead>
-            <TableHead className="px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Tgl Tes</TableHead>
-            <TableHead className="px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Munaqisy</TableHead>
+            <TableHead className="w-[200px] px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Student</TableHead>
+            <TableHead className="px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Class</TableHead>
+            <TableHead className="px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Tilawati Level</TableHead>
+            <TableHead className="px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Test Date</TableHead>
+            <TableHead className="px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Examiner</TableHead>
             <TableHead className="px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</TableHead>
-            <TableHead className="text-center px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Catatan</TableHead>
-            <TableHead className="text-right px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Aksi</TableHead>
+            <TableHead className="text-center px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Notes</TableHead>
+            <TableHead className="text-right px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className="divide-y divide-gray-200">
@@ -106,7 +105,7 @@ const TestResultsTable: React.FC<TestResultsTableProps> = ({
                     {onViewTestDetails && (
                       <DropdownMenuItem onClick={() => onViewTestDetails(test)} className="flex items-center text-sm text-gray-700 hover:bg-gray-100 p-2 cursor-pointer">
                         <Eye className="mr-2 h-4 w-4 text-gray-500" />
-                        <span>Lihat Detail</span>
+                        <span>View Details</span>
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem onClick={() => onEditTest(test)} className="flex items-center text-sm text-gray-700 hover:bg-gray-100 p-2 cursor-pointer">
@@ -115,7 +114,7 @@ const TestResultsTable: React.FC<TestResultsTableProps> = ({
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onDeleteTest(test.id)} className="flex items-center text-sm text-red-600 hover:bg-red-50 hover:text-red-700 focus:text-red-700 p-2 cursor-pointer">
                       <Trash2 className="mr-2 h-4 w-4" />
-                      <span>Hapus</span>
+                      <span>Delete</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

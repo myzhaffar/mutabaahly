@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -25,10 +24,10 @@ const LandingPage: React.FC = () => {
           Al-Quran Progress Tracker
         </h1>
         <p className="text-lg text-gray-600 mb-8">
-          Platform untuk melacak kemajuan belajar Al-Quran dan Tilawati
+          Platform for tracking Al-Quran and Tilawati learning progress
         </p>
         <Button onClick={() => navigate('/auth')} size="lg">
-          Masuk ke Sistem
+          Sign In
         </Button>
       </div>
     </div>

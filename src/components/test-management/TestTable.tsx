@@ -72,14 +72,14 @@ Notes: ${test.notes || 'No notes'}`);
     <Table>
       <TableHeader>
         <TableRow>
-          {showStudentName && <TableHead>Nama Siswa</TableHead>}
-          <TableHead>Kelas</TableHead>
-          <TableHead>Level Tilawati</TableHead>
-          <TableHead>Tanggal</TableHead>
-          <TableHead>Munaqisy</TableHead>
+          {showStudentName && <TableHead>Student Name</TableHead>}
+          <TableHead>Class</TableHead>
+          <TableHead>Tilawati Level</TableHead>
+          <TableHead>Date</TableHead>
+          <TableHead>Examiner</TableHead>
           <TableHead>Status</TableHead>
-          <TableHead>Catatan</TableHead>
-          <TableHead className="text-right">Aksi</TableHead>
+          <TableHead>Notes</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

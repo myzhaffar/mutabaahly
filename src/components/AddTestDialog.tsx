@@ -132,18 +132,18 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[525px] bg-white">
         <DialogHeader>
-          <DialogTitle>{currentTest ? 'Edit Test Kenaikan Level' : 'Jadwalkan Tes Kenaikan Level'}</DialogTitle>
+          <DialogTitle>{currentTest ? 'Edit Level Advancement Test' : 'Schedule Level Advancement Test'}</DialogTitle>
           <DialogDescription>
-            {currentTest ? 'Ubah detail tes di bawah ini.' : 'Isi detail tes kenaikan level Tilawati untuk siswa.'}
+            {currentTest ? 'Edit test details below.' : 'Fill in the test details for the student.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-4">
             <div>
-              <Label htmlFor="student">Siswa</Label>
+              <Label htmlFor="student">Student</Label>
               <Select value={studentId} onValueChange={setStudentId} disabled={!!currentTest}>
                 <SelectTrigger id="student">
-                  <SelectValue placeholder="Pilih Siswa" />
+                  <SelectValue placeholder="Select Student" />
                 </SelectTrigger>
                 <SelectContent>
                   {students.map((s) => (
@@ -158,12 +158,12 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
                 <div className="text-sm mt-1">
                   <p className="text-muted-foreground">
                     {students.find(s => s.id === studentId)?.is_eligible_for_test 
-                      ? "✅ Siswa telah menyelesaikan level saat ini dan siap untuk tes"
-                      : "❌ Siswa belum menyelesaikan level saat ini"}
+                      ? "✅ Student has completed the current level and is ready for testing"
+                      : "❌ Student has not completed the current level"}
                   </p>
                   {selectedStudent && (
                     <p className="text-muted-foreground mt-1">
-                      Guru Pengajar: {selectedStudent.teacher}
+                      Teacher: {selectedStudent.teacher}
                     </p>
                   )}
                 </div>
@@ -171,23 +171,23 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
             </div>
 
             <div>
-              <Label htmlFor="className">Nama Kelas</Label>
+              <Label htmlFor="className">Class Name</Label>
               <Input
                 id="className"
                 value={className}
                 onChange={(e) => setClassName(e.target.value)}
-                placeholder="Nama Kelas"
+                placeholder="Class Name"
               />
             </div>
 
             <div>
-              <Label htmlFor="tilawatiLevel">Level Tilawati</Label>
+              <Label htmlFor="tilawatiLevel">Tilawati Level</Label>
               <Select 
                 value={tilawatiLevel} 
                 onValueChange={(value: TilawatiJilid) => setTilawatiLevel(value)}
               >
                 <SelectTrigger id="tilawatiLevel">
-                  <SelectValue placeholder="Pilih Level Tilawati" />
+                  <SelectValue placeholder="Select Tilawati Level" />
                 </SelectTrigger>
                 <SelectContent>
                   {JILID_OPTIONS.map(jilid => (
@@ -199,7 +199,7 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="testDate">Tanggal Tes</Label>
+                <Label htmlFor="testDate">Test Date</Label>
                 <Input
                   id="testDate"
                   type="date"
@@ -208,12 +208,12 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="munaqisy">Munaqisy</Label>
+                <Label htmlFor="munaqisy">Examiner</Label>
                 <Input
                   id="munaqisy"
                   value={munaqisy}
                   onChange={(e) => setMunaqisy(e.target.value)}
-                  placeholder="Nama Munaqisy"
+                  placeholder="Examiner Name"
                 />
               </div>
             </div>
@@ -225,7 +225,7 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
                 onValueChange={(value: TestStatus) => setStatus(value)}
               >
                 <SelectTrigger id="status">
-                  <SelectValue placeholder="Pilih Status" />
+                  <SelectValue placeholder="Select Status" />
                 </SelectTrigger>
                 <SelectContent>
                   {STATUS_OPTIONS.map(status => (
@@ -238,12 +238,12 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
             </div>
 
             <div>
-              <Label htmlFor="notes">Catatan</Label>
+              <Label htmlFor="notes">Notes</Label>
               <Textarea
                 id="notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Tambahkan catatan jika diperlukan..."
+                placeholder="Add notes if needed..."
                 className="h-20"
               />
             </div>
@@ -263,11 +263,11 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
                 onClick={onClose}
                 disabled={isLoading}
               >
-                Batal
+                Cancel
               </Button>
             </DialogClose>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Menyimpan...' : currentTest ? 'Simpan Perubahan' : 'Jadwalkan Tes'}
+              {isLoading ? 'Saving...' : currentTest ? 'Save Changes' : 'Schedule Test'}
             </Button>
           </DialogFooter>
         </form>

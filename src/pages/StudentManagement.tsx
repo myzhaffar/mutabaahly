@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
@@ -71,16 +70,16 @@ const StudentManagement: React.FC = () => {
     <TeacherLayout>
       <div className="container mx-auto py-6 space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Daftar Siswa</h1>
+          <h1 className="text-2xl font-bold">Student List</h1>
           <Button onClick={handleAddStudent}>
             <Plus className="mr-2 h-4 w-4" />
-            Tambah Siswa
+            Add Student
           </Button>
         </div>
 
         <div className="flex gap-4">
           <Input
-            placeholder="Cari nama siswa..."
+            placeholder="Search student name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="max-w-sm"
@@ -91,10 +90,10 @@ const StudentManagement: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nama Siswa</TableHead>
-                <TableHead>Kelas</TableHead>
-                <TableHead>Guru</TableHead>
-                <TableHead className="text-right">Aksi</TableHead>
+                <TableHead>Student Name</TableHead>
+                <TableHead>Class</TableHead>
+                <TableHead>Teacher</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

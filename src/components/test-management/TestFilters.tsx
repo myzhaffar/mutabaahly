@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import {
@@ -39,7 +38,7 @@ const TestFilters: React.FC<TestFiltersProps> = ({
   return (
     <div className={`grid grid-cols-1 lg:grid-cols-${showDateFilter ? '4' : '3'} gap-4`}>
       <Input
-        placeholder="Cari nama kelas..."
+        placeholder="Search by class name..."
         value={searchTerm || ''}
         onChange={(e) => onFilterChange('searchTerm', e.target.value)}
       />
@@ -51,7 +50,7 @@ const TestFilters: React.FC<TestFiltersProps> = ({
           <SelectValue placeholder="Filter Status" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">Semua Status</SelectItem>
+          <SelectItem value="all">All Status</SelectItem>
           {STATUS_OPTIONS.map((status) => (
             <SelectItem key={status} value={status}>
               {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
@@ -64,10 +63,10 @@ const TestFilters: React.FC<TestFiltersProps> = ({
         onValueChange={(value) => onFilterChange('jilidLevel', value)}
       >
         <SelectTrigger>
-          <SelectValue placeholder="Filter Jilid" />
+          <SelectValue placeholder="Filter Level" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">Semua Jilid</SelectItem>
+          <SelectItem value="all">All Levels</SelectItem>
           {JILID_OPTIONS.map((jilid) => (
             <SelectItem key={jilid} value={jilid}>{jilid}</SelectItem>
           ))}
@@ -78,7 +77,7 @@ const TestFilters: React.FC<TestFiltersProps> = ({
           type="date"
           value={date || ''}
           onChange={(e) => onFilterChange('date', e.target.value)}
-          placeholder="Filter Tanggal"
+          placeholder="Filter by Date"
         />
       )}
     </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { Plus, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import AddTestDialog from '@/components/AddTestDialog';
@@ -11,6 +11,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchTestsWithFilters } from '@/utils/testQueries';
 import type { TilawatiTest, TestStatus, TilawatiJilid, StudentForTest } from '@/types/tilawati';
+import { useNavigate } from 'react-router-dom';
 
 interface TestFilters {
   status?: TestStatus | 'all';
@@ -20,6 +21,7 @@ interface TestFilters {
 }
 
 const TeacherTestManagement: React.FC = () => {
+  const navigate = useNavigate();
   const { profile } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -183,10 +185,21 @@ const TeacherTestManagement: React.FC = () => {
     <TeacherLayout>
       <div className="container mx-auto py-6 space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Tes Kenaikan Level</h1>
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/dashboard')}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+            <h1 className="text-2xl font-bold">Level Advancement Tests</h1>
+          </div>
           <Button onClick={() => setIsAddDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Jadwalkan Tes
+            Schedule Test
           </Button>
         </div>
 

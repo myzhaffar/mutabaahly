@@ -70,19 +70,19 @@ const DeleteTestDialog: React.FC<DeleteTestDialogProps> = ({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Hapus Tes</AlertDialogTitle>
+          <AlertDialogTitle>Delete Test</AlertDialogTitle>
           <AlertDialogDescription>
-            Apakah Anda yakin ingin menghapus tes ini? Tindakan ini tidak dapat dibatalkan.
+            Are you sure you want to delete this test? This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Batal</AlertDialogCancel>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={loading}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {loading ? 'Menghapus...' : 'Hapus'}
+            {loading ? 'Deleting...' : 'Delete'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
