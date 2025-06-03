@@ -24,7 +24,7 @@ function AppContent() {
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-islamic-50 to-islamic-100">
-      <Navigation />
+      {(!profile || profile.role !== 'teacher') && <Navigation />}
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/auth" element={<Auth />} />

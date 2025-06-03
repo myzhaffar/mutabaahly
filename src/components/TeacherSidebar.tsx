@@ -1,15 +1,17 @@
-
 "use client";
 
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Home, Users, BookMarked, UserCircle, Menu, X } from 'lucide-react';
+import { Home, Users, BookMarked, UserCircle, Menu, X, LogOut } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const TeacherSidebar = () => {
   const location = useLocation();
   const pathname = location.pathname;
-  const { profile } = useAuth();
+  const navigate = useNavigate();
+  const { profile, signOut } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Close mobile menu when route changes
@@ -33,6 +35,11 @@ const TeacherSidebar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMobileMenuOpen]);
 
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
   if (profile?.role !== 'teacher') {
     return null;
   }
@@ -46,6 +53,14 @@ const TeacherSidebar = () => {
 
   return (
     <>
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white shadow-md text-islamic-700 hover:bg-islamic-50"
+      >
+        {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+      </button>
+
       {/* Backdrop */}
       {isMobileMenuOpen && (
         <div 
@@ -103,6 +118,33 @@ const TeacherSidebar = () => {
             );
           })}
         </nav>
+
+        {/* User Profile Section */}
+        <div className="absolute bottom-0 left-0 right-0 px-5 py-4 bg-islamic-800">
+          <div className="flex items-center space-x-3 mb-4">
+            <Avatar className="h-10 w-10">
+              <AvatarFallback className="bg-islamic-600">
+                {profile?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white truncate">
+                {profile?.full_name}
+              </p>
+              <p className="text-xs text-gray-300 truncate">
+                Teacher
+              </p>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-gray-200 hover:text-white hover:bg-islamic-600"
+            onClick={handleSignOut}
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Sign Out
+          </Button>
+        </div>
       </aside>
     </>
   );
