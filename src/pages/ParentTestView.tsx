@@ -10,16 +10,10 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { TestStatus, TilawatiJilid, TilawatiTest } from '@/types/tilawati';
 
-interface DateRange {
-  startDate?: Date;
-  endDate?: Date;
-}
-
 interface TestFilters {
   status?: TestStatus | 'all';
   searchTerm?: string;
   jilidLevel?: TilawatiJilid | 'all';
-  dateRange?: DateRange;
 }
 
 const ParentTestView: React.FC = () => {
@@ -34,7 +28,7 @@ const ParentTestView: React.FC = () => {
     enabled: !!profile?.id,
   });
 
-  const handleFilterChange = (key: string, value: string | undefined | DateRange) => {
+  const handleFilterChange = (key: string, value: string | undefined) => {
     setFilters(prev => ({
       ...prev,
       [key]: value === 'all' ? undefined : value,
@@ -109,10 +103,8 @@ Catatan: ${test.notes || 'Tidak ada catatan'}`;
             searchTerm={filters.searchTerm}
             status={filters.status}
             jilidLevel={filters.jilidLevel}
-            startDate={filters.dateRange?.startDate}
-            endDate={filters.dateRange?.endDate}
             onFilterChange={handleFilterChange}
-            showDateFilter={true}
+            showDateFilter={false}
             showAdvancedFilters={showAdvancedFilters}
           />
         </div>

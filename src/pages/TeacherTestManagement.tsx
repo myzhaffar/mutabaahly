@@ -13,16 +13,11 @@ import { fetchTestsWithFilters } from '@/utils/testQueries';
 import type { TilawatiTest, TestStatus, TilawatiJilid, StudentForTest } from '@/types/tilawati';
 import { useNavigate } from 'react-router-dom';
 
-interface DateRange {
-  startDate?: Date;
-  endDate?: Date;
-}
-
 interface TestFilters {
   status?: TestStatus | 'all';
   searchTerm?: string;
   jilidLevel?: TilawatiJilid | 'all';
-  dateRange?: DateRange;
+  date?: string;
 }
 
 const TeacherTestManagement: React.FC = () => {
@@ -94,7 +89,7 @@ const TeacherTestManagement: React.FC = () => {
     });
   };
 
-  const handleFilterChange = (key: string, value: string | undefined | DateRange) => {
+  const handleFilterChange = (key: string, value: string | undefined) => {
     setFilters(prev => ({
       ...prev,
       [key]: value === 'all' ? undefined : value,
@@ -148,8 +143,7 @@ const TeacherTestManagement: React.FC = () => {
             searchTerm={filters.searchTerm}
             status={filters.status}
             jilidLevel={filters.jilidLevel}
-            startDate={filters.dateRange?.startDate}
-            endDate={filters.dateRange?.endDate}
+            date={filters.date}
             onFilterChange={handleFilterChange}
             showDateFilter={true}
             showAdvancedFilters={showAdvancedFilters}

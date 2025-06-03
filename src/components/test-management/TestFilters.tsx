@@ -7,16 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
 import type { TestStatus, TilawatiJilid } from '@/types/tilawati';
 
 const JILID_OPTIONS: TilawatiJilid[] = [
@@ -28,18 +18,12 @@ const STATUS_OPTIONS: TestStatus[] = [
   'scheduled', 'passed', 'failed', 'pending_retake', 'cancelled'
 ];
 
-interface DateRange {
-  startDate?: Date;
-  endDate?: Date;
-}
-
 interface TestFiltersProps {
   searchTerm?: string;
   status?: TestStatus | 'all';
   jilidLevel?: TilawatiJilid | 'all';
-  startDate?: Date;
-  endDate?: Date;
-  onFilterChange: (key: string, value: string | undefined | DateRange) => void;
+  date?: string;
+  onFilterChange: (key: string, value: string | undefined) => void;
   showDateFilter?: boolean;
   showAdvancedFilters?: boolean;
 }
@@ -48,19 +32,11 @@ const TestFilters: React.FC<TestFiltersProps> = ({
   searchTerm,
   status,
   jilidLevel,
-  startDate,
-  endDate,
+  date,
   onFilterChange,
   showDateFilter = false,
   showAdvancedFilters = true
 }) => {
-  const formatDateRange = () => {
-    if (!startDate && !endDate) return 'Pilih tanggal';
-    if (startDate && !endDate) return format(startDate, 'dd MMM yyyy', { locale: id });
-    if (!startDate && endDate) return `Sampai ${format(endDate, 'dd MMM yyyy', { locale: id })}`;
-    return `${format(startDate, 'dd MMM yyyy', { locale: id })} - ${format(endDate, 'dd MMM yyyy', { locale: id })}`;
-  };
-
   return (
     <div className="space-y-4">
       {/* Always visible filters */}
@@ -72,34 +48,13 @@ const TestFilters: React.FC<TestFiltersProps> = ({
           className="w-full"
         />
         {showDateFilter && (
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-start text-left font-normal"
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {formatDateRange()}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="range"
-                selected={{
-                  from: startDate,
-                  to: endDate,
-                }}
-                onSelect={(range) => {
-                  onFilterChange('dateRange', {
-                    startDate: range?.from,
-                    endDate: range?.to,
-                  });
-                }}
-                numberOfMonths={2}
-                locale={id}
-              />
-            </PopoverContent>
-          </Popover>
+          <Input
+            type="date"
+            value={date || ''}
+            onChange={(e) => onFilterChange('date', e.target.value)}
+            placeholder="Filter berdasarkan tanggal"
+            className="w-full"
+          />
         )}
       </div>
 
