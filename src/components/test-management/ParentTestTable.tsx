@@ -10,25 +10,21 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Edit, Trash2 } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import type { TilawatiTest, TestStatus } from '@/types/tilawati';
-import EditTestDialog from '@/components/EditTestDialog';
-import DeleteTestDialog from '@/components/DeleteTestDialog';
 
-interface TestTableProps {
+interface ParentTestTableProps {
   tests: TilawatiTest[];
   isLoading: boolean;
-  onTestUpdated: () => void;
+  onViewDetails?: (test: TilawatiTest) => void;
   showStudentName?: boolean;
-  getStudentName?: (studentId: string) => string;
 }
 
-const TestTable: React.FC<TestTableProps> = ({
+const ParentTestTable: React.FC<ParentTestTableProps> = ({
   tests,
   isLoading,
-  onTestUpdated,
+  onViewDetails,
   showStudentName = false,
-  getStudentName
 }) => {
   const getStatusBadge = (status: TestStatus) => {
     const variants = {
@@ -46,17 +42,6 @@ const TestTable: React.FC<TestTableProps> = ({
     );
   };
 
-  const handleViewDetails = (test: TilawatiTest) => {
-    alert(`Test Details:
-Student: ${getStudentName ? getStudentName(test.student_id) : test.student_id}
-Date: ${format(new Date(test.date), 'dd/MM/yyyy')}
-Class: ${test.class_name || '-'}
-Level: ${test.tilawati_level}
-Munaqisy: ${test.munaqisy}
-Status: ${test.status}
-Notes: ${test.notes || 'No notes'}`);
-  };
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -68,9 +53,7 @@ Notes: ${test.notes || 'No notes'}`);
         <div key={test.id} className="bg-white rounded-lg shadow p-4 space-y-3">
           {showStudentName && (
             <div className="flex justify-between items-center">
-              <span className="font-medium">
-                {getStudentName ? getStudentName(test.student_id) : test.student_id}
-              </span>
+              <span className="font-medium">{test.student?.name || test.student_id}</span>
               {getStatusBadge(test.status)}
             </div>
           )}
@@ -98,13 +81,14 @@ Notes: ${test.notes || 'No notes'}`);
               <p className="text-sm">{test.notes}</p>
             </div>
           )}
-          <div className="flex justify-end gap-2 pt-2 border-t">
-            <Button variant="ghost" size="sm" onClick={() => handleViewDetails(test)}>
-              <Eye className="h-4 w-4" />
-            </Button>
-            <EditTestDialog test={test} onTestUpdated={onTestUpdated} />
-            <DeleteTestDialog testId={test.id} onTestDeleted={onTestUpdated} />
-          </div>
+          {onViewDetails && (
+            <div className="flex justify-end pt-2">
+              <Button variant="ghost" size="sm" onClick={() => onViewDetails(test)}>
+                <Eye className="h-4 w-4 mr-2" />
+                View Details
+              </Button>
+            </div>
+          )}
         </div>
       ))}
     </div>
@@ -119,7 +103,7 @@ Notes: ${test.notes || 'No notes'}`);
             {showStudentName && <TableHead>Student Name</TableHead>}
             <TableHead>Class</TableHead>
             <TableHead>Tilawati Level</TableHead>
-            <TableHead>Date</TableHead>
+            <TableHead>Test Date</TableHead>
             <TableHead>Examiner</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Notes</TableHead>
@@ -130,9 +114,7 @@ Notes: ${test.notes || 'No notes'}`);
           {tests.map((test) => (
             <TableRow key={test.id}>
               {showStudentName && (
-                <TableCell>
-                  {getStudentName ? getStudentName(test.student_id) : test.student_id}
-                </TableCell>
+                <TableCell>{test.student?.name || test.student_id}</TableCell>
               )}
               <TableCell>{test.class_name || '-'}</TableCell>
               <TableCell>{test.tilawati_level}</TableCell>
@@ -142,11 +124,11 @@ Notes: ${test.notes || 'No notes'}`);
               <TableCell>{test.notes || '-'}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end space-x-1">
-                  <Button variant="ghost" size="sm" onClick={() => handleViewDetails(test)}>
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <EditTestDialog test={test} onTestUpdated={onTestUpdated} />
-                  <DeleteTestDialog testId={test.id} onTestDeleted={onTestUpdated} />
+                  {onViewDetails && (
+                    <Button variant="ghost" size="sm" onClick={() => onViewDetails(test)}>
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               </TableCell>
             </TableRow>
@@ -164,4 +146,4 @@ Notes: ${test.notes || 'No notes'}`);
   );
 };
 
-export default TestTable;
+export default ParentTestTable; 

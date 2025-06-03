@@ -36,50 +36,56 @@ const TestFilters: React.FC<TestFiltersProps> = ({
   showDateFilter = false
 }) => {
   return (
-    <div className={`grid grid-cols-1 lg:grid-cols-${showDateFilter ? '4' : '3'} gap-4`}>
-      <Input
-        placeholder="Search by class name..."
-        value={searchTerm || ''}
-        onChange={(e) => onFilterChange('searchTerm', e.target.value)}
-      />
-      <Select
-        value={status || undefined}
-        onValueChange={(value) => onFilterChange('status', value)}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Filter Status" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Status</SelectItem>
-          {STATUS_OPTIONS.map((status) => (
-            <SelectItem key={status} value={status}>
-              {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Select
-        value={jilidLevel || undefined}
-        onValueChange={(value) => onFilterChange('jilidLevel', value)}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Filter Level" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Levels</SelectItem>
-          {JILID_OPTIONS.map((jilid) => (
-            <SelectItem key={jilid} value={jilid}>{jilid}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      {showDateFilter && (
+    <div className="space-y-4 bg-white p-4 rounded-lg shadow-sm">
+      <div className="w-full">
         <Input
-          type="date"
-          value={date || ''}
-          onChange={(e) => onFilterChange('date', e.target.value)}
-          placeholder="Filter by Date"
+          placeholder="Search by class name..."
+          value={searchTerm || ''}
+          onChange={(e) => onFilterChange('searchTerm', e.target.value)}
+          className="w-full"
         />
-      )}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Select
+          value={status || undefined}
+          onValueChange={(value) => onFilterChange('status', value)}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Filter Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            {STATUS_OPTIONS.map((status) => (
+              <SelectItem key={status} value={status}>
+                {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={jilidLevel || undefined}
+          onValueChange={(value) => onFilterChange('jilidLevel', value)}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Filter Level" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Levels</SelectItem>
+            {JILID_OPTIONS.map((jilid) => (
+              <SelectItem key={jilid} value={jilid}>{jilid}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {showDateFilter && (
+          <Input
+            type="date"
+            value={date || ''}
+            onChange={(e) => onFilterChange('date', e.target.value)}
+            placeholder="Filter by Date"
+            className="w-full"
+          />
+        )}
+      </div>
     </div>
   );
 };

@@ -1,12 +1,13 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import ParentLayout from '@/components/layouts/ParentLayout';
 import TestStatsCards from '@/components/test-management/TestStatsCards';
 import TestFilters from '@/components/test-management/TestFilters';
-import TestTable from '@/components/test-management/TestTable';
+import ParentTestTable from '@/components/test-management/ParentTestTable';
 import { fetchTestsWithFilters } from '@/utils/testQueries';
 import { useAuth } from '@/contexts/AuthContext';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import type { TestStatus, TilawatiJilid, TilawatiTest } from '@/types/tilawati';
 
 interface TestFilters {
@@ -18,6 +19,7 @@ interface TestFilters {
 const ParentTestView: React.FC = () => {
   const { profile } = useAuth();
   const [filters, setFilters] = useState<TestFilters>({});
+  const [showFilters, setShowFilters] = useState(false);
 
   // Fetch children's tests
   const { data: tests, isLoading } = useQuery({
@@ -61,21 +63,33 @@ Catatan: ${test.notes || 'Tidak ada catatan'}`;
 
   return (
     <ParentLayout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
+      <div className="space-y-6 px-4 md:px-0">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <h1 className="text-xl lg:text-2xl font-bold">Tes Kenaikan Level Anak</h1>
+          <Button
+            variant="outline"
+            className="w-full md:w-auto flex items-center gap-2"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            {showFilters ? 'Hide Filters' : 'Show Filters'}
+            {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
         </div>
 
-        <TestStatsCards stats={stats} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <TestStatsCards stats={stats} />
+        </div>
 
-        <TestFilters
-          searchTerm={filters.searchTerm}
-          status={filters.status}
-          jilidLevel={filters.jilidLevel}
-          onFilterChange={handleFilterChange}
-        />
+        <div className={`transition-all duration-300 ease-in-out ${showFilters ? 'block' : 'hidden md:block'}`}>
+          <TestFilters
+            searchTerm={filters.searchTerm}
+            status={filters.status}
+            jilidLevel={filters.jilidLevel}
+            onFilterChange={handleFilterChange}
+          />
+        </div>
 
-        <TestTable
+        <ParentTestTable
           tests={tests || []}
           isLoading={isLoading}
           onViewDetails={handleViewTestDetails}

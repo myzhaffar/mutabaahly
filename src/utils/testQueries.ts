@@ -212,19 +212,36 @@ export const updateTest = async (testId: string, updates: {
 };
 
 export const deleteTest = async (testId: string): Promise<void> => {
+  if (!testId) {
+    throw new Error('Test ID is required');
+  }
+
   try {
-    console.log('Deleting test:', testId);
-    const { error } = await supabase
+    // First check if the test exists
+    const { data: existingTest, error: checkError } = await supabase
+      .from('tilawati_level_tests')
+      .select('id')
+      .eq('id', testId)
+      .single();
+
+    if (checkError) {
+      throw new Error('Failed to verify test existence');
+    }
+
+    if (!existingTest) {
+      throw new Error('Test not found');
+    }
+
+    // Delete the test
+    const { error: deleteError } = await supabase
       .from('tilawati_level_tests')
       .delete()
       .eq('id', testId);
 
-    if (error) {
-      console.error('Error deleting test:', error);
-      throw error;
+    if (deleteError) {
+      console.error('Error deleting test:', deleteError);
+      throw new Error(deleteError.message);
     }
-
-    console.log('Test deleted successfully');
   } catch (error) {
     console.error('Error in deleteTest:', error);
     throw error;

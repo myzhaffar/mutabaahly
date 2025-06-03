@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus, ArrowLeft } from 'lucide-react';
+import { Plus, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import AddTestDialog from '@/components/AddTestDialog';
@@ -28,6 +28,7 @@ const TeacherTestManagement: React.FC = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedTest, setSelectedTest] = useState<TilawatiTest | null>(null);
   const [filters, setFilters] = useState<TestFilters>({});
+  const [showFilters, setShowFilters] = useState(false);
 
   // Fetch students for the teacher
   const { data: students, isLoading: isLoadingStudents, refetch: refetchStudents } = useQuery({
@@ -183,42 +184,62 @@ const TeacherTestManagement: React.FC = () => {
 
   return (
     <TeacherLayout>
-      <div className="container mx-auto py-6 space-y-6">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-4">
+      <div className="container mx-auto px-4 md:px-6 py-6 space-y-6">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto">
             <Button 
               variant="outline" 
               size="sm"
               onClick={() => navigate('/dashboard')}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 w-full md:w-auto"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
             </Button>
             <h1 className="text-2xl font-bold">Level Advancement Tests</h1>
           </div>
-          <Button onClick={() => setIsAddDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Schedule Test
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+            <Button 
+              variant="outline"
+              className="w-full sm:w-auto flex items-center gap-2"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              {showFilters ? 'Hide Filters' : 'Show Filters'}
+              {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+            <Button 
+              onClick={() => setIsAddDialogOpen(true)}
+              className="w-full sm:w-auto"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Schedule Test
+            </Button>
+          </div>
         </div>
 
-        <TestFilters
-          searchTerm={filters.searchTerm}
-          status={filters.status}
-          jilidLevel={filters.jilidLevel}
-          date={filters.date}
-          onFilterChange={handleFilterChange}
-          showDateFilter={true}
-        />
+        {/* Filters Section */}
+        <div className={`transition-all duration-300 ease-in-out ${showFilters ? 'block' : 'hidden md:block'}`}>
+          <TestFilters
+            searchTerm={filters.searchTerm}
+            status={filters.status}
+            jilidLevel={filters.jilidLevel}
+            date={filters.date}
+            onFilterChange={handleFilterChange}
+            showDateFilter={true}
+          />
+        </div>
 
-        <TestTable
-          tests={tests || []}
-          isLoading={isLoading}
-          onTestUpdated={handleTestUpdate}
-          showStudentName={true}
-          getStudentName={getStudentName}
-        />
+        {/* Table Section */}
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <TestTable
+            tests={tests || []}
+            isLoading={isLoading}
+            onTestUpdated={handleTestUpdate}
+            showStudentName={true}
+            getStudentName={getStudentName}
+          />
+        </div>
 
         {/* Add/Edit Test Dialog */}
         {isAddDialogOpen && (

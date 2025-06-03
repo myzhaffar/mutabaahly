@@ -7,7 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import Navigation from '@/components/Navigation';
+import ParentNavbar from '@/components/ParentNavbar';
 import Dashboard from '@/pages/Dashboard';
 import Auth from '@/pages/Auth';
 import Profile from '@/pages/Profile';
@@ -24,7 +24,7 @@ function AppContent() {
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-islamic-50 to-islamic-100">
-      {(!profile || profile.role !== 'teacher') && <Navigation />}
+      {profile?.role === 'parent' && <ParentNavbar />}
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/auth" element={<Auth />} />

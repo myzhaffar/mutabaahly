@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
@@ -14,7 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { supabase } from '@/lib/supabase';
+import { deleteTest } from '@/utils/testQueries';
 
 interface DeleteTestDialogProps {
   testId: string;
@@ -25,20 +25,12 @@ const DeleteTestDialog: React.FC<DeleteTestDialogProps> = ({
   testId,
   onTestDeleted
 }) => {
-  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const handleDelete = async () => {
-    setLoading(true);
-
     try {
-      const { error } = await supabase
-        .from('tilawati_level_tests')
-        .delete()
-        .eq('id', testId);
-
-      if (error) throw error;
+      await deleteTest(testId);
 
       // Invalidate and refetch
       await queryClient.invalidateQueries({ queryKey: ['tilawati-tests'] });
@@ -48,7 +40,10 @@ const DeleteTestDialog: React.FC<DeleteTestDialogProps> = ({
         description: "Test deleted successfully!",
       });
 
-      onTestDeleted();
+      // Call the callback
+      if (onTestDeleted) {
+        onTestDeleted();
+      }
     } catch (error) {
       console.error('Error deleting test:', error);
       toast({
@@ -56,8 +51,6 @@ const DeleteTestDialog: React.FC<DeleteTestDialogProps> = ({
         description: "Failed to delete test. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -79,10 +72,9 @@ const DeleteTestDialog: React.FC<DeleteTestDialogProps> = ({
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
-            disabled={loading}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {loading ? 'Deleting...' : 'Delete'}
+            Delete
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
