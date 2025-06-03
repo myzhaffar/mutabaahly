@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import type { TilawatiTest, TilawatiJilid, TestStatus } from '@/types/tilawati';
+import type { TestStatus, TilawatiJilid, TilawatiTest } from '@/types/tilawati';
 
 export interface TestRecord {
   id: string;
@@ -53,51 +53,85 @@ export const fetchTestsForParent = async (parentId: string): Promise<TestRecord[
   }
 };
 
+interface DateRange {
+  startDate?: Date;
+  endDate?: Date;
+}
+
 interface TestFilters {
   status?: TestStatus | 'all';
   searchTerm?: string;
   jilidLevel?: TilawatiJilid | 'all';
-  date?: string;
+  dateRange?: DateRange;
+}
+
+interface Student {
+  id: string;
+  name: string;
+  group_name: string;
+  grade: string;
+  teacher: string;
 }
 
 export const fetchTestsWithFilters = async (filters: TestFilters): Promise<TilawatiTest[]> => {
-  try {
-    console.log('Fetching tests with filters:', filters);
-    let query = supabase
-      .from('tilawati_level_tests')
-      .select('*')
-      .order('date', { ascending: false });
+  let query = supabase
+    .from('tilawati_tests')
+    .select(`
+      id,
+      student_id,
+      class_name,
+      tilawati_level,
+      date,
+      munaqisy,
+      status,
+      notes,
+      created_at,
+      updated_at,
+      student:students (
+        id,
+        name,
+        group_name,
+        grade,
+        teacher
+      )
+    `);
 
-    // Apply filters
-    if (filters.status && filters.status !== 'all') {
-      query = query.eq('status', filters.status);
-    }
+  // Apply filters
+  if (filters.status && filters.status !== 'all') {
+    query = query.eq('status', filters.status);
+  }
 
-    if (filters.searchTerm) {
-      query = query.ilike('class_name', `%${filters.searchTerm}%`);
-    }
+  if (filters.jilidLevel && filters.jilidLevel !== 'all') {
+    query = query.eq('tilawati_level', filters.jilidLevel);
+  }
 
-    if (filters.jilidLevel && filters.jilidLevel !== 'all') {
-      query = query.eq('tilawati_level', filters.jilidLevel);
-    }
+  if (filters.searchTerm) {
+    query = query.ilike('class_name', `%${filters.searchTerm}%`);
+  }
 
-    if (filters.date) {
-      query = query.eq('date', filters.date);
-    }
+  // Apply date range filter
+  if (filters.dateRange?.startDate) {
+    query = query.gte('date', filters.dateRange.startDate.toISOString().split('T')[0]);
+  }
+  if (filters.dateRange?.endDate) {
+    query = query.lte('date', filters.dateRange.endDate.toISOString().split('T')[0]);
+  }
 
-    const { data, error } = await query;
+  // Order by date
+  query = query.order('date', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching tests with filters:', error);
-      throw error;
-    }
+  const { data: tests, error } = await query;
 
-    console.log('Fetched tests:', data);
-    return data || [];
-  } catch (error) {
-    console.error('Error in fetchTestsWithFilters:', error);
+  if (error) {
+    console.error('Error fetching tests:', error);
     throw error;
   }
+
+  // Transform the data to match the TilawatiTest type
+  return (tests || []).map(test => ({
+    ...test,
+    student: test.student?.[0] as Student | undefined
+  })) as TilawatiTest[];
 };
 
 export const saveTest = async (testData: {

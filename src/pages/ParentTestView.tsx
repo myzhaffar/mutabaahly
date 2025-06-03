@@ -10,16 +10,22 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { TestStatus, TilawatiJilid, TilawatiTest } from '@/types/tilawati';
 
+interface DateRange {
+  startDate?: Date;
+  endDate?: Date;
+}
+
 interface TestFilters {
   status?: TestStatus | 'all';
   searchTerm?: string;
   jilidLevel?: TilawatiJilid | 'all';
+  dateRange?: DateRange;
 }
 
 const ParentTestView: React.FC = () => {
   const { profile } = useAuth();
   const [filters, setFilters] = useState<TestFilters>({});
-  const [showFilters, setShowFilters] = useState(false);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   // Fetch children's tests
   const { data: tests, isLoading } = useQuery({
@@ -28,7 +34,7 @@ const ParentTestView: React.FC = () => {
     enabled: !!profile?.id,
   });
 
-  const handleFilterChange = (key: string, value: string | undefined) => {
+  const handleFilterChange = (key: string, value: string | undefined | DateRange) => {
     setFilters(prev => ({
       ...prev,
       [key]: value === 'all' ? undefined : value,
@@ -63,38 +69,63 @@ Catatan: ${test.notes || 'Tidak ada catatan'}`;
 
   return (
     <ParentLayout>
-      <div className="space-y-6 px-4 md:px-0">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="space-y-6 px-4 md:px-6">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
           <h1 className="text-xl lg:text-2xl font-bold">Tes Kenaikan Level Anak</h1>
           <Button
             variant="outline"
             className="w-full md:w-auto flex items-center gap-2"
-            onClick={() => setShowFilters(!showFilters)}
+            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
           >
-            {showFilters ? 'Hide Filters' : 'Show Filters'}
-            {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {showAdvancedFilters ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+            {showAdvancedFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <TestStatsCards stats={stats} />
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <h3 className="text-sm text-gray-500">Total Tes</h3>
+            <p className="text-2xl font-bold">{stats.total}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <h3 className="text-sm text-gray-500">Lulus</h3>
+            <p className="text-2xl font-bold text-green-600">{stats.passed}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <h3 className="text-sm text-gray-500">Terjadwal</h3>
+            <p className="text-2xl font-bold text-blue-600">{stats.scheduled}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <h3 className="text-sm text-gray-500">Belum Lulus</h3>
+            <p className="text-2xl font-bold text-red-600">{stats.failed}</p>
+          </div>
         </div>
 
-        <div className={`transition-all duration-300 ease-in-out ${showFilters ? 'block' : 'hidden md:block'}`}>
+        {/* Filters Section */}
+        <div className="bg-white rounded-lg shadow-sm p-4">
           <TestFilters
             searchTerm={filters.searchTerm}
             status={filters.status}
             jilidLevel={filters.jilidLevel}
+            startDate={filters.dateRange?.startDate}
+            endDate={filters.dateRange?.endDate}
             onFilterChange={handleFilterChange}
+            showDateFilter={true}
+            showAdvancedFilters={showAdvancedFilters}
           />
         </div>
 
-        <ParentTestTable
-          tests={tests || []}
-          isLoading={isLoading}
-          onViewDetails={handleViewTestDetails}
-          showStudentName={true}
-        />
+        {/* Table Section */}
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <ParentTestTable
+            tests={tests || []}
+            isLoading={isLoading}
+            onViewDetails={handleViewTestDetails}
+            showStudentName={true}
+          />
+        </div>
       </div>
     </ParentLayout>
   );

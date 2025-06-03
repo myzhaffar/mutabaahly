@@ -1,5 +1,4 @@
 import React from 'react';
-import { format } from 'date-fns';
 import {
   Table,
   TableBody,
@@ -8,17 +7,35 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Eye } from 'lucide-react';
-import type { TilawatiTest, TestStatus } from '@/types/tilawati';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import type { TilawatiTest } from '@/types/tilawati';
 
 interface ParentTestTableProps {
   tests: TilawatiTest[];
   isLoading: boolean;
-  onViewDetails?: (test: TilawatiTest) => void;
+  onViewDetails: (test: TilawatiTest) => void;
   showStudentName?: boolean;
 }
+
+const getStatusColor = (status: string): string => {
+  switch (status) {
+    case 'passed':
+      return 'bg-green-100 text-green-800';
+    case 'failed':
+      return 'bg-red-100 text-red-800';
+    case 'scheduled':
+      return 'bg-blue-100 text-blue-800';
+    case 'pending_retake':
+      return 'bg-yellow-100 text-yellow-800';
+    case 'cancelled':
+      return 'bg-gray-100 text-gray-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+};
 
 const ParentTestTable: React.FC<ParentTestTableProps> = ({
   tests,
@@ -26,110 +43,94 @@ const ParentTestTable: React.FC<ParentTestTableProps> = ({
   onViewDetails,
   showStudentName = false,
 }) => {
-  const getStatusBadge = (status: TestStatus) => {
-    const variants = {
-      scheduled: 'bg-blue-100 text-blue-800',
-      passed: 'bg-green-100 text-green-800',
-      failed: 'bg-red-100 text-red-800',
-      pending_retake: 'bg-yellow-100 text-yellow-800',
-      cancelled: 'bg-gray-100 text-gray-800'
-    };
-    
-    return (
-      <Badge className={variants[status]}>
-        {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
-      </Badge>
-    );
-  };
-
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="p-4 bg-white rounded-lg shadow-sm">
+            <Skeleton className="h-4 w-3/4 mb-2" />
+            <Skeleton className="h-4 w-1/2" />
+          </div>
+        ))}
+      </div>
+    );
   }
 
-  // Mobile card view
+  if (tests.length === 0) {
+    return (
+      <div className="text-center py-8 px-4">
+        <p className="text-gray-500">Belum ada data tes yang tersedia.</p>
+      </div>
+    );
+  }
+
+  // Mobile view - card layout
   const MobileView = () => (
     <div className="space-y-4 md:hidden">
       {tests.map((test) => (
-        <div key={test.id} className="bg-white rounded-lg shadow p-4 space-y-3">
-          {showStudentName && (
-            <div className="flex justify-between items-center">
-              <span className="font-medium">{test.student?.name || test.student_id}</span>
-              {getStatusBadge(test.status)}
-            </div>
-          )}
-          <div className="grid grid-cols-2 gap-2 text-sm">
+        <div key={test.id} className="bg-white p-4 rounded-lg shadow-sm space-y-3">
+          <div className="flex justify-between items-start">
             <div>
-              <p className="text-gray-500">Class</p>
-              <p className="font-medium">{test.class_name || '-'}</p>
+              <p className="font-medium">{test.class_name}</p>
+              <p className="text-sm text-gray-500">{test.tilawati_level}</p>
             </div>
-            <div>
-              <p className="text-gray-500">Level</p>
-              <p className="font-medium">{test.tilawati_level}</p>
-            </div>
-            <div>
-              <p className="text-gray-500">Date</p>
-              <p className="font-medium">{format(new Date(test.date), 'dd/MM/yyyy')}</p>
-            </div>
-            <div>
-              <p className="text-gray-500">Examiner</p>
-              <p className="font-medium">{test.munaqisy}</p>
-            </div>
+            <Badge className={getStatusColor(test.status)}>
+              {test.status.charAt(0).toUpperCase() + test.status.slice(1).replace('_', ' ')}
+            </Badge>
           </div>
-          {test.notes && (
-            <div className="border-t pt-2">
-              <p className="text-gray-500">Notes</p>
-              <p className="text-sm">{test.notes}</p>
-            </div>
-          )}
-          {onViewDetails && (
-            <div className="flex justify-end pt-2">
-              <Button variant="ghost" size="sm" onClick={() => onViewDetails(test)}>
-                <Eye className="h-4 w-4 mr-2" />
-                View Details
-              </Button>
-            </div>
-          )}
+          <div className="text-sm">
+            <p>Tanggal: {new Date(test.date).toLocaleDateString('id-ID')}</p>
+            <p>Penguji: {test.munaqisy}</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={() => onViewDetails(test)}
+          >
+            <Eye className="h-4 w-4 mr-2" />
+            Lihat Detail
+          </Button>
         </div>
       ))}
     </div>
   );
 
-  // Desktop table view
+  // Desktop view - table layout
   const DesktopView = () => (
-    <div className="hidden md:block overflow-x-auto">
+    <div className="hidden md:block">
       <Table>
         <TableHeader>
           <TableRow>
-            {showStudentName && <TableHead>Student Name</TableHead>}
-            <TableHead>Class</TableHead>
-            <TableHead>Tilawati Level</TableHead>
-            <TableHead>Test Date</TableHead>
-            <TableHead>Examiner</TableHead>
+            <TableHead>Kelas</TableHead>
+            <TableHead>Level</TableHead>
+            <TableHead>Tanggal</TableHead>
+            <TableHead>Penguji</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Notes</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="text-right">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {tests.map((test) => (
             <TableRow key={test.id}>
-              {showStudentName && (
-                <TableCell>{test.student?.name || test.student_id}</TableCell>
-              )}
-              <TableCell>{test.class_name || '-'}</TableCell>
+              <TableCell className="font-medium">{test.class_name}</TableCell>
               <TableCell>{test.tilawati_level}</TableCell>
-              <TableCell>{format(new Date(test.date), 'dd/MM/yyyy')}</TableCell>
+              <TableCell>{new Date(test.date).toLocaleDateString('id-ID')}</TableCell>
               <TableCell>{test.munaqisy}</TableCell>
-              <TableCell>{getStatusBadge(test.status)}</TableCell>
-              <TableCell>{test.notes || '-'}</TableCell>
+              <TableCell>
+                <Badge className={getStatusColor(test.status)}>
+                  {test.status.charAt(0).toUpperCase() + test.status.slice(1).replace('_', ' ')}
+                </Badge>
+              </TableCell>
               <TableCell className="text-right">
-                <div className="flex justify-end space-x-1">
-                  {onViewDetails && (
-                    <Button variant="ghost" size="sm" onClick={() => onViewDetails(test)}>
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onViewDetails(test)}
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Detail
+                </Button>
               </TableCell>
             </TableRow>
           ))}
