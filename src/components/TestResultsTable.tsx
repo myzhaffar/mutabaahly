@@ -11,11 +11,11 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  HoverDropdownMenu,
+  HoverDropdownMenuContent,
+  HoverDropdownMenuTrigger,
+} from "@/components/ui/hover-dropdown-menu";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Edit3, Trash2, Eye } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { TilawatiTest } from "@/types/tilawati";
@@ -94,14 +94,14 @@ const TestResultsTable: React.FC<TestResultsTableProps> = ({
               </TableCell>
               <TableCell className="text-center px-4 py-3 text-sm text-gray-600 whitespace-nowrap">{test.notes || '-'}</TableCell>
               <TableCell className="text-right px-4 py-3">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                <HoverDropdownMenu>
+                  <HoverDropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700">
                       <span className="sr-only">Open menu</span>
                       <MoreHorizontal className="h-5 w-5" />
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="bg-white shadow-lg rounded-md border border-gray-200 w-40">
+                  </HoverDropdownMenuTrigger>
+                  <HoverDropdownMenuContent align="end" className="bg-white shadow-lg rounded-md border border-gray-200 w-40">
                     {onViewTestDetails && (
                       <DropdownMenuItem onClick={() => onViewTestDetails(test)} className="flex items-center text-sm text-gray-700 hover:bg-gray-100 p-2 cursor-pointer">
                         <Eye className="mr-2 h-4 w-4 text-gray-500" />
@@ -116,8 +116,8 @@ const TestResultsTable: React.FC<TestResultsTableProps> = ({
                       <Trash2 className="mr-2 h-4 w-4" />
                       <span>Delete</span>
                     </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  </HoverDropdownMenuContent>
+                </HoverDropdownMenu>
               </TableCell>
             </TableRow>
           ))}

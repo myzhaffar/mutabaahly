@@ -10,13 +10,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Eye } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import type { TilawatiTest, TestStatus } from '@/types/tilawati';
 import EditTestDialog from '@/components/EditTestDialog';
 import DeleteTestDialog from '@/components/DeleteTestDialog';

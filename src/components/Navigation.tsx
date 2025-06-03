@@ -4,12 +4,10 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { Menu, X, ChevronDown, Home, Users, BookMarked, UserCircle, LogOut, LogIn } from 'lucide-react';
+import { Menu, X, ChevronDown, Home, Users, BookMarked, UserCircle } from 'lucide-react';
 
 const Navigation: React.FC = () => {
   const { user, profile, signOut } = useAuth();
-  const { t, language, setLanguage } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const [isTeacherMenuOpen, setIsTeacherMenuOpen] = useState(false);
@@ -17,10 +15,6 @@ const Navigation: React.FC = () => {
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
-  };
-
-  const handleLanguageSwitch = () => {
-    setLanguage(language === 'id' ? 'en' : 'id');
   };
 
   // Teacher menu items for dropdown
@@ -45,7 +39,7 @@ const Navigation: React.FC = () => {
                 <span className="text-white font-bold text-xl">Q</span>
               </div>
               <span className="font-sf-pro font-semibold text-base text-islamic-700 hidden sm:block">
-                {t('home.title')}
+                Al-Quran Progress
               </span>
             </Link>
           </div>
@@ -81,50 +75,11 @@ const Navigation: React.FC = () => {
                     })}
                   </div>
                 </div>
-
-                {/* Mobile Teacher Dropdown */}
-                <div className="lg:hidden">
-                  <button
-                    onClick={() => setIsTeacherMenuOpen(!isTeacherMenuOpen)}
-                    className="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-islamic-600 hover:text-islamic-800 hover:bg-islamic-50"
-                  >
-                    <Menu className="h-4 w-4" />
-                    <span>Menu</span>
-                    <ChevronDown className="h-4 w-4" />
-                  </button>
-
-                  {isTeacherMenuOpen && (
-                    <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-islamic-200 rounded-lg shadow-lg z-50">
-                      <div className="py-2">
-                        {teacherMenuItems.map((item) => {
-                          const Icon = item.icon;
-                          const isActive = location.pathname === item.href || 
-                            (item.href !== '/dashboard' && location.pathname.startsWith(item.href));
-                          
-                          return (
-                            <Link
-                              key={item.label}
-                              to={item.href}
-                              onClick={() => setIsTeacherMenuOpen(false)}
-                              className={`
-                                flex items-center space-x-3 px-4 py-2 text-sm hover:bg-islamic-50 transition-colors
-                                ${isActive ? 'font-medium text-islamic-800 bg-islamic-50' : 'text-islamic-600'}
-                              `}
-                            >
-                              <Icon className="h-4 w-4" />
-                              <span>{item.label}</span>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </div>
               </div>
             )}
           </div>
 
-          {/* Right side: Auth and Language Controls */}
+          {/* Right side: Auth Controls and Mobile Menu */}
           <div className="flex items-center space-x-4">
             {user ? (
               <>
@@ -137,9 +92,46 @@ const Navigation: React.FC = () => {
                   className="font-sf-text border-islamic-200 hover:bg-islamic-50 text-islamic-700"
                   size="sm"
                 >
-                  <LogOut className="h-4 w-4 mr-2" />
                   Sign Out
                 </Button>
+                {/* Mobile Menu Button */}
+                {profile?.role === 'teacher' && (
+                  <div className="lg:hidden relative">
+                    <button
+                      onClick={() => setIsTeacherMenuOpen(!isTeacherMenuOpen)}
+                      className="flex items-center justify-center w-8 h-8 rounded-lg text-sm font-medium text-islamic-600 hover:text-islamic-800 hover:bg-islamic-50"
+                    >
+                      <Menu className="h-5 w-5" />
+                    </button>
+
+                    {isTeacherMenuOpen && (
+                      <div className="absolute top-full right-0 mt-1 w-56 bg-white border border-islamic-200 rounded-lg shadow-lg z-50">
+                        <div className="py-2">
+                          {teacherMenuItems.map((item) => {
+                            const Icon = item.icon;
+                            const isActive = location.pathname === item.href || 
+                              (item.href !== '/dashboard' && location.pathname.startsWith(item.href));
+                            
+                            return (
+                              <Link
+                                key={item.label}
+                                to={item.href}
+                                onClick={() => setIsTeacherMenuOpen(false)}
+                                className={`
+                                  flex items-center space-x-3 px-4 py-2 text-sm hover:bg-islamic-50 transition-colors
+                                  ${isActive ? 'font-medium text-islamic-800 bg-islamic-50' : 'text-islamic-600'}
+                                `}
+                              >
+                                <Icon className="h-4 w-4" />
+                                <span>{item.label}</span>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </>
             ) : (
               <Button
@@ -148,19 +140,9 @@ const Navigation: React.FC = () => {
                 className="font-sf-text border-islamic-200 hover:bg-islamic-50 text-islamic-700"
                 size="sm"
               >
-                <LogIn className="h-4 w-4 mr-2" />
                 Sign In
               </Button>
             )}
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLanguageSwitch}
-              className="font-sf-text text-islamic-600 hover:text-islamic-800"
-            >
-              {language === 'id' ? 'EN' : 'ID'}
-            </Button>
           </div>
         </div>
       </div>

@@ -16,6 +16,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  HoverDropdownMenu,
+  HoverDropdownMenuTrigger,
+  HoverDropdownMenuContent,
+} from "@/components/ui/hover-dropdown-menu";
 
 interface Student {
   id: string;
@@ -84,13 +89,13 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
               </div>
               </div>
                 {isTeacher && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                  <HoverDropdownMenu>
+                    <HoverDropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
                         <MoreVertical className="h-4 w-4" />
                       </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    </HoverDropdownMenuTrigger>
+                    <HoverDropdownMenuContent align="end">
                       <DropdownMenuItem onSelect={() => document.getElementById('edit-student-trigger')?.click()}>
                         <Pencil className="mr-2 h-4 w-4" />
                         Edit Profile
@@ -102,8 +107,8 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete Profile
                       </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                    </HoverDropdownMenuContent>
+                  </HoverDropdownMenu>
                 )}
               </div>
             </div>
