@@ -68,24 +68,55 @@ const ParentTestTable: React.FC<ParentTestTableProps> = ({
   const MobileView = () => (
     <div className="space-y-4 md:hidden">
       {tests.map((test) => (
-        <div key={test.id} className="bg-white p-4 rounded-lg shadow-sm space-y-3">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="font-medium">{test.class_name}</p>
-              <p className="text-sm text-gray-500">{test.tilawati_level}</p>
+        <div key={test.id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+          {/* Header Section */}
+          <div className="flex justify-between items-start mb-4">
+            <div className="space-y-1">
+              {showStudentName && (
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {test.student?.name || 'Unknown Student'}
+                </h3>
+              )}
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-gray-700">{test.class_name}</span>
+                <span className="text-gray-400">•</span>
+                <span className="text-sm font-medium text-gray-700">{test.tilawati_level}</span>
+              </div>
             </div>
-            <Badge className={getStatusColor(test.status)}>
+            <Badge className={`${getStatusColor(test.status)} ml-2`}>
               {test.status.charAt(0).toUpperCase() + test.status.slice(1).replace('_', ' ')}
             </Badge>
           </div>
-          <div className="text-sm">
-            <p>Tanggal: {new Date(test.date).toLocaleDateString('id-ID')}</p>
-            <p>Penguji: {test.munaqisy}</p>
+
+          {/* Info Section */}
+          <div className="space-y-3 mb-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <p className="text-xs text-gray-500">Tanggal Tes</p>
+                <p className="text-sm font-medium text-gray-900">
+                  {new Date(test.date).toLocaleDateString('id-ID')}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs text-gray-500">Penguji</p>
+                <p className="text-sm font-medium text-gray-900">{test.munaqisy}</p>
+              </div>
+            </div>
+
+            {/* Notes Section */}
+            {test.notes && (
+              <div className="pt-3 border-t border-gray-100">
+                <p className="text-xs text-gray-500 mb-1">Catatan</p>
+                <p className="text-sm text-gray-700">{test.notes}</p>
+              </div>
+            )}
           </div>
+
+          {/* Action Button */}
           <Button
             variant="outline"
             size="sm"
-            className="w-full"
+            className="w-full bg-gray-50 hover:bg-gray-100 transition-colors"
             onClick={() => onViewDetails(test)}
           >
             <Eye className="h-4 w-4 mr-2" />
@@ -102,18 +133,23 @@ const ParentTestTable: React.FC<ParentTestTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
+            {showStudentName && <TableHead>Nama Siswa</TableHead>}
             <TableHead>Kelas</TableHead>
             <TableHead>Level</TableHead>
             <TableHead>Tanggal</TableHead>
             <TableHead>Penguji</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Catatan</TableHead>
             <TableHead className="text-right">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {tests.map((test) => (
             <TableRow key={test.id}>
-              <TableCell className="font-medium">{test.class_name}</TableCell>
+              {showStudentName && (
+                <TableCell className="font-medium">{test.student?.name || 'Unknown Student'}</TableCell>
+              )}
+              <TableCell>{test.class_name}</TableCell>
               <TableCell>{test.tilawati_level}</TableCell>
               <TableCell>{new Date(test.date).toLocaleDateString('id-ID')}</TableCell>
               <TableCell>{test.munaqisy}</TableCell>
@@ -121,6 +157,11 @@ const ParentTestTable: React.FC<ParentTestTableProps> = ({
                 <Badge className={getStatusColor(test.status)}>
                   {test.status.charAt(0).toUpperCase() + test.status.slice(1).replace('_', ' ')}
                 </Badge>
+              </TableCell>
+              <TableCell className="max-w-[200px]">
+                <p className="truncate" title={test.notes || '-'}>
+                  {test.notes || '-'}
+                </p>
               </TableCell>
               <TableCell className="text-right">
                 <Button

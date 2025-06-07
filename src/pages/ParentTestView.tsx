@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { TestStatus, TilawatiJilid, TilawatiTest } from '@/types/tilawati';
+import { supabase } from '@/lib/supabase';
 
 interface TestFilters {
   status?: TestStatus | 'all';
@@ -24,7 +25,24 @@ const ParentTestView: React.FC = () => {
   // Fetch children's tests
   const { data: tests, isLoading } = useQuery({
     queryKey: ['parent-tests', filters],
-    queryFn: () => fetchTestsWithFilters(filters),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('tilawati_level_tests')
+        .select(`
+          *,
+          student:student_id (
+            name
+          )
+        `)
+        .order('date', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching tests:', error);
+        throw error;
+      }
+
+      return data || [];
+    },
     enabled: !!profile?.id,
   });
 
@@ -39,6 +57,7 @@ const ParentTestView: React.FC = () => {
     // Show detailed test information
     const message = `Detail Tes Tilawati:
 
+Nama Siswa: ${test.student?.name || 'Unknown Student'}
 Tanggal: ${new Date(test.date).toLocaleDateString('id-ID')}
 Kelas: ${test.class_name || '-'}
 Level Tilawati: ${test.tilawati_level}
