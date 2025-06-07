@@ -10,6 +10,7 @@ import TestTable from '@/components/test-management/TestTable';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchTestsWithFilters } from '@/utils/testQueries';
+import { calculateTilawahProgress } from '@/utils/progressCalculations';
 import type { TilawatiTest, TestStatus, TilawatiJilid, StudentForTest } from '@/types/tilawati';
 import { useNavigate } from 'react-router-dom';
 
@@ -36,7 +37,8 @@ const TeacherTestManagement: React.FC = () => {
     queryFn: async () => {
       if (!profile?.id) return [];
 
-      const { data: students, error: studentsError } = await supabase
+      // First fetch basic student information
+      const { data: studentsData, error: studentsError } = await supabase
         .from('students')
         .select(`
           id,
@@ -53,18 +55,55 @@ const TeacherTestManagement: React.FC = () => {
         throw studentsError;
       }
 
-      if (!students || students.length === 0) {
+      if (!studentsData || studentsData.length === 0) {
         return [];
       }
 
-      // Transform the data to match StudentForTest type
-      return students.map(student => ({
-        id: student.id,
-        name: student.name,
-        class_name: student.group_name || '',
-        current_tilawati_jilid: "Jilid 1" as TilawatiJilid, // Default value
-        teacher: student.teacher
-      }));
+      // For each student, fetch their progress entries
+      const studentsWithProgress = await Promise.all(
+        studentsData.map(async (student) => {
+          try {
+            // Fetch tilawah progress entries
+            const { data: tilawahEntries, error: tilawahError } = await supabase
+              .from('progress_entries')
+              .select('*')
+              .eq('student_id', student.id)
+              .eq('type', 'tilawah')
+              .order('date', { ascending: false });
+
+            if (tilawahError) {
+              console.error(`Error fetching tilawah entries for student ${student.id}:`, tilawahError);
+              return null;
+            }
+
+            // Calculate Tilawati progress
+            const tilawahProgress = calculateTilawahProgress(tilawahEntries || []);
+            
+            // A student is eligible for test if they have completed 100% of their current level
+            const isEligible = tilawahProgress.percentage === 100;
+
+            if (!isEligible) {
+              return null; // Skip students who haven't completed their level
+            }
+
+            return {
+              id: student.id,
+              name: student.name,
+              current_tilawati_jilid: tilawahProgress.jilid as TilawatiJilid || "Jilid 1",
+              class_name: student.group_name || '',
+              teacher: student.teacher,
+              progress_percentage: tilawahProgress.percentage,
+              is_eligible_for_test: true
+            } as StudentForTest;
+          } catch (error) {
+            console.error(`Error processing student ${student.id}:`, error);
+            return null;
+          }
+        })
+      );
+
+      // Filter out null values (students who aren't eligible) and return the list
+      return studentsWithProgress.filter((student): student is StudentForTest => student !== null);
     },
     enabled: !!profile?.id,
   });

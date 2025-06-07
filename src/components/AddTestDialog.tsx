@@ -148,18 +148,15 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
                 <SelectContent>
                   {students.map((s) => (
                     <SelectItem key={s.id} value={s.id}>
-                      {s.name} {s.class_name ? `(${s.class_name})` : ''} - {s.current_tilawati_jilid} 
-                      {s.progress_percentage !== undefined && ` - Progress: ${s.progress_percentage}%`}
+                      {s.name} {s.class_name ? `(${s.class_name})` : ''} - {s.current_tilawati_jilid}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               {studentId && (
                 <div className="text-sm mt-1">
-                  <p className="text-muted-foreground">
-                    {students.find(s => s.id === studentId)?.is_eligible_for_test 
-                      ? "✅ Student has completed the current level and is ready for testing"
-                      : "❌ Student has not completed the current level"}
+                  <p className="text-green-600">
+                    ✅ Student has completed their current level and is ready for testing
                   </p>
                   {selectedStudent && (
                     <p className="text-muted-foreground mt-1">
