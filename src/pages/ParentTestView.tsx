@@ -12,18 +12,17 @@ import { supabase } from '@/lib/supabase';
 
 interface Filters {
   searchQuery: string;
-  status: string | null;
-  level: TilawatiJilid | null;
+  status: TestStatus | 'all' | null;
+  level: TilawatiJilid | 'all' | null;
 }
 
 const ParentTestView: React.FC = () => {
   const { profile } = useAuth();
   const [filters, setFilters] = useState<Filters>({
     searchQuery: '',
-    status: null,
-    level: null
+    status: 'all',
+    level: 'all'
   });
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   // Fetch children's tests
   const { data: tests, isLoading } = useQuery({
@@ -62,18 +61,6 @@ const ParentTestView: React.FC = () => {
     enabled: !!profile?.id,
   });
 
-  const handleSearchChange = (value: string) => {
-    setFilters(prev => ({ ...prev, searchQuery: value }));
-  };
-
-  const handleStatusChange = (value: string | null) => {
-    setFilters(prev => ({ ...prev, status: value }));
-  };
-
-  const handleLevelChange = (value: TilawatiJilid | null) => {
-    setFilters(prev => ({ ...prev, level: value }));
-  };
-
   const handleViewTestDetails = (test: TilawatiTest) => {
     // Show detailed test information
     const message = `Detail Tes Tilawati:
@@ -107,14 +94,6 @@ Catatan: ${test.notes || 'Tidak ada catatan'}`;
         {/* Header Section */}
         <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
           <h1 className="text-xl lg:text-2xl font-bold">Tes Kenaikan Level Anak</h1>
-          <Button
-            variant="outline"
-            className="w-full md:w-auto flex items-center gap-2"
-            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-          >
-            {showAdvancedFilters ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
-            {showAdvancedFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </Button>
         </div>
 
         {/* Stats Cards */}
@@ -138,16 +117,17 @@ Catatan: ${test.notes || 'Tidak ada catatan'}`;
         </div>
 
         {/* Filters Section */}
-        {showAdvancedFilters && (
-          <TestFilters
-            searchQuery={filters.searchQuery}
-            onSearchChange={handleSearchChange}
-            selectedStatus={filters.status}
-            onStatusChange={handleStatusChange}
-            selectedLevel={filters.level}
-            onLevelChange={handleLevelChange}
-          />
-        )}
+        <TestFilters
+          searchTerm={filters.searchQuery}
+          status={filters.status}
+          jilidLevel={filters.level}
+          onFilterChange={(key, value) => {
+            setFilters(prev => ({
+              ...prev,
+              [key === 'searchTerm' ? 'searchQuery' : key === 'jilidLevel' ? 'level' : key]: value
+            }));
+          }}
+        />
 
         {/* Table Section */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">

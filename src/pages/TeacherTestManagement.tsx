@@ -15,9 +15,9 @@ import type { TilawatiTest, TestStatus, TilawatiJilid, StudentForTest } from '@/
 import { useNavigate } from 'react-router-dom';
 
 interface TestFilters {
-  status?: TestStatus | 'all';
   searchTerm?: string;
-  jilidLevel?: TilawatiJilid | 'all';
+  status: TestStatus | 'all';
+  jilidLevel: TilawatiJilid | 'all';
   date?: string;
 }
 
@@ -28,8 +28,12 @@ const TeacherTestManagement: React.FC = () => {
   const queryClient = useQueryClient();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedTest, setSelectedTest] = useState<TilawatiTest | null>(null);
-  const [filters, setFilters] = useState<TestFilters>({});
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [filters, setFilters] = useState<TestFilters>({
+    searchTerm: '',
+    status: 'all',
+    jilidLevel: 'all',
+    date: undefined
+  });
 
   // Fetch students for the teacher
   const { data: students, isLoading: isLoadingStudents, refetch: refetchStudents } = useQuery({
@@ -157,37 +161,24 @@ const TeacherTestManagement: React.FC = () => {
             </Button>
             <h1 className="text-2xl font-bold">Level Advancement Tests</h1>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-            <Button 
-              variant="outline"
-              className="w-full sm:w-auto flex items-center gap-2"
-              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-            >
-              {showAdvancedFilters ? 'Hide Advanced Filters' : 'Show Advanced Filters'}
-              {showAdvancedFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            </Button>
-            <Button 
-              onClick={() => setIsAddDialogOpen(true)}
-              className="w-full sm:w-auto"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Schedule Test
-            </Button>
-          </div>
+          <Button 
+            onClick={() => setIsAddDialogOpen(true)}
+            className="w-full md:w-auto"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Schedule Test
+          </Button>
         </div>
 
         {/* Filters Section */}
-        <div className="bg-white rounded-lg shadow-sm p-4">
-          <TestFilters
-            searchTerm={filters.searchTerm}
-            status={filters.status}
-            jilidLevel={filters.jilidLevel}
-            date={filters.date}
-            onFilterChange={handleFilterChange}
-            showDateFilter={true}
-            showAdvancedFilters={showAdvancedFilters}
-          />
-        </div>
+        <TestFilters
+          searchTerm={filters.searchTerm}
+          status={filters.status}
+          jilidLevel={filters.jilidLevel}
+          date={filters.date}
+          onFilterChange={handleFilterChange}
+          showDateFilter={true}
+        />
 
         {/* Table Section */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
