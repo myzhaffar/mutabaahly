@@ -4,29 +4,32 @@ import ParentLayout from '@/components/layouts/ParentLayout';
 import TestStatsCards from '@/components/test-management/TestStatsCards';
 import TestFilters from '@/components/test-management/TestFilters';
 import ParentTestTable from '@/components/test-management/ParentTestTable';
-import { fetchTestsWithFilters } from '@/utils/testQueries';
 import { useAuth } from '@/contexts/AuthContext';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { TestStatus, TilawatiJilid, TilawatiTest } from '@/types/tilawati';
 import { supabase } from '@/lib/supabase';
 
-interface TestFilters {
-  status?: TestStatus | 'all';
-  searchTerm?: string;
-  jilidLevel?: TilawatiJilid | 'all';
+interface Filters {
+  searchQuery: string;
+  status: string | null;
+  level: TilawatiJilid | null;
 }
 
 const ParentTestView: React.FC = () => {
   const { profile } = useAuth();
-  const [filters, setFilters] = useState<TestFilters>({});
+  const [filters, setFilters] = useState<Filters>({
+    searchQuery: '',
+    status: null,
+    level: null
+  });
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   // Fetch children's tests
   const { data: tests, isLoading } = useQuery({
     queryKey: ['parent-tests', filters],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('tilawati_level_tests')
         .select(`
           *,
@@ -35,6 +38,19 @@ const ParentTestView: React.FC = () => {
           )
         `)
         .order('date', { ascending: false });
+
+      // Apply filters
+      if (filters.status) {
+        query = query.eq('status', filters.status);
+      }
+      if (filters.level) {
+        query = query.eq('tilawati_level', filters.level);
+      }
+      if (filters.searchQuery) {
+        query = query.ilike('class_name', `%${filters.searchQuery}%`);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         console.error('Error fetching tests:', error);
@@ -46,11 +62,16 @@ const ParentTestView: React.FC = () => {
     enabled: !!profile?.id,
   });
 
-  const handleFilterChange = (key: string, value: string | undefined) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: value === 'all' ? undefined : value,
-    }));
+  const handleSearchChange = (value: string) => {
+    setFilters(prev => ({ ...prev, searchQuery: value }));
+  };
+
+  const handleStatusChange = (value: string | null) => {
+    setFilters(prev => ({ ...prev, status: value }));
+  };
+
+  const handleLevelChange = (value: TilawatiJilid | null) => {
+    setFilters(prev => ({ ...prev, level: value }));
   };
 
   const handleViewTestDetails = (test: TilawatiTest) => {
@@ -117,16 +138,16 @@ Catatan: ${test.notes || 'Tidak ada catatan'}`;
         </div>
 
         {/* Filters Section */}
-        <div className="bg-white rounded-lg shadow-sm p-4">
+        {showAdvancedFilters && (
           <TestFilters
-            searchTerm={filters.searchTerm}
-            status={filters.status}
-            jilidLevel={filters.jilidLevel}
-            onFilterChange={handleFilterChange}
-            showDateFilter={false}
-            showAdvancedFilters={showAdvancedFilters}
+            searchQuery={filters.searchQuery}
+            onSearchChange={handleSearchChange}
+            selectedStatus={filters.status}
+            onStatusChange={handleStatusChange}
+            selectedLevel={filters.level}
+            onLevelChange={handleLevelChange}
           />
-        </div>
+        )}
 
         {/* Table Section */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">

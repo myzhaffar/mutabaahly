@@ -113,46 +113,46 @@ Notes: ${test.notes || 'No notes'}`);
   // Desktop table view
   const DesktopView = () => (
     <div className="hidden md:block overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {showStudentName && <TableHead>Student Name</TableHead>}
-            <TableHead>Class</TableHead>
-            <TableHead>Tilawati Level</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Examiner</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Notes</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {tests.map((test) => (
-            <TableRow key={test.id}>
-              {showStudentName && (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          {showStudentName && <TableHead>Student Name</TableHead>}
+          <TableHead>Class</TableHead>
+          <TableHead>Tilawati Level</TableHead>
+          <TableHead>Date</TableHead>
+          <TableHead>Examiner</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Notes</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {tests.map((test) => (
+          <TableRow key={test.id}>
+            {showStudentName && (
                 <TableCell>
                   {getStudentName ? getStudentName(test.student_id) : test.student_id}
                 </TableCell>
-              )}
-              <TableCell>{test.class_name || '-'}</TableCell>
-              <TableCell>{test.tilawati_level}</TableCell>
-              <TableCell>{format(new Date(test.date), 'dd/MM/yyyy')}</TableCell>
-              <TableCell>{test.munaqisy}</TableCell>
-              <TableCell>{getStatusBadge(test.status)}</TableCell>
-              <TableCell>{test.notes || '-'}</TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end space-x-1">
-                  <Button variant="ghost" size="sm" onClick={() => handleViewDetails(test)}>
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <EditTestDialog test={test} onTestUpdated={onTestUpdated} />
-                  <DeleteTestDialog testId={test.id} onTestDeleted={onTestUpdated} />
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+            )}
+            <TableCell>{test.class_name || '-'}</TableCell>
+            <TableCell>{test.tilawati_level}</TableCell>
+            <TableCell>{format(new Date(test.date), 'dd/MM/yyyy')}</TableCell>
+            <TableCell>{test.munaqisy}</TableCell>
+            <TableCell>{getStatusBadge(test.status)}</TableCell>
+            <TableCell>{test.notes || '-'}</TableCell>
+            <TableCell className="text-right">
+              <div className="flex justify-end space-x-1">
+                <Button variant="ghost" size="sm" onClick={() => handleViewDetails(test)}>
+                  <Eye className="h-4 w-4" />
+                </Button>
+                <EditTestDialog test={test} onTestUpdated={onTestUpdated} />
+                <DeleteTestDialog testId={test.id} onTestDeleted={onTestUpdated} />
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
     </div>
   );
 

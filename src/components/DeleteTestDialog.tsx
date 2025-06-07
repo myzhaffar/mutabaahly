@@ -42,7 +42,7 @@ const DeleteTestDialog: React.FC<DeleteTestDialogProps> = ({
 
       // Call the callback
       if (onTestDeleted) {
-        onTestDeleted();
+      onTestDeleted();
       }
     } catch (error) {
       console.error('Error deleting test:', error);
