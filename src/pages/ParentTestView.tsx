@@ -11,18 +11,14 @@ import type { TestStatus, TilawatiJilid, TilawatiTest } from '@/types/tilawati';
 import { supabase } from '@/lib/supabase';
 
 interface Filters {
-  searchQuery: string;
-  status: TestStatus | 'all' | null;
-  level: TilawatiJilid | 'all' | null;
+  searchQuery?: string;
+  status?: TestStatus | 'all' | null;
+  level?: TilawatiJilid | 'all' | null;
 }
 
 const ParentTestView: React.FC = () => {
   const { profile } = useAuth();
-  const [filters, setFilters] = useState<Filters>({
-    searchQuery: '',
-    status: 'all',
-    level: 'all'
-  });
+  const [filters, setFilters] = useState<Filters>({});
 
   // Fetch children's tests
   const { data: tests, isLoading } = useQuery({

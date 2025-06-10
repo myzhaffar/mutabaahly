@@ -15,6 +15,7 @@ import StudentDetails from '@/pages/StudentDetails';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import TeacherTestManagement from '@/pages/TeacherTestManagement';
 import ParentTestView from '@/pages/ParentTestView';
+import Index from '@/pages/Index';
 import { useAuth } from '@/contexts/AuthContext';
 
 const queryClient = new QueryClient();
@@ -26,7 +27,7 @@ function AppContent() {
     <div className="min-h-screen bg-gradient-to-br from-islamic-50 to-islamic-100">
       {profile?.role === 'parent' && <ParentNavbar />}
       <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/dashboard" element={
           <ProtectedRoute>

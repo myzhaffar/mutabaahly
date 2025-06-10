@@ -16,8 +16,8 @@ import { useNavigate } from 'react-router-dom';
 
 interface TestFilters {
   searchTerm?: string;
-  status: TestStatus | 'all';
-  jilidLevel: TilawatiJilid | 'all';
+  status?: TestStatus | 'all';
+  jilidLevel?: TilawatiJilid | 'all';
   date?: string;
 }
 
@@ -28,12 +28,7 @@ const TeacherTestManagement: React.FC = () => {
   const queryClient = useQueryClient();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedTest, setSelectedTest] = useState<TilawatiTest | null>(null);
-  const [filters, setFilters] = useState<TestFilters>({
-    searchTerm: '',
-    status: 'all',
-    jilidLevel: 'all',
-    date: undefined
-  });
+  const [filters, setFilters] = useState<TestFilters>({});
 
   // Fetch students for the teacher
   const { data: students, isLoading: isLoadingStudents, refetch: refetchStudents } = useQuery({

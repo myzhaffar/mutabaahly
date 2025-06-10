@@ -148,7 +148,7 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
                 <SelectContent>
                   {students.map((s) => (
                     <SelectItem key={s.id} value={s.id}>
-                      {s.name} {s.class_name ? `(${s.class_name})` : ''} - {s.current_tilawati_jilid}
+                      {s.name} {s.class_name ? `(${s.class_name})` : ''} - {s.current_tilawati_jilid} 
                     </SelectItem>
                   ))}
                 </SelectContent>
