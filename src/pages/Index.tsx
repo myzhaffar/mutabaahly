@@ -354,7 +354,7 @@ const Index = () => {
             <Heart className="h-4 w-4 text-red-500 fill-current animate-pulse" />
             <span>by</span>
             <a 
-              href="https://github.com/myzhaffar" 
+              href="https://instagram.com/myzhaffar" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
