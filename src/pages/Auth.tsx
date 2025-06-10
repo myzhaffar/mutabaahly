@@ -78,10 +78,10 @@ const Auth = () => {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-islamic-500 to-accent-500 rounded-full mb-4">
-            <span className="text-white text-2xl font-bold">Q</span>
+            <span className="text-white text-2xl font-bold">M</span>
           </div>
           <h1 className="text-2xl font-bold font-sf-pro text-islamic-700">
-            {t('home.title')}
+            Mutabaahly
           </h1>
         </div>
 

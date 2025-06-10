@@ -87,10 +87,10 @@ const TeacherSidebar = () => {
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <div className="w-10 h-10 bg-gradient-to-br from-islamic-500 to-accent-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">Q</span>
+              <span className="text-white font-bold text-xl">M</span>
             </div>
             <span className="font-sf-pro font-semibold text-xl text-white">
-              Al-Quran Progress
+              Mutabaahly
             </span>
           </Link>
         </div>

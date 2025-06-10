@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Language = 'en' | 'id';
@@ -20,7 +19,7 @@ const translations = {
     'nav.profile': 'Profile',
     
     // Home Page
-    'home.title': 'Al-Quran Progress Mentor',
+    'home.title': 'Mutabaahly',
     'home.subtitle': 'Monitoring Student Progress in Quran Memorization & Tilawati Reciting',
     'home.description': 'A comprehensive platform designed to help teachers track and monitor their students\' progress in Al-Quran memorization and Tilawati recitation. Built with Islamic values and modern technology.',
     'home.features.title': 'Key Features',
@@ -59,7 +58,7 @@ const translations = {
     'nav.profile': 'Profil',
     
     // Home Page
-    'home.title': 'Mentor Progres Al-Quran',
+    'home.title': 'Mutabaahly',
     'home.subtitle': 'Memantau Kemajuan Siswa dalam Hafalan Al-Quran & Tilawati',
     'home.description': 'Platform komprehensif yang dirancang untuk membantu guru melacak dan memantau kemajuan siswa dalam hafalan Al-Quran dan tilawati. Dibangun dengan nilai-nilai Islam dan teknologi modern.',
     'home.features.title': 'Fitur Utama',

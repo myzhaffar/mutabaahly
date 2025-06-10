@@ -36,10 +36,10 @@ const Navigation: React.FC = () => {
               className="flex items-center space-x-2"
             >
               <div className="w-9 h-9 bg-gradient-to-br from-islamic-600 to-accent-600 rounded-lg flex items-center justify-center shadow-sm">
-                <span className="text-white font-bold text-xl">Q</span>
+                <span className="text-white font-bold text-xl">M</span>
               </div>
               <span className="font-sf-pro font-semibold text-base text-islamic-700 hidden sm:block">
-                Al-Quran Progress
+                Mutabaahly
               </span>
             </Link>
           </div>

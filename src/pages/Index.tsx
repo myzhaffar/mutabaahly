@@ -114,9 +114,9 @@ const Index = () => {
             
             <h1 className="text-6xl font-bold text-gray-900 mb-6 leading-tight">
               <span className="bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent">
-                Al-Quran Progress
+                Mutabaahly
               </span>
-              <span className="block text-4xl text-gray-700 mt-2">Monitoring System</span>
+              <span className="block text-4xl text-gray-700 mt-2">Al-Quran Progress Monitoring</span>
             </h1>
             
             <p className="text-xl text-gray-600 mb-10 leading-relaxed max-w-3xl mx-auto">
