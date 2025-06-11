@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { GradientButton } from '@/components/ui/gradient-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -91,7 +92,7 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({ studentId, onProg
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-islamic-500 hover:bg-islamic-600">
+        <Button className="bg-gradient-to-r from-emerald-500 to-teal-400 hover:opacity-90">
           <Plus className="h-4 w-4 mr-2" />
           Add Progress
         </Button>
@@ -181,9 +182,9 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({ studentId, onProg
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading || !formData.type}>
+            <GradientButton type="submit" disabled={loading}>
               {loading ? 'Adding...' : 'Add Progress'}
-            </Button>
+            </GradientButton>
           </div>
         </form>
       </DialogContent>

@@ -129,7 +129,7 @@ const Index = () => {
                 onClick={handleGetStarted}
                 size="lg"
                 disabled={isLoading}
-                className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white px-10 py-6 text-lg rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-105 group disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-gradient-to-r from-emerald-500 to-teal-400 hover:opacity-90 text-white px-10 py-6 text-lg rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-105 group disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Processing...' : 'Get Started'}
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -323,7 +323,7 @@ const Index = () => {
                 onClick={handleGetStarted}
                 size="lg"
                 disabled={isLoading}
-                className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white px-12 py-6 text-xl rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-105 group disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-gradient-to-r from-emerald-500 to-teal-400 hover:opacity-90 text-white px-12 py-6 text-xl rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-105 group disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Processing...' : 'Register Now'}
                 <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-1 transition-transform" />

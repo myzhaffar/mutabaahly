@@ -11,6 +11,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { GradientButton } from '@/components/ui/gradient-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -263,9 +264,9 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="submit" disabled={isLoading}>
+            <GradientButton type="submit" disabled={isLoading}>
               {isLoading ? 'Saving...' : currentTest ? 'Save Changes' : 'Schedule Test'}
-            </Button>
+            </GradientButton>
           </DialogFooter>
         </form>
       </DialogContent>

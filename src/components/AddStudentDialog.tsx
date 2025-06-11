@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { GradientButton } from '@/components/ui/gradient-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Plus } from 'lucide-react';
@@ -116,10 +117,10 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-islamic-500 hover:bg-islamic-600">
+        <GradientButton>
           <Plus className="h-4 w-4 mr-2" />
           Add Student
-        </Button>
+        </GradientButton>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -163,9 +164,9 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
+            <GradientButton type="submit" disabled={loading}>
               {loading ? 'Adding...' : 'Add Student'}
-            </Button>
+            </GradientButton>
           </div>
         </form>
       </DialogContent>

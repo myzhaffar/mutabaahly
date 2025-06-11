@@ -128,11 +128,11 @@ Catatan: ${test.notes || 'Tidak ada catatan'}`;
         {/* Table Section */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           <ParentTestTable
-            tests={tests || []}
-            isLoading={isLoading}
-            onViewDetails={handleViewTestDetails}
-            showStudentName={true}
-          />
+          tests={tests || []}
+          isLoading={isLoading}
+          onViewDetails={handleViewTestDetails}
+          showStudentName={true}
+        />
         </div>
       </div>
     </ParentLayout>

@@ -173,7 +173,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => 
         
         <Button 
           onClick={() => onViewDetails(student.id)}
-          className="w-full mt-6 bg-gradient-to-r from-islamic-500 to-accent-500 hover:from-islamic-600 hover:to-accent-600 text-white shadow-lg rounded-full font-medium transition-all duration-300"
+          className="w-full mt-6 bg-gradient-to-r from-emerald-500 to-teal-400 hover:opacity-90 text-white shadow-lg rounded-full font-medium transition-all duration-300"
         >
           View Details
         </Button>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { GradientButton } from '@/components/ui/gradient-button';
 import { useToast } from '@/components/ui/use-toast';
 import AddTestDialog from '@/components/AddTestDialog';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
@@ -64,11 +65,11 @@ const TeacherTestManagement: React.FC = () => {
           try {
             // Fetch tilawah progress entries
             const { data: tilawahEntries, error: tilawahError } = await supabase
-              .from('progress_entries')
-              .select('*')
-              .eq('student_id', student.id)
-              .eq('type', 'tilawah')
-              .order('date', { ascending: false });
+          .from('progress_entries')
+          .select('*')
+          .eq('student_id', student.id)
+          .eq('type', 'tilawah')
+          .order('date', { ascending: false });
 
             if (tilawahError) {
               console.error(`Error fetching tilawah entries for student ${student.id}:`, tilawahError);
@@ -77,7 +78,7 @@ const TeacherTestManagement: React.FC = () => {
 
             // Calculate Tilawati progress
             const tilawahProgress = calculateTilawahProgress(tilawahEntries || []);
-            
+
             // A student is eligible for test if they have completed 100% of their current level
             const isEligible = tilawahProgress.percentage === 100;
 
@@ -85,12 +86,12 @@ const TeacherTestManagement: React.FC = () => {
               return null; // Skip students who haven't completed their level
             }
 
-            return {
-              id: student.id,
-              name: student.name,
+        return {
+          id: student.id,
+          name: student.name,
               current_tilawati_jilid: tilawahProgress.jilid as TilawatiJilid || "Jilid 1",
-              class_name: student.group_name || '',
-              teacher: student.teacher,
+          class_name: student.group_name || '',
+          teacher: student.teacher,
               progress_percentage: tilawahProgress.percentage,
               is_eligible_for_test: true
             } as StudentForTest;
@@ -156,13 +157,13 @@ const TeacherTestManagement: React.FC = () => {
             </Button>
             <h1 className="text-2xl font-bold">Level Advancement Tests</h1>
           </div>
-          <Button 
+          <GradientButton 
             onClick={() => setIsAddDialogOpen(true)}
             className="w-full md:w-auto"
           >
             <Plus className="mr-2 h-4 w-4" />
             Schedule Test
-          </Button>
+          </GradientButton>
         </div>
 
         {/* Filters Section */}
@@ -177,13 +178,13 @@ const TeacherTestManagement: React.FC = () => {
 
         {/* Table Section */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <TestTable
-            tests={tests || []}
-            isLoading={isLoading}
-            onTestUpdated={handleTestUpdate}
-            showStudentName={true}
-            getStudentName={getStudentName}
-          />
+        <TestTable
+          tests={tests || []}
+          isLoading={isLoading}
+          onTestUpdated={handleTestUpdate}
+          showStudentName={true}
+          getStudentName={getStudentName}
+        />
         </div>
 
         {/* Add/Edit Test Dialog */}
