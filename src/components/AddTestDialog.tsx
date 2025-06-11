@@ -35,8 +35,8 @@ interface AddTestDialogProps {
 }
 
 const JILID_OPTIONS: TilawatiJilid[] = [
-  "Jilid 1", "Jilid 2", "Jilid 3", "Jilid 4", "Jilid 5", "Jilid 6",
-  "Ghorib", "Tajwid", "Al-Quran", "Evaluasi"
+  "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6",
+  "Ghorib", "Tajwid", "Quran", "Evaluation"
 ];
 
 const STATUS_OPTIONS: TestStatus[] = [
@@ -100,7 +100,7 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
     setError(null);
 
     if (!studentId || !tilawatiLevel || !testDate || !munaqisy || !className) {
-      setError("Semua field wajib harus diisi.");
+      setError("All required fields must be filled.");
       setIsLoading(false);
       return;
     }

@@ -363,7 +363,7 @@ const Index = () => {
             </a>
           </div>
           <div className="mt-2 text-sm text-gray-500">
-            © {new Date().getFullYear()} Al-Quran Progress Monitoring System. All rights reserved.
+            © {new Date().getFullYear()} Mutabaahly. All rights reserved.
           </div>
         </footer>
       </div>

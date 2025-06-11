@@ -80,14 +80,14 @@ const TestFilters: React.FC<TestFiltersProps> = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Levels</SelectItem>
-              <SelectItem value="Jilid 1">Jilid 1</SelectItem>
-              <SelectItem value="Jilid 2">Jilid 2</SelectItem>
-              <SelectItem value="Jilid 3">Jilid 3</SelectItem>
-              <SelectItem value="Jilid 4">Jilid 4</SelectItem>
-              <SelectItem value="Jilid 5">Jilid 5</SelectItem>
-              <SelectItem value="Jilid 6">Jilid 6</SelectItem>
-              <SelectItem value="Al-Quran">Al-Quran</SelectItem>
-              <SelectItem value="Munaqosah">Munaqosah</SelectItem>
+              <SelectItem value="Level 1">Level 1</SelectItem>
+              <SelectItem value="Level 2">Level 2</SelectItem>
+              <SelectItem value="Level 3">Level 3</SelectItem>
+              <SelectItem value="Level 4">Level 4</SelectItem>
+              <SelectItem value="Level 5">Level 5</SelectItem>
+              <SelectItem value="Level 6">Level 6</SelectItem>
+              <SelectItem value="Quran">Quran</SelectItem>
+              <SelectItem value="Evaluation">Evaluation</SelectItem>
             </SelectContent>
           </Select>
         </div>

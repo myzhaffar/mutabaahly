@@ -59,7 +59,7 @@ const ParentTestTable: React.FC<ParentTestTableProps> = ({
   if (tests.length === 0) {
     return (
       <div className="text-center py-8 px-4">
-        <p className="text-gray-500">Belum ada data tes yang tersedia.</p>
+        <p className="text-gray-500">No test data available.</p>
       </div>
     );
   }
@@ -92,13 +92,13 @@ const ParentTestTable: React.FC<ParentTestTableProps> = ({
           <div className="space-y-3 mb-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <p className="text-xs text-gray-500">Tanggal Tes</p>
+                <p className="text-xs text-gray-500">Test Date</p>
                 <p className="text-sm font-medium text-gray-900">
-                  {new Date(test.date).toLocaleDateString('id-ID')}
+                  {new Date(test.date).toLocaleDateString('en-US')}
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-gray-500">Penguji</p>
+                <p className="text-xs text-gray-500">Examiner</p>
                 <p className="text-sm font-medium text-gray-900">{test.munaqisy}</p>
               </div>
             </div>
@@ -106,7 +106,7 @@ const ParentTestTable: React.FC<ParentTestTableProps> = ({
             {/* Notes Section */}
             {test.notes && (
               <div className="pt-3 border-t border-gray-100">
-                <p className="text-xs text-gray-500 mb-1">Catatan</p>
+                <p className="text-xs text-gray-500 mb-1">Notes</p>
                 <p className="text-sm text-gray-700">{test.notes}</p>
               </div>
             )}
@@ -120,7 +120,7 @@ const ParentTestTable: React.FC<ParentTestTableProps> = ({
             onClick={() => onViewDetails(test)}
           >
             <Eye className="h-4 w-4 mr-2" />
-            Lihat Detail
+            View Details
           </Button>
         </div>
       ))}
@@ -133,14 +133,14 @@ const ParentTestTable: React.FC<ParentTestTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
-            {showStudentName && <TableHead>Nama Siswa</TableHead>}
-            <TableHead>Kelas</TableHead>
+            {showStudentName && <TableHead>Student Name</TableHead>}
+            <TableHead>Class</TableHead>
             <TableHead>Level</TableHead>
-            <TableHead>Tanggal</TableHead>
-            <TableHead>Penguji</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Examiner</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Catatan</TableHead>
-            <TableHead className="text-right">Aksi</TableHead>
+            <TableHead>Notes</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -151,7 +151,7 @@ const ParentTestTable: React.FC<ParentTestTableProps> = ({
               )}
               <TableCell>{test.class_name}</TableCell>
               <TableCell>{test.tilawati_level}</TableCell>
-              <TableCell>{new Date(test.date).toLocaleDateString('id-ID')}</TableCell>
+              <TableCell>{new Date(test.date).toLocaleDateString('en-US')}</TableCell>
               <TableCell>{test.munaqisy}</TableCell>
               <TableCell>
                 <Badge className={getStatusColor(test.status)}>
@@ -170,7 +170,7 @@ const ParentTestTable: React.FC<ParentTestTableProps> = ({
                   onClick={() => onViewDetails(test)}
                 >
                   <Eye className="h-4 w-4 mr-2" />
-                  Detail
+                  View Details
                 </Button>
               </TableCell>
             </TableRow>

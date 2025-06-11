@@ -46,8 +46,8 @@ const TeacherSidebar = () => {
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
-    { href: '/students', label: 'Daftar Siswa', icon: Users },
-    { href: '/tests/manage', label: 'Tes Kenaikan Level', icon: BookMarked },
+    { href: '/students', label: 'Students', icon: Users },
+    { href: '/tests/manage', label: 'Level Tests', icon: BookMarked },
     { href: '/profile', label: 'Profile', icon: UserCircle },
   ];
 
@@ -74,19 +74,19 @@ const TeacherSidebar = () => {
       <aside
         id="teacher-sidebar"
         className={`
-          w-64 min-h-screen bg-gradient-to-b from-islamic-700 to-islamic-800 text-white shadow-lg 
+          w-64 min-h-screen bg-gradient-to-r from-emerald-500 to-teal-400 text-white shadow-lg 
           fixed top-0 left-0 z-40 transform transition-transform duration-300 ease-in-out
           lg:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-          overflow-y-auto scrollbar-thin scrollbar-thumb-islamic-600 scrollbar-track-transparent
+          overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-600 scrollbar-track-transparent
         `}
       >
-        <div className="sticky top-0 bg-gradient-to-b from-islamic-700 to-islamic-800 pt-6 pb-4 px-5">
+        <div className="sticky top-0 bg-gradient-to-r from-emerald-500 to-teal-400 pt-6 pb-4 px-5">
           <Link 
             to="/dashboard" 
             className="flex items-center space-x-3"
             onClick={() => setIsMobileMenuOpen(false)}
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-islamic-500 to-accent-500 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">M</span>
             </div>
             <span className="font-sf-pro font-semibold text-xl text-white">
@@ -107,9 +107,9 @@ const TeacherSidebar = () => {
                 to={item.href}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`
-                  flex items-center space-x-3 p-3 rounded-xl text-gray-200 
-                  hover:bg-islamic-600 hover:text-white transition-all duration-150 ease-in-out
-                  ${isActive ? 'bg-islamic-500 text-white shadow-md' : ''}
+                  flex items-center space-x-3 p-3 rounded-xl text-white/90
+                  hover:bg-white/20 hover:text-white transition-all duration-150 ease-in-out
+                  ${isActive ? 'bg-white/25 text-white shadow-md' : ''}
                 `}
               >
                 <Icon className="h-5 w-5 flex-shrink-0" />
@@ -120,10 +120,10 @@ const TeacherSidebar = () => {
         </nav>
 
         {/* User Profile Section */}
-        <div className="absolute bottom-0 left-0 right-0 px-5 py-4 bg-islamic-800">
+        <div className="absolute bottom-0 left-0 right-0 px-5 py-4 bg-black/10 backdrop-blur-sm">
           <div className="flex items-center space-x-3 mb-4">
             <Avatar className="h-10 w-10">
-              <AvatarFallback className="bg-islamic-600">
+              <AvatarFallback className="bg-white/20">
                 {profile?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase()}
               </AvatarFallback>
             </Avatar>
@@ -131,14 +131,14 @@ const TeacherSidebar = () => {
               <p className="text-sm font-medium text-white truncate">
                 {profile?.full_name}
               </p>
-              <p className="text-xs text-gray-300 truncate">
+              <p className="text-xs text-white/70 truncate">
                 Teacher
               </p>
             </div>
           </div>
           <Button
             variant="ghost"
-            className="w-full justify-start text-gray-200 hover:text-white hover:bg-islamic-600"
+            className="w-full justify-start text-white/90 hover:text-white hover:bg-white/20"
             onClick={handleSignOut}
           >
             <LogOut className="h-4 w-4 mr-2" />

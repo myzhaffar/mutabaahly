@@ -103,10 +103,10 @@ const StudentManagement: React.FC = () => {
                     Loading...
                   </TableCell>
                 </TableRow>
-              ) : filteredStudents?.length === 0 ? (
+              ) : students?.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center">
-                    Tidak ada siswa yang ditemukan.
+                    No students found.
                   </TableCell>
                 </TableRow>
               ) : (

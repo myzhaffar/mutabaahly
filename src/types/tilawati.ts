@@ -2,8 +2,8 @@
 
 // Student information relevant for test management and dialogs
 export type TilawatiJilid = 
-  | "Jilid 1" | "Jilid 2" | "Jilid 3" | "Jilid 4" | "Jilid 5" | "Jilid 6"
-  | "Ghorib" | "Tajwid" | "Al-Quran" | "Evaluasi";
+  | "Level 1" | "Level 2" | "Level 3" | "Level 4" | "Level 5" | "Level 6"
+  | "Ghorib" | "Tajwid" | "Quran" | "Evaluation";
 
 export type TestStatus = 'scheduled' | 'passed' | 'failed' | 'pending_retake' | 'cancelled';
 

@@ -59,15 +59,14 @@ const ParentTestView: React.FC = () => {
 
   const handleViewTestDetails = (test: TilawatiTest) => {
     // Show detailed test information
-    const message = `Detail Tes Tilawati:
-
-Nama Siswa: ${test.student?.name || 'Unknown Student'}
-Tanggal: ${new Date(test.date).toLocaleDateString('id-ID')}
-Kelas: ${test.class_name || '-'}
-Level Tilawati: ${test.tilawati_level}
-Penguji (Munaqisy): ${test.munaqisy}
+    const message = `Tilawati Test Details:
+Student: ${test.student?.name || 'Unknown'}
+Date: ${new Date(test.date).toLocaleDateString('en-US')}
+Class: ${test.class_name}
+Level: ${test.tilawati_level}
+Examiner: ${test.munaqisy}
 Status: ${test.status.charAt(0).toUpperCase() + test.status.slice(1).replace('_', ' ')}
-Catatan: ${test.notes || 'Tidak ada catatan'}`;
+Notes: ${test.notes || 'No notes available'}`;
 
     alert(message);
   };
@@ -107,7 +106,7 @@ Catatan: ${test.notes || 'Tidak ada catatan'}`;
             <p className="text-2xl font-bold text-blue-600">{stats.scheduled}</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4">
-            <h3 className="text-sm text-gray-500">Belum Lulus</h3>
+            <h3 className="text-sm text-gray-500">Not Passed</h3>
             <p className="text-2xl font-bold text-red-600">{stats.failed}</p>
           </div>
         </div>
