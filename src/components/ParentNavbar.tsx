@@ -10,7 +10,8 @@ import {
   BookOpen,
   UserCircle,
   LogOut,
-  ChevronDown
+  ChevronDown,
+  Users
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -32,6 +33,7 @@ const ParentNavbar = () => {
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
+    { href: '/students', label: 'Students', icon: Users },
     { href: '/tests/view', label: 'Test Results', icon: BookOpen },
     { href: '/profile', label: 'Profile', icon: UserCircle },
   ];
