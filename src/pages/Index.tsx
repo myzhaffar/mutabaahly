@@ -89,12 +89,12 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-teal-50 overflow-hidden">
       {/* Decorative Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-emerald-200/20 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 -left-40 w-64 h-64 bg-blue-200/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gold-200/10 rounded-full blur-3xl"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-teal-200/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 -left-40 w-64 h-64 bg-green-200/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-100/20 rounded-full blur-3xl"></div>
       </div>
 
       {/* Hero Section */}
@@ -103,17 +103,17 @@ const Index = () => {
           <div className="mb-8">
             {/* Enhanced Logo */}
             <div className="relative w-24 h-24 mx-auto mb-8">
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 rounded-3xl rotate-6 shadow-2xl opacity-80"></div>
-              <div className="relative w-24 h-24 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-3xl flex items-center justify-center shadow-2xl">
+              <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-teal-500 rounded-3xl rotate-6 shadow-2xl opacity-80"></div>
+              <div className="relative w-24 h-24 bg-gradient-to-r from-green-400 to-teal-500 rounded-3xl flex items-center justify-center shadow-2xl">
                 <span className="text-white font-bold text-4xl">ق</span>
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-gold-400 rounded-full flex items-center justify-center">
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-teal-300 rounded-full flex items-center justify-center">
                   <Star className="h-3 w-3 text-white" />
                 </div>
               </div>
             </div>
             
             <h1 className="text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-green-400 to-teal-500 bg-clip-text text-transparent">
                 Mutabaahly
               </span>
               <span className="block text-4xl text-gray-700 mt-2">Al-Quran Progress Monitoring</span>
@@ -121,7 +121,7 @@ const Index = () => {
             
             <p className="text-xl text-gray-600 mb-10 leading-relaxed max-w-3xl mx-auto">
               Integrated platform for monitoring Al-Quran memorization progress and Tilawati reading learning for SDIT students. 
-              <span className="block mt-2 text-emerald-700 font-medium">Easy, Accurate, and Reliable ✨</span>
+              <span className="block mt-2 font-medium bg-gradient-to-r from-green-400 to-teal-500 bg-clip-text text-transparent">Easy, Accurate, and Reliable ✨</span>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
@@ -129,7 +129,7 @@ const Index = () => {
                 onClick={handleGetStarted}
                 size="lg"
                 disabled={isLoading}
-                className="bg-gradient-to-r from-emerald-500 to-teal-400 hover:opacity-90 text-white px-10 py-6 text-lg rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-105 group disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-gradient-to-r from-green-400 to-teal-500 hover:opacity-90 text-white px-10 py-6 text-lg rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-105 group disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Processing...' : 'Get Started'}
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -138,7 +138,7 @@ const Index = () => {
                 variant="outline"
                 size="lg"
                 onClick={handleLearnMore}
-                className="border-2 border-emerald-500 text-emerald-700 hover:bg-emerald-50 px-10 py-6 text-lg rounded-2xl transition-all duration-300 hover:shadow-lg"
+                className="border-2 border-green-400 text-teal-500 hover:bg-gradient-to-r from-green-400 to-teal-500 hover:text-white px-10 py-6 text-lg rounded-2xl transition-all duration-300 hover:shadow-lg"
               >
                 <BookOpen className="mr-2 h-5 w-5" />
                 Learn More
@@ -148,7 +148,7 @@ const Index = () => {
             {/* Trust Indicators */}
             <div className="mt-12 flex flex-wrap justify-center items-center gap-8 text-sm text-gray-500">
               <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-emerald-600" />
+                <Users className="h-4 w-4 text-teal-600" />
                 <span>500+ Active Students</span>
               </div>
             </div>
@@ -282,7 +282,7 @@ const Index = () => {
                     <p className="font-bold text-gray-900 text-lg">
                       {testimonials[currentTestimonial].name}
                     </p>
-                    <p className="text-emerald-600 font-medium">
+                    <p className="bg-gradient-to-r from-green-400 to-teal-500 bg-clip-text text-transparent font-medium">
                       {testimonials[currentTestimonial].role}
                     </p>
                   </div>
@@ -291,17 +291,17 @@ const Index = () => {
             </Card>
             
             {/* Testimonial Indicators */}
-            <div className="flex justify-center mt-6 space-x-2">
+            <div className="flex justify-center gap-2 mt-6">
               {testimonials.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentTestimonial(index)}
                   className={`w-3 h-3 rounded-full transition-all duration-300 ${
                     index === currentTestimonial 
-                      ? 'bg-emerald-600 w-8' 
-                      : 'bg-gray-300 hover:bg-gray-400'
+                    ? 'bg-gradient-to-r from-green-400 to-teal-500 w-6' 
+                    : 'bg-gray-300 hover:bg-teal-200'
                   }`}
-                  aria-label={`View testimonial ${index + 1}`}
+                  aria-label={`Go to testimonial ${index + 1}`}
                 />
               ))}
             </div>
@@ -357,7 +357,7 @@ const Index = () => {
               href="https://instagram.com/myzhaffar" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+              className="font-semibold bg-gradient-to-r from-green-400 to-teal-500 bg-clip-text text-transparent hover:opacity-80 transition-opacity"
             >
               myzhaffar
             </a>

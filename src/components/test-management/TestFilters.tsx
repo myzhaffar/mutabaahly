@@ -42,44 +42,44 @@ const TestFilters: React.FC<TestFiltersProps> = ({
         {/* Search Bar */}
         <div className="relative flex-1">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-          <Input
+      <Input
             placeholder="Search students by name..."
             value={searchTerm}
-            onChange={(e) => onFilterChange('searchTerm', e.target.value)}
+        onChange={(e) => onFilterChange('searchTerm', e.target.value)}
             className="pl-9 pr-4 w-full"
-          />
+      />
         </div>
 
         {/* Status Filter */}
         <div className="w-full sm:w-48">
-          <Select 
+      <Select
             value={status || 'all'} 
             onValueChange={(value) => onFilterChange('status', value === 'all' ? undefined : value)}
-          >
-            <SelectTrigger>
+      >
+        <SelectTrigger>
               <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="scheduled">Scheduled</SelectItem>
               <SelectItem value="passed">Passed</SelectItem>
               <SelectItem value="failed">Failed</SelectItem>
               <SelectItem value="pending_retake">Pending Retake</SelectItem>
-            </SelectContent>
-          </Select>
+        </SelectContent>
+      </Select>
         </div>
 
         {/* Level Filter */}
         <div className="w-full sm:w-48">
-          <Select 
+      <Select
             value={jilidLevel || 'all'} 
             onValueChange={(value) => onFilterChange('jilidLevel', value === 'all' ? undefined : value)}
-          >
-            <SelectTrigger>
+      >
+        <SelectTrigger>
               <SelectValue placeholder="Filter by level" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Levels</SelectItem>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Levels</SelectItem>
               <SelectItem value="Level 1">Level 1</SelectItem>
               <SelectItem value="Level 2">Level 2</SelectItem>
               <SelectItem value="Level 3">Level 3</SelectItem>
@@ -88,17 +88,17 @@ const TestFilters: React.FC<TestFiltersProps> = ({
               <SelectItem value="Level 6">Level 6</SelectItem>
               <SelectItem value="Quran">Quran</SelectItem>
               <SelectItem value="Evaluation">Evaluation</SelectItem>
-            </SelectContent>
-          </Select>
+        </SelectContent>
+      </Select>
         </div>
 
         {/* Date Filter */}
-        {showDateFilter && (
+      {showDateFilter && (
           <div className="w-full sm:w-48">
-            <Input
-              type="date"
-              value={date || ''}
-              onChange={(e) => onFilterChange('date', e.target.value)}
+        <Input
+          type="date"
+          value={date || ''}
+          onChange={(e) => onFilterChange('date', e.target.value)}
               className="w-full"
             />
           </div>
