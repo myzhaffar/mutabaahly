@@ -16,6 +16,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import TeacherTestManagement from '@/pages/TeacherTestManagement';
 import ParentTestView from '@/pages/ParentTestView';
 import Index from '@/pages/Index';
+import Students from '@/pages/Students';
 import { useAuth } from '@/contexts/AuthContext';
 
 const queryClient = new QueryClient();
@@ -37,6 +38,11 @@ function AppContent() {
         <Route path="/profile" element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        } />
+        <Route path="/students" element={
+          <ProtectedRoute requiredRole="teacher">
+            <Students />
           </ProtectedRoute>
         } />
         <Route path="/student/:id" element={

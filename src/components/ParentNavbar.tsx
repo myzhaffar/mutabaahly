@@ -32,7 +32,7 @@ const ParentNavbar = () => {
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
-    { href: '/tests/view', label: 'Hasil Tes', icon: BookOpen },
+    { href: '/tests/view', label: 'Test Results', icon: BookOpen },
     { href: '/profile', label: 'Profile', icon: UserCircle },
   ];
 
@@ -48,10 +48,10 @@ const ParentNavbar = () => {
           {/* Logo Section */}
           <div className="flex items-center gap-2">
             <Link to="/dashboard" className="flex items-center space-x-2">
-              <div className="w-9 h-9 bg-gradient-to-br from-islamic-600 to-accent-600 rounded-lg flex items-center justify-center shadow-sm">
+              <div className="w-9 h-9 bg-gradient-to-r from-green-400 to-teal-500 rounded-lg flex items-center justify-center shadow-sm">
                 <span className="text-white font-bold text-xl">M</span>
               </div>
-              <span className="font-sf-pro font-semibold text-base text-islamic-700 hidden sm:block">
+              <span className="font-sf-pro font-semibold text-base bg-gradient-to-r from-green-400 to-teal-500 bg-clip-text text-transparent hidden sm:block">
                 Mutabaahly
               </span>
             </Link>
@@ -66,12 +66,16 @@ const ParentNavbar = () => {
                 className={`
                   flex items-center gap-2 text-sm font-medium transition-colors
                   ${isActive(item.href)
-                    ? 'text-islamic-900'
-                    : 'text-islamic-600 hover:text-islamic-900'
+                    ? 'bg-gradient-to-r from-green-400 to-teal-500 bg-clip-text text-transparent'
+                    : 'text-gray-600 hover:bg-gradient-to-r hover:from-green-400 hover:to-teal-500 hover:bg-clip-text hover:text-transparent'
                   }
                 `}
               >
-                <item.icon className="h-4 w-4" />
+                <item.icon className={`h-4 w-4 ${
+                  isActive(item.href)
+                    ? 'text-teal-500'
+                    : 'text-gray-600 group-hover:text-teal-500'
+                }`} />
                 {item.label}
               </Link>
             ))}
@@ -83,14 +87,14 @@ const ParentNavbar = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2">
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-islamic-100 text-islamic-700">
+                    <AvatarFallback className="bg-green-100 text-teal-700">
                       {profile?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="text-sm font-medium text-islamic-700">
+                  <span className="text-sm font-medium bg-gradient-to-r from-green-400 to-teal-500 bg-clip-text text-transparent">
                     {profile?.full_name}
                   </span>
-                  <ChevronDown className="h-4 w-4 text-islamic-500" />
+                  <ChevronDown className="h-4 w-4 text-teal-500" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
@@ -105,7 +109,7 @@ const ParentNavbar = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 text-islamic-700 hover:bg-islamic-50 rounded-lg"
+            className="md:hidden p-2 text-teal-700 hover:bg-teal-50 rounded-lg"
           >
             {isMobileMenuOpen ? (
               <X className="h-6 w-6" />
@@ -127,12 +131,16 @@ const ParentNavbar = () => {
                   className={`
                     flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium
                     ${isActive(item.href)
-                      ? 'bg-islamic-50 text-islamic-900'
-                      : 'text-islamic-600 hover:bg-islamic-50 hover:text-islamic-900'
+                      ? 'bg-gradient-to-r from-green-400/10 to-teal-500/10 text-teal-600'
+                      : 'text-gray-600 hover:bg-gradient-to-r hover:from-green-400/10 hover:to-teal-500/10 hover:text-teal-600'
                     }
                   `}
                 >
-                  <item.icon className="h-5 w-5" />
+                  <item.icon className={`h-5 w-5 ${
+                    isActive(item.href)
+                      ? 'text-teal-500'
+                      : 'text-gray-600 group-hover:text-teal-500'
+                  }`} />
                   {item.label}
                 </Link>
               ))}
@@ -141,15 +149,15 @@ const ParentNavbar = () => {
               <div className="border-t mt-2 pt-4 px-4">
                 <div className="flex items-center gap-3 mb-4">
                   <Avatar className="h-10 w-10">
-                    <AvatarFallback className="bg-islamic-100 text-islamic-700">
+                    <AvatarFallback className="bg-green-100 text-teal-700">
                       {profile?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm font-medium text-islamic-900">
+                    <p className="text-sm font-medium text-teal-900">
                       {profile?.full_name}
                     </p>
-                    <p className="text-xs text-islamic-500">Parent</p>
+                    <p className="text-xs text-teal-500">Parent</p>
                   </div>
                 </div>
                 <Button
