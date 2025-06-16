@@ -142,125 +142,125 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
         <form onSubmit={handleSubmit} className="flex flex-col min-h-0 flex-1">
           <div className="flex-1 overflow-y-auto px-6">
             <div className="space-y-4 py-4">
-              <div>
-                <Label htmlFor="student">Student</Label>
-                <Select value={studentId} onValueChange={setStudentId} disabled={!!currentTest}>
-                  <SelectTrigger id="student">
-                    <SelectValue placeholder="Select Student" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {students.map((s) => (
-                      <SelectItem key={s.id} value={s.id}>
-                        {s.name} {s.class_name ? `(${s.class_name})` : ''} - {s.current_tilawati_jilid} 
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {studentId && (
-                  <div className="text-sm mt-1">
+            <div>
+              <Label htmlFor="student">Student</Label>
+              <Select value={studentId} onValueChange={setStudentId} disabled={!!currentTest}>
+                <SelectTrigger id="student">
+                  <SelectValue placeholder="Select Student" />
+                </SelectTrigger>
+                <SelectContent>
+                  {students.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name} {s.class_name ? `(${s.class_name})` : ''} - {s.current_tilawati_jilid} 
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {studentId && (
+                <div className="text-sm mt-1">
                     <p className="text-green-600">
                       ✅ Student has completed their current level and is ready for testing
+                  </p>
+                  {selectedStudent && (
+                    <p className="text-muted-foreground mt-1">
+                      Teacher: {selectedStudent.teacher}
                     </p>
-                    {selectedStudent && (
-                      <p className="text-muted-foreground mt-1">
-                        Teacher: {selectedStudent.teacher}
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
+            </div>
 
-              <div>
-                <Label htmlFor="className">Class Name</Label>
-                <Input
-                  id="className"
-                  value={className}
-                  onChange={(e) => setClassName(e.target.value)}
-                  placeholder="Class Name"
-                />
-              </div>
+            <div>
+              <Label htmlFor="className">Class Name</Label>
+              <Input
+                id="className"
+                value={className}
+                onChange={(e) => setClassName(e.target.value)}
+                placeholder="Class Name"
+              />
+            </div>
 
-              <div>
-                <Label htmlFor="tilawatiLevel">Tilawati Level</Label>
-                <Select 
-                  value={tilawatiLevel} 
-                  onValueChange={(value: TilawatiJilid) => setTilawatiLevel(value)}
-                >
-                  <SelectTrigger id="tilawatiLevel">
-                    <SelectValue placeholder="Select Tilawati Level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {JILID_OPTIONS.map(jilid => (
-                      <SelectItem key={jilid} value={jilid}>{jilid}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div>
+              <Label htmlFor="tilawatiLevel">Tilawati Level</Label>
+              <Select 
+                value={tilawatiLevel} 
+                onValueChange={(value: TilawatiJilid) => setTilawatiLevel(value)}
+              >
+                <SelectTrigger id="tilawatiLevel">
+                  <SelectValue placeholder="Select Tilawati Level" />
+                </SelectTrigger>
+                <SelectContent>
+                  {JILID_OPTIONS.map(jilid => (
+                    <SelectItem key={jilid} value={jilid}>{jilid}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="testDate">Test Date</Label>
-                  <Input
-                    id="testDate"
-                    type="date"
-                    value={testDate}
-                    onChange={(e) => setTestDate(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="munaqisy">Examiner</Label>
-                  <Input
-                    id="munaqisy"
-                    value={munaqisy}
-                    onChange={(e) => setMunaqisy(e.target.value)}
-                    placeholder="Examiner Name"
-                  />
-                </div>
-              </div>
-
               <div>
-                <Label htmlFor="status">Status</Label>
-                <Select 
-                  value={status} 
-                  onValueChange={(value: TestStatus) => setStatus(value)}
-                >
-                  <SelectTrigger id="status">
-                    <SelectValue placeholder="Select Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {STATUS_OPTIONS.map(status => (
-                      <SelectItem key={status} value={status}>
-                        {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="testDate">Test Date</Label>
+                <Input
+                  id="testDate"
+                  type="date"
+                  value={testDate}
+                  onChange={(e) => setTestDate(e.target.value)}
+                />
               </div>
-
-              <div>
-                <Label htmlFor="notes">Notes</Label>
-                <Textarea
-                  id="notes"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Add notes if needed..."
-                  className="h-20"
+                <div>
+                <Label htmlFor="munaqisy">Examiner</Label>
+                <Input
+                  id="munaqisy"
+                  value={munaqisy}
+                  onChange={(e) => setMunaqisy(e.target.value)}
+                  placeholder="Examiner Name"
                 />
               </div>
             </div>
 
-            {error && (
+            <div>
+              <Label htmlFor="status">Status</Label>
+              <Select 
+                value={status} 
+                onValueChange={(value: TestStatus) => setStatus(value)}
+              >
+                <SelectTrigger id="status">
+                  <SelectValue placeholder="Select Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {STATUS_OPTIONS.map(status => (
+                    <SelectItem key={status} value={status}>
+                      {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="notes">Notes</Label>
+              <Textarea
+                id="notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Add notes if needed..."
+                className="h-20"
+              />
+            </div>
+          </div>
+
+          {error && (
               <div className="text-sm font-medium text-red-500 mt-2 mb-4">
-                {error}
-              </div>
-            )}
+              {error}
+            </div>
+          )}
           </div>
 
           <DialogFooter className="px-6 py-4 bg-gray-50 border-t mt-auto flex-shrink-0">
             <div className="flex justify-end gap-4 w-full">
-              <DialogClose asChild>
+            <DialogClose asChild>
                 <Button variant="outline" onClick={onClose}>Cancel</Button>
-              </DialogClose>
+            </DialogClose>
               <GradientButton type="submit" disabled={isLoading}>
                 {isLoading ? 'Saving...' : currentTest ? 'Save Changes' : 'Add Test'}
               </GradientButton>

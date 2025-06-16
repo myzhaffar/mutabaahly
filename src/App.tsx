@@ -15,7 +15,6 @@ import StudentDetails from '@/pages/StudentDetails';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import TeacherTestManagement from '@/pages/TeacherTestManagement';
 import ParentTestView from '@/pages/ParentTestView';
-import ParentStudentView from '@/pages/ParentStudentView';
 import Index from '@/pages/Index';
 import Students from '@/pages/Students';
 import { useAuth } from '@/contexts/AuthContext';
@@ -42,15 +41,9 @@ function AppContent() {
           </ProtectedRoute>
         } />
         <Route path="/students" element={
-          profile?.role === 'parent' ? (
-            <ProtectedRoute requiredRole="parent">
-              <ParentStudentView />
-            </ProtectedRoute>
-          ) : (
-            <ProtectedRoute requiredRole="teacher">
-              <Students />
-            </ProtectedRoute>
-          )
+          <ProtectedRoute requiredRole="teacher">
+            <Students />
+          </ProtectedRoute>
         } />
         <Route path="/student/:id" element={
           <ProtectedRoute>

@@ -5,6 +5,7 @@ import { User, Mail, Shield, ArrowLeft, MoreVertical, Pencil, Trash2 } from 'luc
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import TeacherLayout from '@/components/layouts/TeacherLayout';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,11 +30,11 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <TeacherLayout>
       <div className="container mx-auto py-6 px-4">
         <div className="max-w-2xl mx-auto">
-          {/* Header with Back Button */}
-          <div className="flex items-center justify-between mb-6">
+          {/* Header with Back Button and Label */}
+          <div className="flex items-center gap-4 mb-6">
             <Button
               variant="outline"
               onClick={() => navigate(-1)}
@@ -122,7 +123,7 @@ const Profile: React.FC = () => {
           </Card>
         </div>
       </div>
-    </div>
+    </TeacherLayout>
   );
 };
 
