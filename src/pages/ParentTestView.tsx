@@ -5,10 +5,11 @@ import TestStatsCards from '@/components/test-management/TestStatsCards';
 import TestFilters from '@/components/test-management/TestFilters';
 import ParentTestTable from '@/components/test-management/ParentTestTable';
 import { useAuth } from '@/contexts/AuthContext';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { TestStatus, TilawatiJilid, TilawatiTest } from '@/types/tilawati';
 import { supabase } from '@/lib/supabase';
+import { useNavigate } from 'react-router-dom';
 
 interface Filters {
   searchQuery?: string;
@@ -19,6 +20,7 @@ interface Filters {
 const ParentTestView: React.FC = () => {
   const { profile } = useAuth();
   const [filters, setFilters] = useState<Filters>({});
+  const navigate = useNavigate();
 
   // Fetch children's tests
   const { data: tests, isLoading } = useQuery({
@@ -87,8 +89,18 @@ Notes: ${test.notes || 'No notes available'}`;
     <ParentLayout>
       <div className="space-y-6 px-4 md:px-6">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-          <h1 className="text-xl lg:text-2xl font-bold">Tes Kenaikan Level Anak</h1>
+        <div className="flex items-center gap-4 mb-6">
+          <Button
+            variant="outline"
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 rounded-full border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Tes Kenaikan Level Anak
+          </h1>
         </div>
 
         {/* Stats Cards */}

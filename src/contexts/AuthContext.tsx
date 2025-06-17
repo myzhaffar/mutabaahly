@@ -5,7 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 interface Profile {
   id: string;
   full_name: string;
-  role: 'teacher' | 'parent';
+  role: "parent" | "teacher";
+  email?: string;
+  avatar_url?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -48,10 +50,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) {
         console.error('Error fetching profile:', error);
       } else if (profileData) {
-        // Type assertion to ensure the role is properly typed
+        // Type assertion for the database response
+        const dbProfile = profileData as {
+          id: string;
+          full_name: string;
+          role: string;
+          email?: string;
+          avatar_url?: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+
+        // Ensure all required fields are present
         const typedProfile: Profile = {
-          ...profileData,
-          role: profileData.role as 'teacher' | 'parent'
+          id: dbProfile.id,
+          full_name: dbProfile.full_name,
+          role: dbProfile.role as 'teacher' | 'parent',
+          email: dbProfile.email,
+          avatar_url: dbProfile.avatar_url,
+          created_at: dbProfile.created_at,
+          updated_at: dbProfile.updated_at,
         };
         setProfile(typedProfile);
       }
@@ -118,6 +136,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
       },
     });
+
+    if (data.user && !error) {
+      try {
+        await createProfile(data.user, role);
+      } catch (profileError) {
+        console.error('Error creating profile:', profileError);
+        // If profile creation fails, we should probably delete the user
+        await supabase.auth.admin.deleteUser(data.user.id);
+        return { data: { user: null, session: null }, error: profileError as AuthError };
+      }
+    }
+
     return { data, error };
   };
 
@@ -137,6 +167,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Error signing out:', error);
       return { error };
     }
+  };
+
+  const createProfile = async (user: User, role: "parent" | "teacher") => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .insert([
+        {
+          id: user.id,
+          full_name: user.user_metadata.full_name || "",
+          role,
+          email: user.email || undefined,
+          avatar_url: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error creating profile:", error);
+      throw error;
+    }
+
+    return data;
   };
 
   return (

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { GradientButton } from '@/components/ui/gradient-button';
 import { Input } from '@/components/ui/input';
@@ -97,9 +97,12 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({ studentId, onProg
           Add Progress
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px]" aria-describedby="add-progress-description">
         <DialogHeader>
           <DialogTitle>Add Daily Progress</DialogTitle>
+          <DialogDescription id="add-progress-description">
+            Fill in the details to add a new daily progress entry for the student.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">

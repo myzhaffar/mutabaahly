@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { User, Mail, Shield, ArrowLeft, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import TeacherLayout from '@/components/layouts/TeacherLayout';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import ProfileLayout from '@/components/layouts/ProfileLayout';
+import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
+import { DeleteProfileDialog } from '@/components/profile/DeleteProfileDialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,25 +15,68 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { toast } from 'sonner';
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
+
+interface Profile {
+  id: string;
+  full_name: string;
+  role: "parent" | "teacher";
+  avatar_url: string | null;
+}
 
 const Profile: React.FC = () => {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (user?.id) {
+      fetchProfile();
+    }
+  }, [user?.id]);
+
+  const fetchProfile = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user?.id)
+        .single();
+
+      if (error) throw error;
+      setProfile(data);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      toast.error("Failed to load profile");
+    }
+  };
+
   const handleEditProfile = () => {
-    // For now, just show a toast
-    toast.info("Edit profile feature coming soon!");
+    setIsEditDialogOpen(true);
   };
 
   const handleDeleteProfile = () => {
-    // For now, just show a toast
-    toast.info("Delete profile feature coming soon!");
+    setIsDeleteDialogOpen(true);
   };
 
+  const handleProfileUpdated = () => {
+    fetchProfile();
+  };
+
+  if (!profile) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
-    <TeacherLayout>
-      <div className="container mx-auto py-6 px-4">
+    <ProfileLayout>
+      <div className="container mx-auto pt-2 pb-6 px-2 sm:pt-6 sm:px-4">
         <div className="max-w-2xl mx-auto">
           {/* Header with Back Button and Label */}
           <div className="flex items-center gap-4 mb-6">
@@ -76,6 +121,7 @@ const Profile: React.FC = () => {
 
                 <div className="flex flex-col items-center">
                   <Avatar className="h-24 w-24 mb-4">
+                    <AvatarImage src={profile?.avatar_url || undefined} />
                     <AvatarFallback className="bg-gradient-to-r from-green-400 to-teal-500 text-white text-xl">
                       {profile?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase()}
                     </AvatarFallback>
@@ -123,7 +169,20 @@ const Profile: React.FC = () => {
           </Card>
         </div>
       </div>
-    </TeacherLayout>
+
+      {/* Edit Profile Dialog */}
+      <EditProfileDialog
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        onProfileUpdated={handleProfileUpdated}
+      />
+
+      {/* Delete Profile Dialog */}
+      <DeleteProfileDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+      />
+    </ProfileLayout>
   );
 };
 

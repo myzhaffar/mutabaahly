@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -30,7 +29,7 @@ const ParentLayout: React.FC<ParentLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 pt-16">
+    <div className="min-h-screen bg-gray-100 pt-0">
       <main className="container mx-auto py-4 px-4 lg:py-6">
         {children}
       </main>

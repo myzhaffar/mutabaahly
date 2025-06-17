@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -77,9 +77,12 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
           <Edit className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px]" aria-describedby="edit-progress-description">
         <DialogHeader>
           <DialogTitle>Edit {entry.type === 'hafalan' ? 'Hafalan' : 'Tilawati'} Progress</DialogTitle>
+          <DialogDescription id="edit-progress-description">
+            Update the progress details for this entry.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
