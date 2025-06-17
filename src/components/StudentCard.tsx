@@ -84,7 +84,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => 
               {student.name}
             </CardTitle>
             <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" size="sm" className="border-islamic-200 text-islamic-700">
+              <Badge variant="outline" size="sm" className="border-islamic-500 text-islamic-700">
                 {student.class}
               </Badge>
               <Badge variant="secondary" size="sm" className="bg-accent/10 text-accent-foreground/80">
