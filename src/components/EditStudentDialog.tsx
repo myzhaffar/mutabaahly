@@ -8,6 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import FileUpload from '@/components/ui/file-upload';
 import { useAuth } from '@/contexts/AuthContext';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { FIXED_TEACHERS } from '@/utils/rankingDataService';
 
 interface Student {
   id: string;
@@ -164,12 +166,22 @@ const EditStudentDialog: React.FC<EditStudentDialogProps> = ({ student, onStuden
           </div>
           <div className="space-y-2">
             <Label htmlFor="teacher">Teacher</Label>
-            <Input
-              id="teacher"
+            <Select
               value={formData.teacher}
-              onChange={(e) => handleInputChange('teacher', e.target.value)}
+              onValueChange={(value) => handleInputChange('teacher', value)}
               required
-            />
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select teacher" />
+              </SelectTrigger>
+              <SelectContent>
+                {FIXED_TEACHERS.map((teacher) => (
+                  <SelectItem key={teacher.id} value={teacher.name}>
+                    {teacher.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>

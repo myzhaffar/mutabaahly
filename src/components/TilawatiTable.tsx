@@ -34,12 +34,14 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
       
       try {
         const rankingFilters: RankingFilters = {
-          teacher: filters.teacher,
+          teacher: filters.teacher === 'All Teachers' ? '' : filters.teacher,
           grade: filters.grade
         };
         
         const data = await fetchTilawatiRankingData(rankingFilters);
         setAllStudents(data);
+        console.log('[TilawatiTable] allStudents:', data);
+        console.log('[TilawatiTable] filters:', filters);
       } catch (err) {
         console.error('Error fetching Tilawati ranking data:', err);
         setError('Failed to load ranking data');
@@ -53,7 +55,7 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
 
   // Apply filters
   const filteredStudents = allStudents.filter(student => {
-    const matchesTeacher = filters.teacher === 'all' || student.teacherId === filters.teacher;
+    const matchesTeacher = !filters.teacher || student.teacher === filters.teacher;
     const matchesGrade = filters.grade === 'all' || student.grade === filters.grade;
     
     return matchesTeacher && matchesGrade;
@@ -154,7 +156,7 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
             Tilawati Reading Rankings
           </CardTitle>
           <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-            {filters.teacher !== 'all' && <Badge variant="outline">Teacher: {filters.teacher}</Badge>}
+            {filters.teacher !== 'All Teachers' && <Badge variant="outline">Teacher: {filters.teacher}</Badge>}
             {filters.grade !== 'all' && <Badge variant="outline">Grade: {filters.grade}</Badge>}
           </div>
         </CardHeader>

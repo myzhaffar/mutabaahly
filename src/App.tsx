@@ -18,6 +18,7 @@ import ParentTestView from '@/pages/ParentTestView';
 import Index from '@/pages/Index';
 import Students from '@/pages/Students';
 import { useAuth } from '@/contexts/AuthContext';
+import ClassDetail from '@/pages/ClassDetail';
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,11 @@ function AppContent() {
         <Route path="/tests/view" element={
           <ProtectedRoute requiredRole="parent">
             <ParentTestView />
+          </ProtectedRoute>
+        } />
+        <Route path="/class/:className" element={
+          <ProtectedRoute requiredRole="teacher">
+            <ClassDetail />
           </ProtectedRoute>
         } />
       </Routes>

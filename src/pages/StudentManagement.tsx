@@ -15,6 +15,8 @@ import { useToast } from '@/components/ui/use-toast';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import AddStudentDialog from '@/components/AddStudentDialog';
+import BulkUploadStudentsDialog from '@/components/BulkUploadStudentsDialog';
 
 interface Student {
   id: string;
@@ -62,6 +64,10 @@ const StudentManagement: React.FC = () => {
     });
   };
 
+  const handleStudentAdded = () => {
+    refetch();
+  };
+
   const filteredStudents = students?.filter(student =>
     student.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -71,10 +77,10 @@ const StudentManagement: React.FC = () => {
       <div className="container mx-auto py-6 space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">Student List</h1>
-          <Button onClick={handleAddStudent}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Student
-          </Button>
+          <div className="flex items-center gap-2">
+            <BulkUploadStudentsDialog onStudentsAdded={handleStudentAdded} />
+            <AddStudentDialog onStudentAdded={handleStudentAdded} />
+          </div>
         </div>
 
         <div className="flex gap-4">

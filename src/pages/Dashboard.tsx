@@ -3,12 +3,16 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SearchAndFilter from '@/components/SearchAndFilter';
 import StatsCards from '@/components/dashboard/StatsCards';
-import StudentsGrid from '@/components/dashboard/StudentsGrid';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
 import AddStudentDialog from '@/components/AddStudentDialog';
+import BulkUploadStudentsDialog from '@/components/BulkUploadStudentsDialog';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import ClassCard from '@/components/dashboard/ClassCard';
 
 interface Student {
   id: string;
@@ -243,6 +247,13 @@ const Dashboard = () => {
 
   const { classes, teachers } = getFilterOptions();
 
+  // Group students by class
+  const classGroups = students.reduce((acc, student) => {
+    if (!acc[student.group_name]) acc[student.group_name] = [];
+    acc[student.group_name].push(student);
+    return acc;
+  }, {} as Record<string, Student[]>);
+
   if (profile?.role === 'teacher') {
     return (
       <TeacherLayout>
@@ -253,37 +264,18 @@ const Dashboard = () => {
             </h1>
             <p className="text-gray-600">Teacher Dashboard</p>
           </div>
-          <AddStudentDialog onStudentAdded={handleStudentAdded} />
+          <div className="flex items-center gap-2">
+            <BulkUploadStudentsDialog onStudentsAdded={handleStudentAdded} />
+            <AddStudentDialog onStudentAdded={handleStudentAdded} />
+          </div>
         </div>
 
         <StatsCards stats={stats} />
 
-        <div className="mb-6">
-          <SearchAndFilter
-            onSearchChange={handleSearchChange}
-            onFiltersChange={handleFiltersChange}
-            availableClasses={classes}
-            availableTeachers={teachers}
-            currentFilters={filters}
-          />
-        </div>
-
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Students Overview</h2>
-            {filteredStudents.length !== students.length && (
-              <span className="text-sm text-gray-600">
-                Showing {filteredStudents.length} of {students.length} students
-              </span>
-            )}
-          </div>
-          
-          <StudentsGrid
-            students={students}
-            filteredStudents={filteredStudents}
-            onViewDetails={handleViewDetails}
-            userRole={profile?.role}
-          />
+        <div className="mb-6 space-y-6">
+          {Object.entries(classGroups).map(([className, classStudents]) => (
+            <ClassCard key={className} className={className} classStudents={classStudents} />
+          ))}
         </div>
       </TeacherLayout>
     );
@@ -325,13 +317,6 @@ const Dashboard = () => {
               </span>
             )}
           </div>
-          
-          <StudentsGrid
-            students={students}
-            filteredStudents={filteredStudents}
-            onViewDetails={handleViewDetails}
-            userRole={profile?.role}
-          />
         </div>
       </div>
     </div>

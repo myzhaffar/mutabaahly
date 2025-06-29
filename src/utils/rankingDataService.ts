@@ -219,7 +219,7 @@ export const fetchHafalanRankingData = async (filters: RankingFilters): Promise<
     );
 
     // Filter out null values and sort by custom ranking logic
-    const validStudents = studentsWithProgress.filter((student): student is StudentRankingData => 
+    const validStudents = studentsWithProgress.filter(student => 
       student !== null && typeof student.verse === 'number' && student.verse > 0
     );
     
@@ -580,4 +580,22 @@ export const fetchGrades = async (): Promise<{ id: string; name: string }[]> => 
     console.error('Error in fetchGrades:', error);
     return [];
   }
-}; 
+};
+
+// Fixed teacher list for dropdowns and filters
+export const FIXED_TEACHERS = [
+  { id: 'titin', name: 'Bu Titin' },
+  { id: 'witri', name: 'Bu Witri' },
+  { id: 'lila', name: 'Bu Lila' },
+  { id: 'alya', name: 'Bu Alya' },
+  { id: 'liana', name: 'Bu Liana' },
+  { id: 'talia', name: 'Bu Talia' },
+  { id: 'liza', name: 'Bu Liza' },
+  { id: 'zaedun', name: 'Pak Zaedun' },
+  { id: 'heri', name: 'Pak Heri' },
+  { id: 'sata', name: 'Pak Sata' },
+  { id: 'kusnadi', name: 'Pak Kusnadi' },
+  { id: 'riski', name: 'Pak Riski' },
+  { id: 'hasib', name: 'Pak Hasib' },
+  { id: 'muzhaffar', name: 'Pak Muzhaffar' },
+]; 
