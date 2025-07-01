@@ -255,27 +255,30 @@ const Dashboard = () => {
   }, {} as Record<string, Student[]>);
 
   if (profile?.role === 'teacher') {
+    const breadcrumbs = [{ label: 'Dashboard Overview' }];
     return (
-      <TeacherLayout>
-        <div className="flex justify-between items-center mb-8">
+      <TeacherLayout breadcrumbs={breadcrumbs}>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
               Welcome back, {profile?.full_name}
             </h1>
             <p className="text-gray-600">Teacher Dashboard</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex justify-center gap-2 sm:justify-end">
             <BulkUploadStudentsDialog onStudentsAdded={handleStudentAdded} />
-            <AddStudentDialog onStudentAdded={handleStudentAdded} />
+          <AddStudentDialog onStudentAdded={handleStudentAdded} />
           </div>
         </div>
 
         <StatsCards stats={stats} />
 
-        <div className="mb-6 space-y-6">
-          {Object.entries(classGroups).map(([className, classStudents]) => (
-            <ClassCard key={className} className={className} classStudents={classStudents} />
-          ))}
+        <div className="mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Object.entries(classGroups).map(([className, classStudents]) => (
+              <ClassCard key={className} className={className} classStudents={classStudents} />
+            ))}
+          </div>
         </div>
       </TeacherLayout>
     );

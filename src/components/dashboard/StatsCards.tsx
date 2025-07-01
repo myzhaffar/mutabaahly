@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Users, BookOpen, Award, TrendingUp } from 'lucide-react';
@@ -14,7 +13,7 @@ interface StatsCardsProps {
 
 const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <Card className="bg-white shadow-sm border-l-4 border-l-blue-500">
         <CardContent className="p-6">
           <div className="flex items-center">

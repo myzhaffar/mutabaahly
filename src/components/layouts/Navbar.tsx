@@ -20,7 +20,7 @@ export default function Navbar() {
       <div className="flex h-16 items-center px-4">
         <div className="flex items-center space-x-4">
           <Link to="/" className="font-bold text-xl">
-            Quran Monitoring
+            Mutabaahly
           </Link>
         </div>
         <div className="ml-auto flex items-center space-x-4">

@@ -8,19 +8,25 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect } from 'react';
+import { Home, Mail, Lock, Eye, User } from 'lucide-react';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [role, setRole] = useState<'teacher' | 'parent'>('teacher');
+  const [role, setRole] = useState<string>('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   const { signIn, signUp, user } = useAuth();
   const { t } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  const allowedRoles = ['teacher', 'parent'];
 
   useEffect(() => {
     if (user) {
@@ -31,6 +37,17 @@ const Auth = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    // Validate role selection
+    if (!isLogin && !allowedRoles.includes(role)) {
+      toast({
+        title: 'Role Required',
+        description: 'Please select your role (Teacher or Parent) to continue.',
+        variant: 'destructive',
+      });
+      setLoading(false);
+      return;
+    }
 
     try {
       if (isLogin) {
@@ -48,7 +65,7 @@ const Auth = () => {
           });
         }
       } else {
-        const { error } = await signUp(email, password, fullName, role);
+        const { error } = await signUp(email, password, fullName, role as 'teacher' | 'parent');
         if (error) {
           toast({
             title: "Sign Up Error",
@@ -73,33 +90,36 @@ const Auth = () => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    await supabase.auth.signInWithOAuth({ provider: 'google' });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-islamic-50 via-accent-50 to-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-islamic-500 to-accent-500 rounded-full mb-4">
-            <span className="text-white text-2xl font-bold">M</span>
-          </div>
-          <h1 className="text-2xl font-bold font-sf-pro text-islamic-700">
-            Mutabaahly
-          </h1>
-        </div>
-
-        <Card>
-          <CardHeader className="text-center">
-            <CardTitle className="font-sf-pro">
-              {isLogin ? 'Sign In' : 'Create Account'}
-            </CardTitle>
-            <CardDescription className="font-sf-text">
-              {isLogin 
-                ? 'Enter your credentials to access your account' 
-                : 'Create a new account to get started'}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+        <Card className="rounded-2xl shadow-xl border-0">
+          <CardContent className="p-8">
+            <div className="flex flex-col items-center mb-8">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center mb-4">
+                <span className="text-white text-3xl font-bold">ق</span>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="w-full flex items-center justify-center gap-2 border border-gray-200 rounded-lg py-3 font-medium text-gray-700 hover:bg-gray-50 transition mb-6"
+              onClick={handleGoogleLogin}
+            >
+              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="h-5 w-5" />
+              Continue with Google
+            </button>
+            <div className="flex items-center my-6">
+              <div className="flex-1 h-px bg-gray-200" />
+              <span className="mx-3 text-gray-400 text-sm">Or continue with email</span>
+              <div className="flex-1 h-px bg-gray-200" />
+            </div>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {!isLogin && (
-                <div className="space-y-2">
+              { !isLogin && (
+                <div>
                   <Label htmlFor="fullName">Full Name</Label>
                   <Input
                     id="fullName"
@@ -111,66 +131,92 @@ const Auth = () => {
                   />
                 </div>
               )}
-              
-              <div className="space-y-2">
+              <div>
                 <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  placeholder="Enter your email"
-                />
+                <div className="relative mt-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><Mail className="h-5 w-5" /></span>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    placeholder="Enter your email"
+                    className="pl-10"
+                  />
+                </div>
               </div>
-              
-              <div className="space-y-2">
+              <div>
                 <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  placeholder="Enter your password"
-                  minLength={6}
-                />
-              </div>
-
-              {!isLogin && (
-                <div className="space-y-2">
-                  <Label htmlFor="role">Role</Label>
-                  <select
-                    id="role"
-                    value={role}
-                    onChange={(e) => setRole(e.target.value as 'teacher' | 'parent')}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                <div className="relative mt-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><Lock className="h-5 w-5" /></span>
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    placeholder="Enter your password"
+                    className="pl-10 pr-10"
+                  />
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    onClick={() => setShowPassword((v) => !v)}
                   >
-                    <option value="teacher">Teacher/Mentor</option>
-                    <option value="parent">Parent</option>
-                  </select>
+                    <Eye className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+              { !isLogin && (
+                <div>
+                  <Label htmlFor="role">Role</Label>
+                  <div className="relative mt-1">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><User className="h-5 w-5" /></span>
+                    <Select value={role} onValueChange={v => {
+                      if (allowedRoles.includes(v)) setRole(v);
+                    }}>
+                      <SelectTrigger className="pl-10">
+                        <SelectValue placeholder="Select role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="teacher">Teacher/Mentor</SelectItem>
+                        <SelectItem value="parent">Parent</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               )}
-              
               <Button 
                 type="submit" 
-                className="w-full bg-gradient-to-r from-emerald-500 to-teal-400 hover:opacity-90 text-white"
+                className={`w-full text-white text-lg font-semibold rounded-lg py-3 flex items-center justify-center gap-2
+                  ${isLogin ? 'bg-gradient-to-r from-emerald-500 to-teal-400 hover:opacity-90' : 'bg-gradient-to-r from-orange-400 to-orange-600 hover:opacity-90'}`}
                 disabled={loading}
               >
-                {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
+                {loading ? 'Please wait...' : (isLogin ? (<><span>Sign In</span></>) : (<><span>Sign Up</span></>))}
               </Button>
             </form>
-            
             <div className="mt-4 text-center">
               <button
                 type="button"
                 onClick={() => setIsLogin(!isLogin)}
-                className="text-accent-600 hover:text-accent-700 text-sm font-medium"
+                className="text-blue-600 hover:underline text-sm font-medium"
               >
                 {isLogin 
                   ? "Don't have an account? Sign up" 
                   : "Already have an account? Sign in"}
               </button>
+            </div>
+            <div className="mt-8">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-gray-700 border-gray-300"
+                onClick={() => navigate('/')}
+              >
+                <Home className="h-5 w-5 mr-1" /> Back to Home
+              </Button>
             </div>
           </CardContent>
         </Card>

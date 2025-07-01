@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
+import { ArrowLeft } from 'lucide-react';
 
 interface Student {
   id: string;
@@ -93,27 +94,37 @@ const ClassDetail: React.FC = () => {
     (selectedTeacher === 'all' || student.teacher === selectedTeacher)
   );
 
+  const breadcrumbs = [
+    { label: 'Dashboard', href: '/dashboard' },
+    { label: className }
+  ];
+
   return (
-    <TeacherLayout>
-      <div className="container mx-auto py-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">Class: {className}</h1>
-            <p className="text-gray-600">Students: {filteredStudents.length}</p>
+    <TeacherLayout breadcrumbs={breadcrumbs}>
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-2 mb-1">
+            <Button variant="outline" onClick={() => navigate(-1)} size="sm" className="mr-2 px-2">
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Back
+            </Button>
+            <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+              {className}
+              <span className="inline-flex items-center justify-center px-2 py-0.5 ml-1 text-xs font-semibold leading-none text-white bg-emerald-500 rounded-full">
+                {filteredStudents.length}
+              </span>
+            </h1>
           </div>
-          <Button variant="outline" onClick={() => navigate(-1)}>
-            Back
-          </Button>
         </div>
-        <div className="flex items-center gap-4 mb-4">
+        <div className="flex flex-col sm:flex-row items-center gap-4">
           <Input
             placeholder="Search students in this class..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="max-w-xs"
+            className="w-full sm:max-w-xs"
           />
           <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-full sm:w-48">
               <SelectValue placeholder="Filter by teacher" />
             </SelectTrigger>
             <SelectContent>

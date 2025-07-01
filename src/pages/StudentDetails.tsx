@@ -6,6 +6,7 @@ import StudentOverviewCard from '@/components/student-details/StudentOverviewCar
 import DailyProgressTabs from '@/components/student-details/DailyProgressTabs';
 import { useStudentDetails } from '@/hooks/useStudentDetails';
 import { useAuth } from '@/contexts/AuthContext';
+import TeacherLayout from '@/components/layouts/TeacherLayout';
 
 const StudentDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -48,9 +49,14 @@ const StudentDetails = () => {
     );
   }
 
+  const breadcrumbs = [
+    { label: 'Dashboard', href: '/dashboard' },
+    { label: student.group_name, href: `/class/${encodeURIComponent(student.group_name)}` },
+    { label: student.name }
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-6 py-8">
+    <TeacherLayout breadcrumbs={breadcrumbs}>
         <StudentDetailsHeader
           student={student}
           userRole={profile?.role || 'parent'}
@@ -70,8 +76,7 @@ const StudentDetails = () => {
           tilawahEntries={tilawahEntries}
           onProgressUpdated={refetchData}
         />
-      </div>
-    </div>
+    </TeacherLayout>
   );
 };
 

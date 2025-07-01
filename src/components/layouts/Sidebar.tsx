@@ -75,7 +75,7 @@ export function Sidebar({ className }: { className?: string }) {
         <div className="flex h-full flex-col">
           <div className="flex h-16 items-center border-b px-6">
             <Link to="/" className="font-bold text-xl">
-              Quran Monitoring
+              Mutabaahly
             </Link>
           </div>
           <div className="flex-1 overflow-auto py-4">

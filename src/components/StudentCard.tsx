@@ -66,9 +66,9 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => 
 
   return (
     <Card className="bg-white hover:shadow-xl transition-all duration-300 border-0 shadow-md rounded-xl overflow-hidden">
-      <CardHeader className="pb-4 bg-gradient-to-r from-islamic-50 to-accent-50">
-        <div className="flex items-center space-x-4">
-          <Avatar className="h-16 w-16 border-3 border-white shadow-lg">
+      <CardHeader className="p-4 sm:p-6 pb-4 bg-gradient-to-r from-islamic-50 to-accent-50">
+        <div className="flex flex-col sm:flex-row items-center sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 text-center sm:text-left">
+          <Avatar className="h-16 w-16 border-3 border-white shadow-lg mx-auto sm:mx-0">
             <AvatarImage 
               src={student.photo || '/avatars/placeholder.png'} 
               alt={student.name}
@@ -79,11 +79,11 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => 
             </AvatarFallback>
           </Avatar>
           
-          <div className="flex-1">
-            <CardTitle className="text-lg font-bold text-gray-900 mb-1">
+          <div className="flex-1 flex flex-col items-center sm:items-start">
+            <CardTitle className="text-lg font-bold text-gray-900 mb-1 text-center sm:text-left">
               {student.name}
             </CardTitle>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
               <Badge variant="outline" size="sm" className="border-islamic-500 text-islamic-700">
                 {student.class}
               </Badge>
@@ -96,10 +96,10 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => 
         </div>
       </CardHeader>
       
-      <CardContent className="p-6 space-y-5">
+      <CardContent className="p-4 sm:p-6 space-y-5">
         {/* Al-Quran Memorization Progress */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <div className="flex items-center space-x-2">
               <Award className="h-5 w-5 text-islamic-600" />
               <span className="text-sm font-semibold text-gray-800">
@@ -109,7 +109,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => 
             <Badge 
               variant={getStatusVariant(student.memorization.status)}
               size="sm"
-              className="whitespace-nowrap"
+              className="whitespace-nowrap self-start sm:self-auto"
             >
               {getStatusText(student.memorization.status)}
             </Badge>
@@ -136,7 +136,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => 
         
         {/* Tilawati Progress */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <div className="flex items-center space-x-2">
               <BookOpen className="h-5 w-5 text-accent-600" />
               <span className="text-sm font-semibold text-gray-800">
@@ -146,7 +146,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => 
             <Badge 
               variant={getStatusVariant(student.tilawati.status)}
               size="sm"
-              className="whitespace-nowrap"
+              className="whitespace-nowrap self-start sm:self-auto"
             >
               {getStatusText(student.tilawati.status)}
             </Badge>

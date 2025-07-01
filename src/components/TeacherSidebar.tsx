@@ -1,39 +1,41 @@
 "use client";
 
+import React, { useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Home, Users, BookMarked, UserCircle, Menu, X, LogOut } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-const TeacherSidebar = () => {
+interface TeacherSidebarProps {
+  isMobileMenuOpen: boolean;
+  setIsMobileMenuOpen: (open: boolean) => void;
+}
+
+const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const location = useLocation();
   const pathname = location.pathname;
   const navigate = useNavigate();
   const { profile, signOut } = useAuth();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Close mobile menu when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
-  }, [pathname]);
+  }, [pathname, setIsMobileMenuOpen]);
 
   // Close mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const sidebar = document.getElementById('teacher-sidebar');
-      
       if (isMobileMenuOpen && sidebar) {
         if (!sidebar.contains(event.target as Node)) {
           setIsMobileMenuOpen(false);
         }
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isMobileMenuOpen]);
+  }, [isMobileMenuOpen, setIsMobileMenuOpen]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -53,14 +55,7 @@ const TeacherSidebar = () => {
 
   return (
     <>
-      {/* Mobile Menu Button */}
-      <button
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white shadow-md text-teal-700 hover:bg-teal-50"
-      >
-        {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-      </button>
-
+      {/* Mobile Menu Button (now handled by header) */}
       {/* Backdrop */}
       {isMobileMenuOpen && (
         <div 
@@ -69,7 +64,6 @@ const TeacherSidebar = () => {
           aria-hidden="true"
         />
       )}
-
       {/* Sidebar */}
       <aside
         id="teacher-sidebar"
@@ -94,13 +88,11 @@ const TeacherSidebar = () => {
             </span>
           </Link>
         </div>
-
         <nav className="px-5 py-6 space-y-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href || 
               (item.href !== '/dashboard' && pathname.startsWith(item.href) && item.href !== '/');
-            
             return (
               <Link
                 key={item.label}
@@ -118,7 +110,6 @@ const TeacherSidebar = () => {
             );
           })}
         </nav>
-
         {/* User Profile Section */}
         <div className="absolute bottom-0 left-0 right-0 px-5 py-4 bg-teal-600/30">
           <div className="flex items-center space-x-3 mb-4">
