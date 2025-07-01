@@ -112,8 +112,8 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({ studentId, onProg
                 <SelectValue placeholder="Select progress type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="hafalan">Hafalan/Memorizing</SelectItem>
-                <SelectItem value="tilawah">Tilawati/Reciting</SelectItem>
+                <SelectItem value="hafalan">Tahfidz</SelectItem>
+                <SelectItem value="tilawah">Tahsin</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -60,25 +60,64 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
         {/* Main Container */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:space-x-6">
           {/* Avatar Section */}
-          <div className="flex items-center justify-center mb-4 lg:mb-0">
+          <div className="flex flex-col items-center justify-center mb-4 lg:mb-0 w-full lg:w-auto relative">
+            {/* Three dots menu for mobile (absolute top right) */}
+            {isTeacher && (
+              <div className="absolute right-0 top-0 lg:hidden">
+                <HoverDropdownMenu>
+                  <HoverDropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </HoverDropdownMenuTrigger>
+                  <HoverDropdownMenuContent align="end">
+                    <DropdownMenuItem onSelect={() => document.getElementById('edit-student-trigger')?.click()}>
+                      <Pencil className="mr-2 h-4 w-4" />
+                      Edit Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      className="text-destructive focus:text-destructive" 
+                      onSelect={() => document.getElementById('delete-student-trigger')?.click()}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete Profile
+                    </DropdownMenuItem>
+                  </HoverDropdownMenuContent>
+                </HoverDropdownMenu>
+              </div>
+            )}
             <Avatar className="h-24 w-24 sm:h-28 sm:w-28 lg:h-32 lg:w-32">
-            <AvatarImage src={student.photo || ''} alt={student.name} />
+              <AvatarImage src={student.photo || ''} alt={student.name} />
               <AvatarFallback className="text-xl sm:text-2xl font-semibold bg-muted">
-              {student.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+                {student.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            {/* Student name and badges for mobile (centered) */}
+            <div className="block lg:hidden mt-4 w-full">
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground text-center">
+                {student.name}
+              </h2>
+              <div className="flex flex-row flex-wrap gap-2 justify-center w-full mt-2">
+                <Badge variant="outline" className="border-islamic-200 text-islamic-700">
+                  {student.group_name}
+                </Badge>
+                <Badge variant="secondary" className="bg-accent/10 text-accent-foreground/80">
+                  <User className="h-3 w-3 mr-1" />
+                  {student.teacher}
+                </Badge>
+              </div>
+            </div>
           </div>
-          
           {/* Content Section */}
           <div className="flex-1">
-            {/* Student Info with Action Buttons */}
-            <div className="text-center lg:text-left mb-6">
+            {/* Student Info with Action Buttons for desktop */}
+            <div className="hidden lg:block text-left mb-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex flex-col items-start gap-2">
                   <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
                     {student.name}
                   </h2>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-row flex-wrap gap-2 justify-start w-full">
                     <Badge variant="outline" className="border-islamic-200 text-islamic-700">
                       {student.group_name}
                     </Badge>
@@ -86,8 +125,8 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
                       <User className="h-3 w-3 mr-1" />
                       {student.teacher}
                     </Badge>
-              </div>
-              </div>
+                  </div>
+                </div>
                 {isTeacher && (
                   <HoverDropdownMenu>
                     <HoverDropdownMenuTrigger asChild>

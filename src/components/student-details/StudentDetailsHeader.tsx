@@ -32,11 +32,11 @@ const StudentDetailsHeader: React.FC<StudentDetailsHeaderProps> = ({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate(-1)}
           className="w-fit"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Dashboard
+          Back
         </Button>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Student Details</h1>
       </div>

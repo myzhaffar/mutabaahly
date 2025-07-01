@@ -53,9 +53,8 @@ const HafalanTable: React.FC<HafalanTableProps> = ({ filters, pagination }) => {
 
   // Apply filters
   const filteredStudents = allStudents.filter(student => {
-    const matchesTeacher = filters.teacher === 'all' || student.teacherId === filters.teacher;
+    const matchesTeacher = !filters.teacher || student.teacherId === filters.teacher;
     const matchesGrade = filters.grade === 'all' || student.grade === filters.grade;
-    
     return matchesTeacher && matchesGrade;
   });
 
@@ -154,7 +153,7 @@ const HafalanTable: React.FC<HafalanTableProps> = ({ filters, pagination }) => {
             Al-Quran Memorization Rankings
           </CardTitle>
           <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-            {filters.teacher !== 'all' && <Badge variant="outline">Teacher: {filters.teacher}</Badge>}
+            {filters.teacher && <Badge variant="outline">Teacher: {filters.teacher}</Badge>}
             {filters.grade !== 'all' && <Badge variant="outline">Grade: {filters.grade}</Badge>}
           </div>
         </CardHeader>

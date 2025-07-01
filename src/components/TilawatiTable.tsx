@@ -57,7 +57,6 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
   const filteredStudents = allStudents.filter(student => {
     const matchesTeacher = !filters.teacher || student.teacher === filters.teacher;
     const matchesGrade = filters.grade === 'all' || student.grade === filters.grade;
-    
     return matchesTeacher && matchesGrade;
   });
 
@@ -156,7 +155,7 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
             Tilawati Reading Rankings
           </CardTitle>
           <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-            {filters.teacher !== 'All Teachers' && <Badge variant="outline">Teacher: {filters.teacher}</Badge>}
+            {filters.teacher && <Badge variant="outline">Teacher: {filters.teacher}</Badge>}
             {filters.grade !== 'all' && <Badge variant="outline">Grade: {filters.grade}</Badge>}
           </div>
         </CardHeader>

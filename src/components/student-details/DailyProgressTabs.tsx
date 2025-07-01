@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -32,8 +31,8 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
       <CardContent>
         <Tabs defaultValue="hafalan" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="hafalan">Hafalan/Memorizing</TabsTrigger>
-            <TabsTrigger value="tilawah">Tilawati/Reciting</TabsTrigger>
+            <TabsTrigger value="hafalan">Tahfidz</TabsTrigger>
+            <TabsTrigger value="tilawah">Tahsin</TabsTrigger>
           </TabsList>
           
           <TabsContent value="hafalan" className="mt-6">

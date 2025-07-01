@@ -38,7 +38,7 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
       `);
 
     // Apply filters
-    if (filters.teacher !== 'all') {
+    if (filters.teacher) {
       query = query.eq('teacher', filters.teacher);
     }
     if (filters.grade !== 'all') {
@@ -155,7 +155,7 @@ export const fetchHafalanRankingData = async (filters: RankingFilters): Promise<
       `);
 
     // Apply filters
-    if (filters.teacher !== 'all') {
+    if (filters.teacher) {
       query = query.eq('teacher', filters.teacher);
     }
     if (filters.grade !== 'all') {

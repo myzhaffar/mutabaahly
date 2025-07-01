@@ -8,7 +8,6 @@ import { ArrowLeft, BookOpen, Award, Search, Filter, ChevronLeft, ChevronRight, 
 import TilawatiTable from '@/components/TilawatiTable';
 import HafalanTable from '@/components/HafalanTable';
 import { fetchGrades, FIXED_TEACHERS } from '@/utils/rankingDataService';
-import BulkUploadStudentsDialog from '@/components/BulkUploadStudentsDialog';
 
 const Students = () => {
   const navigate = useNavigate();
@@ -26,6 +25,10 @@ const Students = () => {
   // Data states
   const [grades, setGrades] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  // Helper to determine if any filter is active
+  const hasAnyActiveFilter = selectedTeacher || selectedGrade !== 'all';
 
   // Fetch filter data on component mount
   useEffect(() => {
@@ -92,102 +95,110 @@ const Students = () => {
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Student Rankings</h1>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <BulkUploadStudentsDialog onStudentsAdded={() => {
-              // Refresh the tables when students are added
-              // This will trigger a re-render of the tables
-            }} />
-          </div>
         </div>
 
         {/* Filters */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-2 bg-gray-100 rounded-lg">
-                  <Filter className="h-4 w-4 text-gray-600" />
+          <button
+            className="w-full flex items-center gap-3 px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100 hover:bg-gray-50 focus:outline-none"
+            onClick={() => setFiltersOpen((open) => !open)}
+            aria-expanded={filtersOpen}
+          >
+            <div className="p-2 bg-gray-100 rounded-lg">
+              <Filter className="h-4 w-4 text-gray-600" />
+            </div>
+            <div className="flex-1 text-left">
+              <h3 className="font-semibold text-gray-900 text-base sm:text-lg">Filters</h3>
+              <p className="text-xs sm:text-sm text-gray-500">Refine your search results</p>
+              {/* Show selected filter badges under description, even when collapsed */}
+              {hasAnyActiveFilter && (
+                <div className="flex items-center gap-2 flex-wrap mt-2">
+                  {selectedTeacher && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-50 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
+                      Teacher: {selectedTeacher}
+                    </span>
+                  )}
+                  {selectedGrade !== 'all' && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-green-50 text-green-700 text-xs sm:text-sm rounded-full border border-green-200">
+                      Grade: {grades.find(g => g.id === selectedGrade)?.name || selectedGrade}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={clearFilters}
+                    className="ml-2 text-xs text-gray-500 hover:text-red-600 underline"
+                  >
+                    Clear Filters
+                  </button>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-base sm:text-lg">Filters</h3>
-                  <p className="text-xs sm:text-sm text-gray-500">Refine your search results</p>
-                </div>
-              </div>
-              {hasActiveFilters && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearFilters}
-                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
-                >
-                  <X className="h-4 w-4" />
-                  <span className="hidden xs:inline">Clear filters</span>
-                </Button>
               )}
             </div>
-          </div>
-          {loading ? (
-            <div className="flex items-center justify-center py-8 sm:py-12">
-              <div className="flex items-center gap-3">
-                <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-                <span className="text-gray-600">Loading filters...</span>
-              </div>
-            </div>
-          ) : (
-            <div className="p-4 sm:p-6">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-                {/* Teacher Filter */}
-                <div className="space-y-2 sm:space-y-3">
-                  <label className="text-xs sm:text-sm font-medium text-gray-700 flex items-center gap-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    Teacher
-                  </label>
-                  <Select value={selectedTeacher} onValueChange={handleTeacherChange}>
-                    <SelectTrigger className="w-full h-10 sm:h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500 text-xs sm:text-sm">
-                      <SelectValue placeholder="Select teacher" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {teachers.map((teacher) => (
-                        <SelectItem key={teacher.id} value={teacher.name}>
-                          {teacher.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                {/* Grade Filter */}
-                <div className="space-y-2 sm:space-y-3">
-                  <label className="text-xs sm:text-sm font-medium text-gray-700 flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    Grade
-                  </label>
-                  <Select value={selectedGrade} onValueChange={handleGradeChange}>
-                    <SelectTrigger className="w-full h-10 sm:h-11 border-gray-200 focus:border-green-500 focus:ring-green-500 text-xs sm:text-sm">
-                      <SelectValue placeholder="Select grade" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {grades.map((grade) => (
-                        <SelectItem key={grade.id} value={grade.id}>
-                          {grade.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+            <span className="ml-auto text-xs text-gray-500">{filtersOpen ? 'Hide' : 'Show'}</span>
+          </button>
+          {filtersOpen && (
+            loading ? (
+              <div className="flex items-center justify-center py-8 sm:py-12">
+                <div className="flex items-center gap-3">
+                  <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+                  <span className="text-gray-600">Loading filters...</span>
                 </div>
               </div>
-              {/* Active Filters Display */}
-              {hasActiveFilters && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    {selectedTeacher && (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-50 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
-                        Teacher: {selectedTeacher}
-                      </span>
-                    )}
+            ) : (
+              <div className="p-4 sm:p-6">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
+                  {/* Teacher Filter */}
+                  <div className="space-y-2 sm:space-y-3">
+                    <label className="text-xs sm:text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      Teacher
+                    </label>
+                    <Select value={selectedTeacher} onValueChange={handleTeacherChange}>
+                      <SelectTrigger className="w-full h-10 sm:h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500 text-xs sm:text-sm">
+                        <SelectValue placeholder="Select teacher" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {teachers.map((teacher) => (
+                          <SelectItem key={teacher.id} value={teacher.name}>
+                            {teacher.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {/* Grade Filter */}
+                  <div className="space-y-2 sm:space-y-3">
+                    <label className="text-xs sm:text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      Grade
+                    </label>
+                    <Select value={selectedGrade} onValueChange={handleGradeChange}>
+                      <SelectTrigger className="w-full h-10 sm:h-11 border-gray-200 focus:border-green-500 focus:ring-green-500 text-xs sm:text-sm">
+                        <SelectValue placeholder="Select grade" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {grades.map((grade) => (
+                          <SelectItem key={grade.id} value={grade.id}>
+                            {grade.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-              )}
-            </div>
+                {/* Active Filters Display */}
+                {hasActiveFilters && (
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {selectedTeacher && (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-50 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
+                          Teacher: {selectedTeacher}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
           )}
         </div>
 

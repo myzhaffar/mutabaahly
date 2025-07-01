@@ -40,8 +40,8 @@ const StudentDetails = () => {
         <div className="container mx-auto px-6 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Student Not Found</h1>
-            <Button onClick={() => navigate('/dashboard')}>
-              Back to Dashboard
+            <Button onClick={() => navigate(-1)}>
+              Back
             </Button>
           </div>
         </div>

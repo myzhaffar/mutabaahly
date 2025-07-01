@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,7 +7,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
-import { useEffect } from 'react';
 import { Home, Mail, Lock, Eye, User } from 'lucide-react';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,6 +26,20 @@ const Auth = () => {
   const navigate = useNavigate();
 
   const allowedRoles = ['teacher', 'parent'];
+
+  const quotes = [
+    "Stay connect with Al Qur'an",
+    "The best among you are those who learn the Qur'an and teach it.",
+    "Let the Qur'an be your companion every day.",
+    "Knowledge is light, and the Qur'an is its source."
+  ];
+  const [quoteIndex, setQuoteIndex] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setQuoteIndex((prev) => (prev + 1) % quotes.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [quotes.length]);
 
   useEffect(() => {
     if (user) {
@@ -102,6 +115,9 @@ const Auth = () => {
             <div className="flex flex-col items-center mb-8">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center mb-4">
                 <span className="text-white text-3xl font-bold">ق</span>
+              </div>
+              <div className="text-gray-500 text-base font-medium text-center mb-2 transition-opacity duration-700" key={quoteIndex}>
+                {quotes[quoteIndex]}
               </div>
             </div>
             <button
