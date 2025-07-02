@@ -10,6 +10,7 @@ interface ProfileLayoutProps {
 const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children }) => {
   const { profile, loading } = useAuth();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (!loading && !profile) {
@@ -33,7 +34,7 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children }) => {
   if (profile.role === 'teacher') {
     return (
       <div className="min-h-screen bg-gray-100">
-        <TeacherSidebar />
+        <TeacherSidebar isMobileMenuOpen={sidebarOpen} setIsMobileMenuOpen={setSidebarOpen} />
         <main className="lg:pl-64 min-h-screen">
           <div className="container mx-auto py-6 px-4 lg:px-8">
             <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">

@@ -61,10 +61,9 @@ const TestFilters: React.FC<TestFiltersProps> = ({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="scheduled">Scheduled</SelectItem>
-              <SelectItem value="passed">Passed</SelectItem>
-              <SelectItem value="failed">Failed</SelectItem>
-              <SelectItem value="pending_retake">Pending Retake</SelectItem>
+          <SelectItem value="scheduled">Scheduled</SelectItem>
+          <SelectItem value="passed">Passed</SelectItem>
+          <SelectItem value="failed">Failed</SelectItem>
         </SelectContent>
       </Select>
         </div>
@@ -80,29 +79,15 @@ const TestFilters: React.FC<TestFiltersProps> = ({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All Levels</SelectItem>
-              <SelectItem value="Level 1">Level 1</SelectItem>
-              <SelectItem value="Level 2">Level 2</SelectItem>
-              <SelectItem value="Level 3">Level 3</SelectItem>
-              <SelectItem value="Level 4">Level 4</SelectItem>
-              <SelectItem value="Level 5">Level 5</SelectItem>
-              <SelectItem value="Level 6">Level 6</SelectItem>
-              <SelectItem value="Quran">Quran</SelectItem>
-              <SelectItem value="Evaluation">Evaluation</SelectItem>
+          <SelectItem value="Level 1">Level 1</SelectItem>
+          <SelectItem value="Level 2">Level 2</SelectItem>
+          <SelectItem value="Level 3">Level 3</SelectItem>
+          <SelectItem value="Level 4">Level 4</SelectItem>
+          <SelectItem value="Level 5">Level 5</SelectItem>
+          <SelectItem value="Level 6">Level 6</SelectItem>
         </SelectContent>
       </Select>
         </div>
-
-        {/* Date Filter */}
-      {showDateFilter && (
-          <div className="w-full sm:w-48">
-        <Input
-          type="date"
-          value={date || ''}
-          onChange={(e) => onFilterChange('date', e.target.value)}
-              className="w-full"
-            />
-          </div>
-        )}
 
         {/* Clear Filters Button */}
         {hasActiveFilters && (

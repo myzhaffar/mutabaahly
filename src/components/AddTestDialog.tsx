@@ -35,12 +35,11 @@ interface AddTestDialogProps {
 }
 
 const JILID_OPTIONS: TilawatiJilid[] = [
-  "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6",
-  "Ghorib", "Tajwid", "Quran", "Evaluation"
+  "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6"
 ];
 
 const STATUS_OPTIONS: TestStatus[] = [
-  'scheduled', 'passed', 'failed', 'pending_retake', 'cancelled'
+  'scheduled', 'passed', 'failed'
 ];
 
 const AddTestDialog: React.FC<AddTestDialogProps> = ({
@@ -228,7 +227,7 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
                   <SelectValue placeholder="Select Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  {STATUS_OPTIONS.map(status => (
+                  {STATUS_OPTIONS.map((status) => (
                     <SelectItem key={status} value={status}>
                       {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
                     </SelectItem>

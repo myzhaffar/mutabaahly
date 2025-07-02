@@ -65,7 +65,7 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
             .from('tilawah_progress')
             .select('*')
             .eq('student_id', student.id)
-            .single();
+            .maybeSingle();
 
           // Also fetch progress entries for backup calculation
           const { data: tilawahEntries } = await supabase
