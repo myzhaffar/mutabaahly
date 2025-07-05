@@ -93,9 +93,9 @@ Notes: ${test.notes || 'No notes available'}`;
 
   return (
     <ParentLayout breadcrumbs={breadcrumbs}>
-      <div className="space-y-6 pt-6 px-0 sm:px-4 md:px-6">
+      <div className="space-y-6 px-0 sm:px-4 md:px-6">
         {/* Header Section */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-4 mt-2">
           <button
             type="button"
             onClick={() => navigate(-1)}
@@ -105,26 +105,26 @@ Notes: ${test.notes || 'No notes available'}`;
             <ArrowLeft className="h-4 w-4" />
           </button>
           <h1 className="text-2xl font-bold text-gray-900">
-            Tes Kenaikan Level Anak
+            Tilawati Test
           </h1>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <h3 className="text-sm text-gray-500">Total Tes</h3>
+          <div className="bg-gradient-to-r from-orange-50 to-yellow-100 rounded-lg shadow-sm p-4 text-gray-900 transition duration-200 hover:shadow-lg hover:scale-105 cursor-pointer">
+            <h3 className="text-sm text-gray-500">Total Tests</h3>
             <p className="text-2xl font-bold">{stats.total}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <h3 className="text-sm text-gray-500">Lulus</h3>
+          <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg shadow-sm p-4 text-gray-900 transition duration-200 hover:shadow-lg hover:scale-105 cursor-pointer">
+            <h3 className="text-sm text-gray-500">Passed</h3>
             <p className="text-2xl font-bold text-green-600">{stats.passed}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <h3 className="text-sm text-gray-500">Terjadwal</h3>
+          <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg shadow-sm p-4 text-gray-900 transition duration-200 hover:shadow-lg hover:scale-105 cursor-pointer">
+            <h3 className="text-sm text-gray-500">Scheduled</h3>
             <p className="text-2xl font-bold text-blue-600">{stats.scheduled}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <h3 className="text-sm text-gray-500">Not Passed</h3>
+          <div className="bg-gradient-to-r from-red-50 to-red-100 rounded-lg shadow-sm p-4 text-gray-900 transition duration-200 hover:shadow-lg hover:scale-105 cursor-pointer">
+            <h3 className="text-sm text-gray-500">Failed</h3>
             <p className="text-2xl font-bold text-red-600">{stats.failed}</p>
           </div>
         </div>

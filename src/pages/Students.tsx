@@ -88,7 +88,7 @@ const Students = () => {
     <div className="w-full flex justify-center py-0 px-0 sm:py-4 sm:px-4">
       <div className="w-full max-w-5xl space-y-4">
         {/* Header, left-aligned */}
-        <div className="flex items-center gap-2 sm:gap-4 px-0 pt-2 pb-2">
+        <div className="flex items-center gap-3 sm:gap-4 mt-2">
           <button
             type="button"
             onClick={() => navigate(-1)}
@@ -97,7 +97,7 @@ const Students = () => {
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Student Rankings</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Student Rankings</h1>
         </div>
 
         {/* Filters */}

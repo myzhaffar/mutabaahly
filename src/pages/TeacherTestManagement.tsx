@@ -151,7 +151,7 @@ const TeacherTestManagement: React.FC = () => {
       <div className="container mx-auto px-0 sm:px-4 py-4 space-y-6">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-4 w-full mb-4">
-          <div className="flex flex-row items-center gap-4">
+          <div className="flex flex-row items-center gap-3 sm:gap-4 mt-2">
             <button
               type="button"
               onClick={() => navigate('/dashboard')}
