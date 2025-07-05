@@ -85,10 +85,10 @@ const Students = () => {
   ];
 
   const MainContent = (
-    <div className="container mx-auto py-4 px-0 sm:px-4 space-y-4">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
-        <div className="flex items-center gap-2 sm:gap-4">
+    <div className="w-full flex justify-center py-0 px-0 sm:py-4 sm:px-4">
+      <div className="w-full max-w-5xl space-y-4">
+        {/* Header, left-aligned */}
+        <div className="flex items-center gap-2 sm:gap-4 px-0 pt-2 pb-2">
           <button
             type="button"
             onClick={() => navigate(-1)}
@@ -97,13 +97,11 @@ const Students = () => {
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Student Rankings</h1>
-          </div>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Student Rankings</h1>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden p-0 sm:p-4">
           <button
             className="w-full flex items-center gap-3 px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100 hover:bg-gray-50 focus:outline-none"
             onClick={() => setFiltersOpen((open) => !open)}
@@ -208,7 +206,7 @@ const Students = () => {
         </div>
 
         {/* Table Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-0 sm:p-4">
           <div className="flex flex-col xs:flex-row border-b border-gray-200 overflow-x-auto min-w-0">
             <button
               onClick={() => setActiveTab('tilawati')}
