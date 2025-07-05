@@ -14,6 +14,7 @@ import { fetchTestsWithFilters } from '@/utils/testQueries';
 import { calculateTilawahProgress } from '@/utils/progressCalculations';
 import type { TilawatiTest, TestStatus, TilawatiJilid, StudentForTest } from '@/types/tilawati';
 import { useNavigate } from 'react-router-dom';
+import Breadcrumbs from '@/components/ui/Breadcrumbs';
 
 interface TestFilters {
   searchTerm?: string;
@@ -30,6 +31,11 @@ const TeacherTestManagement: React.FC = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedTest, setSelectedTest] = useState<TilawatiTest | null>(null);
   const [filters, setFilters] = useState<TestFilters>({});
+
+  const breadcrumbs = [
+    { label: 'Dashboard', href: '/dashboard' },
+    { label: 'Tilawati Tests' }
+  ];
 
   // Fetch students for the teacher
   const { data: students, isLoading: isLoadingStudents, refetch: refetchStudents } = useQuery({
@@ -141,8 +147,8 @@ const TeacherTestManagement: React.FC = () => {
   };
 
   return (
-    <TeacherLayout>
-      <div className="container mx-auto px-4 md:px-6 py-6 space-y-6">
+    <TeacherLayout breadcrumbs={breadcrumbs}>
+      <div className="container mx-auto px-4 py-4 space-y-6">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto">
@@ -155,7 +161,7 @@ const TeacherTestManagement: React.FC = () => {
               <ArrowLeft className="h-4 w-4" />
               Back
             </Button>
-            <h1 className="text-2xl font-bold">Level Advancement Tests</h1>
+            <h1 className="text-2xl font-bold">Tilawati Tests</h1>
           </div>
           <GradientButton 
             onClick={() => setIsAddDialogOpen(true)}

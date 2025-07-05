@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import Breadcrumbs from '@/components/ui/Breadcrumbs';
 
 interface Profile {
   id: string;
@@ -31,6 +32,11 @@ const Profile: React.FC = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const navigate = useNavigate();
+
+  const breadcrumbs = [
+    { label: 'Dashboard', href: '/dashboard' },
+    { label: 'Profile' }
+  ];
 
   useEffect(() => {
     if (user?.id) {
@@ -75,7 +81,7 @@ const Profile: React.FC = () => {
   }
 
   return (
-    <ProfileLayout>
+    <ProfileLayout breadcrumbs={breadcrumbs}>
       <div className="container mx-auto pt-2 pb-6 px-2 sm:pt-6 sm:px-4">
         <div className="max-w-2xl mx-auto">
           {/* Header with Back Button and Label */}

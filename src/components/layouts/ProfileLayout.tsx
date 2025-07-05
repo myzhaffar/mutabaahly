@@ -2,12 +2,14 @@ import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import TeacherSidebar from '@/components/TeacherSidebar';
+import Breadcrumbs, { BreadcrumbItem } from '@/components/ui/Breadcrumbs';
 
 interface ProfileLayoutProps {
   children: React.ReactNode;
+  breadcrumbs?: BreadcrumbItem[];
 }
 
-const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children }) => {
+const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children, breadcrumbs }) => {
   const { profile, loading } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -36,8 +38,9 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children }) => {
       <div className="min-h-screen bg-gray-100">
         <TeacherSidebar isMobileMenuOpen={sidebarOpen} setIsMobileMenuOpen={setSidebarOpen} />
         <main className="lg:pl-64 min-h-screen">
-          <div className="container mx-auto py-6 px-4 lg:px-8">
-            <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
+          {breadcrumbs && <div className="pt-6 px-4 lg:px-8"><Breadcrumbs items={breadcrumbs} /></div>}
+          <div className="container mx-auto pt-2 pb-6 px-2 sm:pt-6 sm:px-4">
+            <div className="bg-white rounded-lg shadow-sm p-4">
               {children}
             </div>
           </div>
@@ -49,8 +52,9 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children }) => {
   // If user is a parent, show a simpler layout
   return (
     <div className="min-h-screen bg-gray-100 pt-4">
-      <main className="container mx-auto py-4 px-4 lg:py-6">
-        <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
+      {breadcrumbs && <div className="pt-6 px-4 lg:px-8"><Breadcrumbs items={breadcrumbs} /></div>}
+      <main className="container mx-auto pt-2 pb-6 px-4 lg:px-8">
+        <div className="bg-white rounded-lg shadow-sm p-4">
           {children}
         </div>
       </main>

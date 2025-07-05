@@ -132,9 +132,9 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[525px] bg-white flex flex-col h-[calc(100vh-32px)] sm:h-auto max-h-[calc(100vh-32px)] p-0" aria-describedby="add-test-description">
         <DialogHeader className="px-6 pt-6 flex-shrink-0">
-          <DialogTitle>{currentTest ? 'Edit Level Advancement Test' : 'Schedule Level Advancement Test'}</DialogTitle>
+          <DialogTitle>{currentTest ? 'Edit Tilawati Test' : 'Schedule Tilawati Test'}</DialogTitle>
           <DialogDescription id="add-test-description">
-            {currentTest ? 'Edit test details below.' : 'Fill in the test details for the student.'}
+            {currentTest ? 'Edit test details below.' : 'Fill in the Tilawati test details for the student.'}
           </DialogDescription>
         </DialogHeader>
 

@@ -78,7 +78,7 @@ const Students = () => {
 
   return (
     <TeacherLayout>
-      <div className="container mx-auto py-4 px-2 sm:px-6 space-y-4 sm:space-y-6">
+      <div className="container mx-auto py-4 px-4 space-y-4">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
           <div className="flex items-center gap-2 sm:gap-4">
@@ -203,8 +203,8 @@ const Students = () => {
         </div>
 
         {/* Table Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
-          <div className="flex flex-col xs:flex-row border-b border-gray-200">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+          <div className="flex flex-col xs:flex-row border-b border-gray-200 overflow-x-auto min-w-0">
             <button
               onClick={() => setActiveTab('tilawati')}
               className={`flex-1 px-2 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-medium transition-colors ${
@@ -233,7 +233,7 @@ const Students = () => {
             </button>
           </div>
           {/* Tab Content */}
-          <div className="p-2 sm:p-6 min-w-[340px] xs:min-w-0">
+          <div className="p-2 sm:p-6 min-w-0">
             {activeTab === 'tilawati' ? (
               <TilawatiTable
                 filters={{

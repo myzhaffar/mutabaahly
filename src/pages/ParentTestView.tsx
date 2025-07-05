@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import type { TestStatus, TilawatiJilid, TilawatiTest } from '@/types/tilawati';
 import { supabase } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
+import Breadcrumbs from '@/components/ui/Breadcrumbs';
 
 interface Filters {
   searchQuery?: string;
@@ -21,6 +22,11 @@ const ParentTestView: React.FC = () => {
   const { profile } = useAuth();
   const [filters, setFilters] = useState<Filters>({});
   const navigate = useNavigate();
+
+  const breadcrumbs = [
+    { label: 'Dashboard', href: '/dashboard' },
+    { label: 'Tilawati Tests' }
+  ];
 
   // Fetch children's tests
   const { data: tests, isLoading } = useQuery({
@@ -86,7 +92,7 @@ Notes: ${test.notes || 'No notes available'}`;
   }, [tests]);
 
   return (
-    <ParentLayout>
+    <ParentLayout breadcrumbs={breadcrumbs}>
       <div className="space-y-6 px-4 md:px-6">
         {/* Header Section */}
         <div className="flex items-center gap-4 mb-6">
@@ -139,11 +145,11 @@ Notes: ${test.notes || 'No notes available'}`;
         {/* Table Section */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           <ParentTestTable
-          tests={tests || []}
-          isLoading={isLoading}
-          onViewDetails={handleViewTestDetails}
-          showStudentName={true}
-        />
+            tests={tests || []}
+            isLoading={isLoading}
+            onViewDetails={handleViewTestDetails}
+            showStudentName={true}
+          />
         </div>
       </div>
     </ParentLayout>

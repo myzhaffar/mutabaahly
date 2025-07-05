@@ -53,10 +53,10 @@ const TeacherLayout: React.FC<TeacherLayoutProps> = ({ children, breadcrumbs }) 
       {/* Sidebar (controlled by sidebarOpen for mobile) */}
       <TeacherSidebar isMobileMenuOpen={sidebarOpen} setIsMobileMenuOpen={setSidebarOpen} />
       <main className="lg:pl-64 min-h-screen">
-        <div className="container mx-auto py-6 px-4 lg:px-8">
-          {breadcrumbs && <Breadcrumbs items={breadcrumbs} />}
-        <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
-          {children}
+        {breadcrumbs && <div className="pt-6 px-4 lg:px-8"><Breadcrumbs items={breadcrumbs} /></div>}
+        <div className="container mx-auto pt-2 pb-6 px-4 lg:px-8">
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            {children}
           </div>
         </div>
       </main>

@@ -1,12 +1,14 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import Breadcrumbs, { BreadcrumbItem } from '@/components/ui/Breadcrumbs';
 
 interface ParentLayoutProps {
   children: React.ReactNode;
+  breadcrumbs?: BreadcrumbItem[];
 }
 
-const ParentLayout: React.FC<ParentLayoutProps> = ({ children }) => {
+const ParentLayout: React.FC<ParentLayoutProps> = ({ children, breadcrumbs }) => {
   const { profile, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -30,8 +32,11 @@ const ParentLayout: React.FC<ParentLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-gray-100 pt-0">
-      <main className="container mx-auto py-4 px-4 lg:py-6">
-        {children}
+      {breadcrumbs && <div className="pt-6 px-4 lg:px-8"><Breadcrumbs items={breadcrumbs} /></div>}
+      <main className="container mx-auto pt-2 pb-6 px-4 lg:px-8">
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          {children}
+        </div>
       </main>
     </div>
   );
