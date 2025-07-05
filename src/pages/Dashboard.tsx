@@ -258,28 +258,28 @@ const Dashboard = () => {
     const breadcrumbs = [{ label: 'Dashboard Overview' }];
     return (
       <TeacherLayout breadcrumbs={breadcrumbs}>
-        <div className="bg-white rounded-lg shadow-sm p-4">
+        <div className="bg-white rounded-lg shadow-sm px-0 sm:px-4 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
-            <div>
+          <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-                Welcome back, {profile?.full_name}
-              </h1>
-              <p className="text-gray-600">Teacher Dashboard</p>
-            </div>
+              Welcome back, {profile?.full_name}
+            </h1>
+            <p className="text-gray-600">Teacher Dashboard</p>
+          </div>
             <div className="flex justify-center gap-2 sm:justify-end">
               <BulkUploadStudentsDialog onStudentsAdded={handleStudentAdded} />
-              <AddStudentDialog onStudentAdded={handleStudentAdded} />
+          <AddStudentDialog onStudentAdded={handleStudentAdded} />
             </div>
-          </div>
+        </div>
 
-          <StatsCards stats={stats} />
+        <StatsCards stats={stats} />
 
-          <div className="mb-6">
+        <div className="mb-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {Object.entries(classGroups).map(([className, classStudents]) => (
                 <ClassCard key={className} className={className} classStudents={classStudents} />
               ))}
-            </div>
+        </div>
           </div>
         </div>
       </TeacherLayout>

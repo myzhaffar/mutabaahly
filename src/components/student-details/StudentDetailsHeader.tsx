@@ -29,15 +29,14 @@ const StudentDetailsHeader: React.FC<StudentDetailsHeaderProps> = ({
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-6">
       {/* Left Section - Back Button and Title */}
       <div className="flex flex-row items-center gap-4 w-full sm:w-auto">
-        <Button
-          variant="outline"
-          size="sm"
+        <button
+          type="button"
           onClick={() => navigate(-1)}
-          className="w-fit"
+          className="p-0 m-0 bg-transparent border-none outline-none flex items-center"
+          aria-label="Back"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button>
+          <ArrowLeft className="h-4 w-4" />
+        </button>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Student Details</h1>
       </div>
     </div>

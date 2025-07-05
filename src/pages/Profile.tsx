@@ -86,14 +86,14 @@ const Profile: React.FC = () => {
         <div className="max-w-2xl mx-auto">
           {/* Header with Back Button and Label */}
           <div className="flex items-center gap-4 mb-6">
-            <Button
-              variant="outline"
+            <button
+              type="button"
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 rounded-full border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+              className="p-0 m-0 bg-transparent border-none outline-none flex items-center"
+              aria-label="Back"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back
-            </Button>
+            </button>
             <h1 className="text-2xl font-bold text-gray-900">
               Profile Settings
             </h1>

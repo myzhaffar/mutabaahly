@@ -36,6 +36,21 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children, breadcrumbs }) 
   if (profile.role === 'teacher') {
     return (
       <div className="min-h-screen bg-gray-100">
+        {/* Top Header: only show on mobile (below lg) */}
+        <header className="sticky top-0 z-40 bg-white shadow-sm flex items-center justify-between h-16 px-4 lg:px-8 lg:hidden">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-gradient-to-br from-teal-500 to-green-500 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">M</span>
+            </div>
+            <span className="font-semibold text-lg text-gray-900 hidden sm:inline">Mutabaahly</span>
+          </div>
+          <button
+            className="lg:hidden p-2 rounded-md text-teal-700 hover:bg-teal-50"
+            onClick={() => setSidebarOpen((open) => !open)}
+          >
+            <svg className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+          </button>
+        </header>
         <TeacherSidebar isMobileMenuOpen={sidebarOpen} setIsMobileMenuOpen={setSidebarOpen} />
         <main className="lg:pl-64 min-h-screen">
           {breadcrumbs && <div className="pt-6 px-4 lg:px-8"><Breadcrumbs items={breadcrumbs} /></div>}

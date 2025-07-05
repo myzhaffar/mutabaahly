@@ -104,10 +104,14 @@ const ClassDetail: React.FC = () => {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-2 mb-1">
-            <Button variant="outline" onClick={() => navigate(-1)} size="sm" className="mr-2 px-2">
-              <ArrowLeft className="h-4 w-4 mr-1" />
-              Back
-            </Button>
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="p-0 m-0 bg-transparent border-none outline-none flex items-center mr-2"
+              aria-label="Back"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </button>
             <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
               {className}
               <span className="inline-flex items-center justify-center px-2 py-0.5 ml-1 text-xs font-semibold leading-none text-white bg-emerald-500 rounded-full">
