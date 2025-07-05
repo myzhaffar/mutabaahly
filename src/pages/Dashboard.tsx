@@ -65,7 +65,7 @@ const Dashboard = () => {
 
   const fetchStudents = async () => {
     try {
-      // Fetch students
+      // Fetch all students for all roles (including parent)
       const { data: studentsData, error: studentsError } = await supabase
         .from('students')
         .select('*');
@@ -321,6 +321,11 @@ const Dashboard = () => {
                 Showing {filteredStudents.length} of {students.length} students
               </span>
             )}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Object.entries(classGroups).map(([className, classStudents]) => (
+              <ClassCard key={className} className={className} classStudents={classStudents} />
+            ))}
           </div>
         </div>
       </div>

@@ -42,7 +42,7 @@ function AppContent() {
           </ProtectedRoute>
         } />
         <Route path="/students" element={
-          <ProtectedRoute requiredRole="teacher">
+          <ProtectedRoute>
             <Students />
           </ProtectedRoute>
         } />
@@ -62,7 +62,7 @@ function AppContent() {
           </ProtectedRoute>
         } />
         <Route path="/class/:className" element={
-          <ProtectedRoute requiredRole="teacher">
+          <ProtectedRoute>
             <ClassDetail />
           </ProtectedRoute>
         } />

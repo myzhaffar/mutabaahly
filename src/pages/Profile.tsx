@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { User, Mail, Shield, ArrowLeft, MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { User, Mail, Shield, ArrowLeft, MoreVertical, Pencil, Trash2, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -27,7 +27,7 @@ interface Profile {
 }
 
 const Profile: React.FC = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -72,6 +72,11 @@ const Profile: React.FC = () => {
     fetchProfile();
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
   if (!profile) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -82,7 +87,7 @@ const Profile: React.FC = () => {
 
   return (
     <ProfileLayout breadcrumbs={breadcrumbs}>
-      <div className="container mx-auto pt-2 pb-6 px-2 sm:pt-6 sm:px-4">
+      <div className="container mx-auto pt-6 pb-6 px-2 sm:px-4">
         <div className="max-w-2xl mx-auto">
           {/* Header with Back Button and Label */}
           <div className="flex items-center gap-4 mb-6">
@@ -138,7 +143,7 @@ const Profile: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           {/* User Information Card */}
           <Card>
             <CardHeader>
@@ -173,9 +178,22 @@ const Profile: React.FC = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Mobile-only Sign Out button for parent role, under Account Information card */}
+          {profile?.role === 'parent' && (
+            <div className="md:hidden mt-6">
+              <Button
+                onClick={handleSignOut}
+                variant="outline"
+                className="w-full flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+              >
+                <LogOut className="h-5 w-5" />
+                Sign Out
+              </Button>
+            </div>
+          )}
         </div>
       </div>
-
       {/* Edit Profile Dialog */}
       <EditProfileDialog
         isOpen={isEditDialogOpen}

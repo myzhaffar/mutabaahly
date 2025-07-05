@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import ParentLayout from '@/components/layouts/ParentLayout';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -10,6 +12,7 @@ import HafalanTable from '@/components/HafalanTable';
 import { fetchGrades, FIXED_TEACHERS } from '@/utils/rankingDataService';
 
 const Students = () => {
+  const { profile } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'tilawati' | 'hafalan'>('tilawati');
   
@@ -81,23 +84,21 @@ const Students = () => {
     { label: 'Student Rankings' }
   ];
 
-  return (
-    <TeacherLayout breadcrumbs={breadcrumbs}>
-      <div className="container mx-auto py-4 px-0 sm:px-4 space-y-4">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
-          <div className="flex items-center gap-2 sm:gap-4">
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              className="p-0 m-0 bg-transparent border-none outline-none flex items-center"
-              aria-label="Back"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </button>
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Student Rankings</h1>
-            </div>
+  const MainContent = (
+    <div className="container mx-auto py-4 px-0 sm:px-4 space-y-4">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="p-0 m-0 bg-transparent border-none outline-none flex items-center"
+            aria-label="Back"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </button>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Student Rankings</h1>
           </div>
         </div>
 
@@ -266,8 +267,13 @@ const Students = () => {
           </div>
         </div>
       </div>
-    </TeacherLayout>
+    </div>
   );
+
+  if (profile?.role === 'parent') {
+    return <ParentLayout breadcrumbs={breadcrumbs}>{MainContent}</ParentLayout>;
+  }
+  return <TeacherLayout breadcrumbs={breadcrumbs}>{MainContent}</TeacherLayout>;
 };
 
 export default Students;

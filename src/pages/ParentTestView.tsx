@@ -93,7 +93,7 @@ Notes: ${test.notes || 'No notes available'}`;
 
   return (
     <ParentLayout breadcrumbs={breadcrumbs}>
-      <div className="space-y-6 px-4 md:px-6">
+      <div className="space-y-6 pt-6 px-0 sm:px-4 md:px-6">
         {/* Header Section */}
         <div className="flex items-center gap-4 mb-6">
           <button

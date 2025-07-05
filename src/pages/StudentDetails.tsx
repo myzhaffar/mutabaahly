@@ -7,6 +7,7 @@ import DailyProgressTabs from '@/components/student-details/DailyProgressTabs';
 import { useStudentDetails } from '@/hooks/useStudentDetails';
 import { useAuth } from '@/contexts/AuthContext';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
+import ParentLayout from '@/components/layouts/ParentLayout';
 
 const StudentDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -55,29 +56,31 @@ const StudentDetails = () => {
     { label: student.name }
   ];
 
-  return (
-    <TeacherLayout breadcrumbs={breadcrumbs}>
-        <StudentDetailsHeader
-          student={student}
-          userRole={profile?.role || 'parent'}
-          profile={profile}
-        />
-
-        <StudentOverviewCard
-          student={student}
-          progressData={progressData}
-          onProgressAdded={refetchData}
-          onStudentUpdated={refetchData}
-          onStudentDeleted={handleStudentDeleted}
-        />
-
-        <DailyProgressTabs
-          hafalanEntries={hafalanEntries}
-          tilawahEntries={tilawahEntries}
-          onProgressUpdated={refetchData}
-        />
-    </TeacherLayout>
+  const MainContent = (
+    <>
+      <StudentDetailsHeader
+        student={student}
+        userRole={profile?.role || 'parent'}
+        profile={profile}
+      />
+      <StudentOverviewCard
+        student={student}
+        progressData={progressData}
+        onProgressAdded={refetchData}
+        onStudentUpdated={refetchData}
+        onStudentDeleted={handleStudentDeleted}
+      />
+      <DailyProgressTabs
+        hafalanEntries={hafalanEntries}
+        tilawahEntries={tilawahEntries}
+        onProgressUpdated={refetchData}
+      />
+    </>
   );
+  if (profile?.role === 'parent') {
+    return <ParentLayout breadcrumbs={breadcrumbs}>{MainContent}</ParentLayout>;
+  }
+  return <TeacherLayout breadcrumbs={breadcrumbs}>{MainContent}</TeacherLayout>;
 };
 
 export default StudentDetails;

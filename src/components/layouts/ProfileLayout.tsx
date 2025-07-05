@@ -66,7 +66,7 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children, breadcrumbs }) 
 
   // If user is a parent, show a simpler layout
   return (
-    <div className="min-h-screen bg-gray-100 pt-4">
+    <div className="min-h-screen bg-gray-100">
       {breadcrumbs && <div className="pt-6 px-4 lg:px-8"><Breadcrumbs items={breadcrumbs} /></div>}
       <main className="container mx-auto pt-2 pb-6 px-4 lg:px-8">
         <div className="bg-white rounded-lg shadow-sm p-4">
