@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 
 interface Student {
   id: string;
@@ -35,7 +35,7 @@ const StudentDetailsHeader: React.FC<StudentDetailsHeaderProps> = ({
           className="p-0 m-0 bg-transparent border-none outline-none flex items-center"
           aria-label="Back"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ChevronLeft className="h-6 w-6" />
         </button>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Student Details</h1>
       </div>

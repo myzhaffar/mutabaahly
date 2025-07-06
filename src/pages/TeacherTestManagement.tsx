@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, ArrowLeft, ChevronDown, ChevronUp, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GradientButton } from '@/components/ui/gradient-button';
 import { useToast } from '@/components/ui/use-toast';
@@ -158,7 +158,7 @@ const TeacherTestManagement: React.FC = () => {
               className="p-0 m-0 bg-transparent border-none outline-none flex items-center"
               aria-label="Back"
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ChevronLeft className="h-6 w-6" />
             </button>
             <h1 className="text-2xl font-bold">Tilawati Tests</h1>
           </div>

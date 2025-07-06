@@ -5,7 +5,7 @@ import TestStatsCards from '@/components/test-management/TestStatsCards';
 import TestFilters from '@/components/test-management/TestFilters';
 import ParentTestTable from '@/components/test-management/ParentTestTable';
 import { useAuth } from '@/contexts/AuthContext';
-import { ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
+import { ChevronDown, ChevronUp, ArrowLeft, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { TestStatus, TilawatiJilid, TilawatiTest } from '@/types/tilawati';
 import { supabase } from '@/lib/supabase';
@@ -102,7 +102,7 @@ Notes: ${test.notes || 'No notes available'}`;
             className="p-0 m-0 bg-transparent border-none outline-none flex items-center"
             aria-label="Back"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ChevronLeft className="h-6 w-6" />
           </button>
           <h1 className="text-2xl font-bold text-gray-900">
             Tilawati Test

@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
-import { ArrowLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 
 interface Student {
   id: string;
@@ -113,7 +113,7 @@ const ClassDetail: React.FC = () => {
             className="p-0 m-0 bg-transparent border-none outline-none flex items-center mr-2"
             aria-label="Back"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ChevronLeft className="h-6 w-6" />
           </button>
           <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
             {className}
