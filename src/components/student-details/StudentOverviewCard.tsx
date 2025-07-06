@@ -54,6 +54,14 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
   const tilawahPercentage = progressData?.tilawah_progress?.percentage || 0;
   const tilawahJilid = progressData?.tilawah_progress?.jilid || 'Not started';
 
+  // Progress color logic (copied from StudentCard)
+  const getProgressColor = (progress: number) => {
+    if (progress >= 80) return 'bg-islamic-500';
+    if (progress >= 60) return 'bg-blue-500';
+    if (progress >= 40) return 'bg-accent-500';
+    return 'bg-gray-500';
+  };
+
   return (
     <Card className="mb-8">
       <CardContent className="p-4 sm:p-6">
@@ -172,45 +180,51 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {/* Hafalan Progress */}
-                <div className="bg-islamic-100/10 dark:bg-islamic-950/50 p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center mb-3">
-                    <Award className="h-6 w-6 text-islamic-600 dark:text-islamic-400 mr-2" />
-                    <h3 className="font-semibold text-islamic-900 dark:text-islamic-100">Hafalan Progress</h3>
-                </div>
-                  <div className="space-y-3">
-                <Progress 
-                      value={hafalanPercentage} 
-                      className="h-2.5"
-                />
-                    <div className="flex justify-between items-center">
-                      <p className="text-sm font-medium text-foreground">
-                        {hafalanPercentage}% completed
-                </p>
-                      <p className="text-sm text-muted-foreground">
-                        {hafalanLastSurah}
-                </p>
-              </div>
+                <div className="bg-gradient-to-r from-green-100 via-green-50 to-green-200 rounded-xl shadow-sm hover:shadow-md transition-shadow w-full h-full">
+                  <div className="p-4">
+                    <div className="flex items-center mb-3">
+                      <Award className="h-6 w-6 text-green-600 mr-2" />
+                      <h3 className="font-semibold text-green-900">Hafalan Progress</h3>
+                    </div>
+                    <div className="space-y-3">
+                      <Progress 
+                        value={hafalanPercentage} 
+                        className="h-2.5"
+                        indicatorClassName={getProgressColor(hafalanPercentage)}
+                      />
+                      <div className="flex justify-between items-center">
+                        <p className="text-sm font-medium text-foreground">
+                          {hafalanPercentage}% completed
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {hafalanLastSurah}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 {/* Tilawati Progress */}
-                <div className="bg-green-100/10 dark:bg-green-950/50 p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex items-center mb-3">
-                    <BookOpen className="h-6 w-6 text-green-600 dark:text-green-400 mr-2" />
-                    <h3 className="font-semibold text-green-900 dark:text-green-100">Tilawati Progress</h3>
-                  </div>
-                  <div className="space-y-3">
-                <Progress 
-                      value={tilawahPercentage} 
-                      className="h-2.5"
-                />
-                    <div className="flex justify-between items-center">
-                      <p className="text-sm font-medium text-foreground">
-                        {tilawahPercentage}% completed
-                </p>
-                      <p className="text-sm text-muted-foreground">
-                        {tilawahJilid}
-                </p>
+                <div className="bg-gradient-to-r from-blue-100 via-blue-50 to-blue-200 rounded-xl shadow-sm hover:shadow-md transition-shadow w-full h-full">
+                  <div className="p-4">
+                    <div className="flex items-center mb-3">
+                      <BookOpen className="h-6 w-6 text-blue-600 mr-2" />
+                      <h3 className="font-semibold text-blue-900">Tilawati Progress</h3>
+                    </div>
+                    <div className="space-y-3">
+                      <Progress 
+                        value={tilawahPercentage} 
+                        className="h-2.5"
+                        indicatorClassName={getProgressColor(tilawahPercentage)}
+                      />
+                      <div className="flex justify-between items-center">
+                        <p className="text-sm font-medium text-foreground">
+                          {tilawahPercentage}% completed
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {tilawahJilid}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
