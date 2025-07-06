@@ -34,7 +34,7 @@ const ProgressEntriesTable: React.FC<ProgressEntriesTableProps> = ({
         <TableRow>
           <TableHead>Date</TableHead>
           <TableHead>{isHafalan ? 'Surah' : 'Jilid/Level'}</TableHead>
-          <TableHead>{isHafalan ? 'Verse/Ayat' : 'Page/Verse'}</TableHead>
+          <TableHead>{isHafalan ? 'Ayat' : 'Page/Verse'}</TableHead>
           <TableHead>Notes</TableHead>
           {isTeacher && <TableHead>Actions</TableHead>}
         </TableRow>

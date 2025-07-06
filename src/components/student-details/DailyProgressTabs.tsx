@@ -31,8 +31,18 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
       <CardContent>
         <Tabs defaultValue="hafalan" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="hafalan">Tahfidz</TabsTrigger>
-            <TabsTrigger value="tilawah">Tahsin</TabsTrigger>
+            <TabsTrigger
+              value="hafalan"
+              className="data-[state=active]:bg-green-100 data-[state=active]:text-green-700"
+            >
+              Tahfidz
+            </TabsTrigger>
+            <TabsTrigger
+              value="tilawah"
+              className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700"
+            >
+              Tahsin
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="hafalan" className="mt-6">

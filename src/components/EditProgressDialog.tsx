@@ -126,7 +126,7 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
           </div>
           <div className="space-y-2">
             <Label htmlFor="ayat_or_page">
-              {entry.type === 'hafalan' ? 'Verse/Ayat' : 'Page'}
+              {entry.type === 'hafalan' ? 'Ayat' : 'Page'}
             </Label>
             <Input
               id="ayat_or_page"

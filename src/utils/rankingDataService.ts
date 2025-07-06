@@ -41,8 +41,13 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
     if (filters.teacher) {
       query = query.eq('teacher', filters.teacher);
     }
-    if (filters.grade !== 'all') {
-      query = query.eq('group_name', filters.grade);
+    if (filters.grade && filters.grade !== 'all') {
+      if (filters.grade.includes(',')) {
+        const gradeArr = filters.grade.split(',').map(g => g.trim()).filter(Boolean);
+        query = query.in('group_name', gradeArr);
+      } else {
+        query = query.eq('group_name', filters.grade);
+      }
     }
 
     const { data: students, error } = await query;
@@ -156,10 +161,20 @@ export const fetchHafalanRankingData = async (filters: RankingFilters): Promise<
 
     // Apply filters
     if (filters.teacher) {
-      query = query.eq('teacher', filters.teacher);
+      if (filters.teacher.includes(',')) {
+        const teacherArr = filters.teacher.split(',').map(t => t.trim()).filter(Boolean);
+        query = query.in('teacher', teacherArr);
+      } else {
+        query = query.eq('teacher', filters.teacher);
+      }
     }
-    if (filters.grade !== 'all') {
-      query = query.eq('group_name', filters.grade);
+    if (filters.grade && filters.grade !== 'all') {
+      if (filters.grade.includes(',')) {
+        const gradeArr = filters.grade.split(',').map(g => g.trim()).filter(Boolean);
+        query = query.in('group_name', gradeArr);
+      } else {
+        query = query.eq('group_name', filters.grade);
+      }
     }
 
     const { data: students, error } = await query;

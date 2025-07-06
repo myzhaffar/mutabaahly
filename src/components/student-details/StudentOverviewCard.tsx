@@ -184,7 +184,7 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
                   <div className="p-4">
                     <div className="flex items-center mb-3">
                       <Award className="h-6 w-6 text-green-600 mr-2" />
-                      <h3 className="font-semibold text-green-900">Hafalan Progress</h3>
+                      <h3 className="font-semibold text-green-900">Tahfidz Progress</h3>
                     </div>
                     <div className="space-y-3">
                       <Progress 
@@ -209,7 +209,7 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
                   <div className="p-4">
                     <div className="flex items-center mb-3">
                       <BookOpen className="h-6 w-6 text-blue-600 mr-2" />
-                      <h3 className="font-semibold text-blue-900">Tilawati Progress</h3>
+                      <h3 className="font-semibold text-blue-900">Tahsin Progress</h3>
                     </div>
                     <div className="space-y-3">
                       <Progress 

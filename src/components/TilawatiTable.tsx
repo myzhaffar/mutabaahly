@@ -6,8 +6,8 @@ import { Trophy, BookOpen, ChevronLeft, ChevronRight, Loader2 } from 'lucide-rea
 import { fetchTilawatiRankingData, StudentRankingData, RankingFilters } from '@/utils/rankingDataService';
 
 interface Filters {
-  teacher: string;
-  grade: string;
+  teachers?: string[];
+  grades: string[];
 }
 
 interface Pagination {
@@ -34,8 +34,8 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
       
       try {
         const rankingFilters: RankingFilters = {
-          teacher: filters.teacher === 'All Teachers' ? '' : filters.teacher,
-          grade: filters.grade
+          teacher: filters.teachers?.length === 0 ? '' : filters.teachers?.join(','),
+          grade: filters.grades.length === 0 ? '' : filters.grades.join(',')
         };
         
         const data = await fetchTilawatiRankingData(rankingFilters);
@@ -51,12 +51,13 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
     };
 
     fetchData();
-  }, [filters.teacher, filters.grade]);
+  }, [filters.teachers, filters.grades]);
 
   // Apply filters
   const filteredStudents = allStudents.filter(student => {
-    const matchesTeacher = !filters.teacher || student.teacher === filters.teacher;
-    const matchesGrade = filters.grade === 'all' || student.grade === filters.grade;
+    const teachers = filters.teachers || [];
+    const matchesTeacher = teachers.length === 0 || teachers.includes(student.teacherId);
+    const matchesGrade = filters.grades.length === 0 || filters.grades.includes('all') || filters.grades.includes(student.grade);
     return matchesTeacher && matchesGrade;
   });
 
@@ -154,10 +155,6 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
             <BookOpen className="h-6 w-6 text-blue-600" />
             Tilawati Reading Rankings
           </CardTitle>
-          <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-            {filters.teacher && <Badge variant="outline">Teacher: {filters.teacher}</Badge>}
-            {filters.grade !== 'all' && <Badge variant="outline">Grade: {filters.grade}</Badge>}
-          </div>
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
@@ -252,9 +249,9 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
                 size="sm"
                 onClick={() => handlePageChange(pagination.currentPage - 1)}
                 disabled={pagination.currentPage === 1}
+                aria-label="Previous Page"
               >
                 <ChevronLeft className="h-4 w-4" />
-                Previous
               </Button>
               <span className="text-sm text-gray-600">
                 Page {pagination.currentPage} of {totalPages}
@@ -264,8 +261,8 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
                 size="sm"
                 onClick={() => handlePageChange(pagination.currentPage + 1)}
                 disabled={pagination.currentPage === totalPages}
+                aria-label="Next Page"
               >
-                Next
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>

@@ -161,7 +161,7 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({ studentId, onProg
 
           <div className="space-y-2">
             <Label htmlFor="ayat_or_page">
-              {formData.type === 'hafalan' ? 'Verse/Ayat' : 'Page/Verse'}
+              {formData.type === 'hafalan' ? 'Ayat' : 'Page/Verse'}
             </Label>
             <Input
               id="ayat_or_page"

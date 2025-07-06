@@ -103,7 +103,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => 
             <div className="flex items-center space-x-2">
               <Award className="h-5 w-5 text-islamic-600" />
               <span className="text-sm font-semibold text-gray-800">
-                Al-Quran Memorization
+                Tahfidz Al-Quran
               </span>
             </div>
             <Badge 
@@ -140,7 +140,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => 
             <div className="flex items-center space-x-2">
               <BookOpen className="h-5 w-5 text-accent-600" />
               <span className="text-sm font-semibold text-gray-800">
-                Tilawati Reading
+                Tahsin/Tilawati
               </span>
             </div>
             <Badge 

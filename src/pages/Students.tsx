@@ -10,6 +10,13 @@ import { ArrowLeft, BookOpen, Award, Search, Filter, ChevronLeft, ChevronRight, 
 import TilawatiTable from '@/components/TilawatiTable';
 import HafalanTable from '@/components/HafalanTable';
 import { fetchGrades, FIXED_TEACHERS } from '@/utils/rankingDataService';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+} from '@/components/ui/dropdown-menu';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const Students = () => {
   const { profile } = useAuth();
@@ -17,9 +24,8 @@ const Students = () => {
   const [activeTab, setActiveTab] = useState<'tilawati' | 'hafalan'>('tilawati');
   
   // Filter states
-  const teachers = [...FIXED_TEACHERS];
-  const [selectedTeacher, setSelectedTeacher] = useState<string>('');
-  const [selectedGrade, setSelectedGrade] = useState<string>('all');
+  // Removed teacher filter
+  const [selectedGrades, setSelectedGrades] = useState<string[]>(['all']);
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -31,7 +37,7 @@ const Students = () => {
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Helper to determine if any filter is active
-  const hasAnyActiveFilter = selectedTeacher || selectedGrade !== 'all';
+  const hasAnyActiveFilter = selectedGrades.length > 0 && !selectedGrades.includes('all');
 
   // Fetch filter data on component mount
   useEffect(() => {
@@ -57,19 +63,26 @@ const Students = () => {
     setCurrentPage(1); // Reset to first page when filters change
   };
 
-  const handleTeacherChange = (value: string) => {
-    setSelectedTeacher(value);
-    handleFilterChange();
-  };
+  // Removed teacher filter logic
 
-  const handleGradeChange = (value: string) => {
-    setSelectedGrade(value);
-    handleFilterChange();
+  const handleGradeToggle = (grade: string) => {
+    setSelectedGrades((prev) => {
+      let updated;
+      if (grade === 'all') {
+        updated = ['all'];
+      } else {
+        updated = prev.includes(grade)
+          ? prev.filter(g => g !== grade && g !== 'all')
+          : [...prev.filter(g => g !== 'all'), grade];
+      }
+      handleFilterChange();
+      return updated.length === 0 ? ['all'] : updated;
+    });
   };
 
   const clearFilters = () => {
-    setSelectedTeacher('');
-    setSelectedGrade('all');
+    // Removed teacher filter logic
+    setSelectedGrades(['all']);
     setCurrentPage(1);
   };
 
@@ -77,7 +90,7 @@ const Students = () => {
     setCurrentPage(page);
   };
 
-  const hasActiveFilters = selectedGrade !== 'all';
+  const hasActiveFilters = selectedGrades.length > 0 && !selectedGrades.includes('all');
 
   const breadcrumbs = [
     { label: 'Dashboard', href: '/dashboard' },
@@ -116,14 +129,10 @@ const Students = () => {
               {/* Show selected filter badges under description, even when collapsed */}
               {hasAnyActiveFilter && (
                 <div className="flex items-center gap-2 flex-wrap mt-2">
-                  {selectedTeacher && (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-50 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
-                      Teacher: {selectedTeacher}
-                    </span>
-                  )}
-                  {selectedGrade !== 'all' && (
+                  {/* Removed teacher filter badge */}
+                  {selectedGrades.length > 0 && (
                     <span className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-green-50 text-green-700 text-xs sm:text-sm rounded-full border border-green-200">
-                      Grade: {grades.find(g => g.id === selectedGrade)?.name || selectedGrade}
+                      Grades: {selectedGrades.map(id => grades.find(g => g.id === id)?.name || id).join(', ')}
                     </span>
                   )}
                   <button
@@ -149,57 +158,30 @@ const Students = () => {
             ) : (
               <div className="p-4 sm:p-6">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-                  {/* Teacher Filter */}
-                  <div className="space-y-2 sm:space-y-3">
-                    <label className="text-xs sm:text-sm font-medium text-gray-700 flex items-center gap-2">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      Teacher
-                    </label>
-                    <Select value={selectedTeacher} onValueChange={handleTeacherChange}>
-                      <SelectTrigger className="w-full h-10 sm:h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500 text-xs sm:text-sm">
-                        <SelectValue placeholder="Select teacher" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {teachers.map((teacher) => (
-                          <SelectItem key={teacher.id} value={teacher.name}>
-                            {teacher.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {/* Grade Filter */}
+                  {/* Removed teacher filter UI */}
+                  {/* Grade Multi-Select Filter (Checkboxes) */}
                   <div className="space-y-2 sm:space-y-3">
                     <label className="text-xs sm:text-sm font-medium text-gray-700 flex items-center gap-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                       Grade
                     </label>
-                    <Select value={selectedGrade} onValueChange={handleGradeChange}>
-                      <SelectTrigger className="w-full h-10 sm:h-11 border-gray-200 focus:border-green-500 focus:ring-green-500 text-xs sm:text-sm">
-                        <SelectValue placeholder="Select grade" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {grades.map((grade) => (
-                          <SelectItem key={grade.id} value={grade.id}>
+                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                      {grades.map((grade) => (
+                        <div key={grade.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`grade-${grade.id}`}
+                            checked={selectedGrades.includes(grade.id)}
+                            onCheckedChange={() => handleGradeToggle(grade.id)}
+                            className="rounded-full"
+                          />
+                          <label htmlFor={`grade-${grade.id}`} className="text-sm text-gray-600 cursor-pointer">
                             {grade.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                {/* Active Filters Display */}
-                {hasActiveFilters && (
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {selectedTeacher && (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-50 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
-                          Teacher: {selectedTeacher}
-                        </span>
-                      )}
+                          </label>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                )}
+                </div>
               </div>
             )
           )}
@@ -218,7 +200,7 @@ const Students = () => {
             >
               <div className="flex items-center justify-center gap-1 sm:gap-2">
                 <BookOpen className="h-4 w-4" />
-                Tilawati Rank
+                Tilawati Standing
               </div>
             </button>
             <button
@@ -231,7 +213,7 @@ const Students = () => {
             >
               <div className="flex items-center justify-center gap-1 sm:gap-2">
                 <Award className="h-4 w-4" />
-                Hafalan Rank
+                Tahfidz Standing
               </div>
             </button>
           </div>
@@ -240,8 +222,7 @@ const Students = () => {
             {activeTab === 'tilawati' ? (
               <TilawatiTable
                 filters={{
-                  teacher: selectedTeacher,
-                  grade: selectedGrade
+                  grades: selectedGrades
                 }}
                 pagination={{
                   currentPage,
@@ -252,8 +233,7 @@ const Students = () => {
             ) : (
               <HafalanTable
                 filters={{
-                  teacher: selectedTeacher,
-                  grade: selectedGrade
+                  grades: selectedGrades
                 }}
                 pagination={{
                   currentPage,
