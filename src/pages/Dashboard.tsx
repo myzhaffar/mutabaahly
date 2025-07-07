@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import ClassCard from '@/components/dashboard/ClassCard';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface Student {
   id: string;
@@ -303,29 +304,52 @@ const Dashboard = () => {
           <StatsCards stats={stats} />
         </div>
 
+        {/* Multi-select teacher filter for parent role */}
         <div className="mb-6">
-          <SearchAndFilter
-            onSearchChange={handleSearchChange}
-            onFiltersChange={handleFiltersChange}
-            availableClasses={classes}
-            availableTeachers={teachers}
-            currentFilters={filters}
-          />
+          <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Teacher</label>
+          <div className="flex flex-wrap gap-3 mb-2">
+            {teachers.map((teacher) => (
+              <div key={teacher} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`teacher-filter-${teacher}`}
+                  checked={filters.teachers.includes(teacher)}
+                  onCheckedChange={() => {
+                    setFilters((prev) => {
+                      const exists = prev.teachers.includes(teacher);
+                      return {
+                        ...prev,
+                        teachers: exists
+                          ? prev.teachers.filter((t) => t !== teacher)
+                          : [...prev.teachers, teacher],
+                      };
+                    });
+                  }}
+                  className="rounded-full"
+                />
+                <label htmlFor={`teacher-filter-${teacher}`} className="text-sm text-gray-600 cursor-pointer">
+                  {teacher}
+                </label>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="mb-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">My Children's Overview</h2>
-            {filteredStudents.length !== students.length && (
-              <span className="text-sm text-gray-600">
-                Showing {filteredStudents.length} of {students.length} students
-              </span>
-            )}
+            {/* Removed filtered count for parent role */}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {Object.entries(classGroups).map(([className, classStudents]) => (
-              <ClassCard key={className} className={className} classStudents={classStudents} />
-            ))}
+            {Object.entries(classGroups).map(([className, classStudents]) => {
+              // Filter students by selected teachers
+              const filteredClassStudents = filters.teachers.length > 0
+                ? classStudents.filter((student) => filters.teachers.includes(student.teacher))
+                : classStudents;
+              if (filteredClassStudents.length === 0) return null;
+              return (
+                <ClassCard key={className} className={className} classStudents={filteredClassStudents} />
+              );
+            })}
           </div>
         </div>
       </div>

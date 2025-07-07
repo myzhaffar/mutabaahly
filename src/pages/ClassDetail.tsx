@@ -7,10 +7,11 @@ import StudentsGrid from '@/components/dashboard/StudentsGrid';
 import StatsCards from '@/components/dashboard/StatsCards';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Filter, X } from 'lucide-react';
+import { FIXED_TEACHERS } from '@/utils/rankingDataService';
 
 interface Student {
   id: string;
@@ -36,7 +37,8 @@ const ClassDetail: React.FC = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [selectedTeacher, setSelectedTeacher] = useState('all');
+  const [selectedTeachers, setSelectedTeachers] = useState<string[]>([]);
+  const [teacherFilterOpen, setTeacherFilterOpen] = useState(false);
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -90,13 +92,25 @@ const ClassDetail: React.FC = () => {
     navigate(`/student/${studentId}`);
   };
 
-  // Get unique teacher names from students in this class
-  const teacherOptions = Array.from(new Set(students.map(s => s.teacher))).sort();
+  // Use fixed teacher list for filter
+  const teacherOptions = FIXED_TEACHERS;
+
+  // Map student.teacher to ID if needed (for legacy data)
+  const getTeacherId = (student: Student) => {
+    // If already an ID, return as is
+    if (teacherOptions.some(t => t.id === student.teacher)) return student.teacher;
+    // Try to map by name
+    const found = teacherOptions.find(t => t.name === student.teacher);
+    return found ? found.id : student.teacher;
+  };
 
   const filteredStudents = students.filter(student =>
     student.name.toLowerCase().includes(search.toLowerCase()) &&
-    (selectedTeacher === 'all' || student.teacher === selectedTeacher)
+    (selectedTeachers.length === 0 || selectedTeachers.includes(getTeacherId(student)))
   );
+
+  const hasAnyActiveTeacherFilter = selectedTeachers.length > 0;
+  const clearTeacherFilters = () => setSelectedTeachers([]);
 
   const breadcrumbs = [
     { label: 'Dashboard', href: '/dashboard' },
@@ -123,24 +137,85 @@ const ClassDetail: React.FC = () => {
           </h1>
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row items-center gap-4">
-        <Input
-          placeholder="Search students in this class..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="w-full sm:max-w-xs"
-        />
-        <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
-          <SelectTrigger className="w-full sm:w-48">
-            <SelectValue placeholder="Filter by teacher" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Teachers</SelectItem>
-            {teacherOptions.map(teacher => (
-              <SelectItem key={teacher} value={teacher}>{teacher}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      {/* Modern Filter Card with Search and Teacher Filter */}
+      <div className="sticky top-14 z-20 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-200 mb-6 px-0 sm:px-0">
+        <div className="px-6 pt-6 pb-2">
+          <Input
+            placeholder="Search students in this class..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-base py-2 px-4 shadow-sm"
+          />
+        </div>
+        <div className="border-t border-gray-100 mx-6" />
+        <button
+          type="button"
+          className="w-full flex items-center gap-3 px-6 py-4 border-b border-gray-100 hover:bg-gray-50 focus:outline-none"
+          onClick={() => setTeacherFilterOpen(open => !open)}
+          aria-expanded={teacherFilterOpen}
+        >
+          <div className="p-2 bg-blue-50 rounded-lg">
+            <Filter className="h-4 w-4 text-blue-600" />
+          </div>
+          <div className="flex-1 text-left">
+            <h3 className="font-semibold text-gray-900 text-base sm:text-lg">Teacher Filters</h3>
+            <p className="text-xs sm:text-sm text-gray-500">Select one or more teachers to filter students</p>
+            {hasAnyActiveTeacherFilter && (
+              <div className="flex items-center gap-2 flex-wrap mt-2">
+                {selectedTeachers.map(id => {
+                  const teacher = teacherOptions.find(t => t.id === id);
+                  return (
+                    <span key={id} className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-100 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
+                      {teacher?.name || id}
+                      <button
+                        type="button"
+                        onClick={e => { e.stopPropagation(); setSelectedTeachers(prev => prev.filter(t => t !== id)); }}
+                        className="ml-1 text-xs text-gray-400 hover:text-red-600"
+                        aria-label="Remove teacher filter"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  );
+                })}
+                <button
+                  type="button"
+                  onClick={e => { e.stopPropagation(); clearTeacherFilters(); }}
+                  className="ml-2 text-xs text-gray-500 hover:text-red-600 underline"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            )}
+          </div>
+          <span className="ml-auto text-xs text-gray-500 font-medium">{teacherFilterOpen ? 'Hide' : 'Show'}</span>
+        </button>
+        {teacherFilterOpen && (
+          <div className="px-6 pb-6 pt-2">
+            <div className="max-h-48 overflow-y-auto flex flex-col gap-2 pr-2">
+              {teacherOptions.map(teacher => (
+                <div key={teacher.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`teacher-filter-${teacher.id}`}
+                    checked={selectedTeachers.includes(teacher.id)}
+                    onCheckedChange={() => {
+                      setSelectedTeachers(prev => {
+                        const exists = prev.includes(teacher.id);
+                        return exists
+                          ? prev.filter(t => t !== teacher.id)
+                          : [...prev, teacher.id];
+                      });
+                    }}
+                    className="rounded-full"
+                  />
+                  <label htmlFor={`teacher-filter-${teacher.id}`} className="text-sm text-gray-700 cursor-pointer">
+                    {teacher.name}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       {loading ? (
         <div className="text-center py-12 text-gray-500">Loading students...</div>
