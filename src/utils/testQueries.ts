@@ -54,9 +54,9 @@ export const fetchTestsForParent = async (parentId: string): Promise<TestRecord[
 };
 
 interface TestFilters {
-  status?: TestStatus | 'all';
+  status?: TestStatus | TestStatus[] | 'all';
   searchTerm?: string;
-  jilidLevel?: TilawatiJilid | 'all';
+  jilidLevel?: TilawatiJilid | TilawatiJilid[] | 'all';
   date?: string;
 }
 
@@ -68,17 +68,30 @@ export const fetchTestsWithFilters = async (filters: TestFilters): Promise<Tilaw
       .select('*')
       .order('date', { ascending: false });
 
-    // Apply filters
-    if (filters.status && filters.status !== 'all') {
+    // Status filter (array or single)
+    if (filters.status && filters.status !== 'all' && Array.isArray(filters.status) && filters.status.length > 0) {
+      if (filters.status.length === 1) {
+        query = query.eq('status', filters.status[0]);
+      } else {
+        query = query.in('status', filters.status);
+      }
+    } else if (filters.status && filters.status !== 'all' && typeof filters.status === 'string') {
       query = query.eq('status', filters.status);
+    }
+
+    // JilidLevel filter (array or single)
+    if (filters.jilidLevel && filters.jilidLevel !== 'all' && Array.isArray(filters.jilidLevel) && filters.jilidLevel.length > 0) {
+      if (filters.jilidLevel.length === 1) {
+        query = query.eq('tilawati_level', filters.jilidLevel[0]);
+      } else {
+        query = query.in('tilawati_level', filters.jilidLevel);
+      }
+    } else if (filters.jilidLevel && filters.jilidLevel !== 'all' && typeof filters.jilidLevel === 'string') {
+      query = query.eq('tilawati_level', filters.jilidLevel);
     }
 
     if (filters.searchTerm) {
       query = query.ilike('class_name', `%${filters.searchTerm}%`);
-    }
-
-    if (filters.jilidLevel && filters.jilidLevel !== 'all') {
-      query = query.eq('tilawati_level', filters.jilidLevel);
     }
 
     if (filters.date) {

@@ -1,143 +1,169 @@
-import React from 'react';
-import { Search } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, ChevronDown, X, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TilawatiJilid, TestStatus } from '@/types/tilawati';
 import { cn } from '@/lib/utils';
 
+export type StatusOption = TestStatus | 'scheduled' | 'passed' | 'failed';
+export type JilidOption = TilawatiJilid | 'Level 1' | 'Level 2' | 'Level 3' | 'Level 4' | 'Level 5' | 'Level 6';
+
 interface TestFiltersProps {
   searchTerm?: string;
-  status?: TestStatus | 'all';
-  jilidLevel?: TilawatiJilid | 'all';
+  status?: StatusOption[];
+  jilidLevel?: JilidOption[];
   date?: string;
-  onFilterChange: (key: string, value: string | undefined) => void;
+  onFilterChange: (key: string, value: string[] | string | undefined) => void;
   showDateFilter?: boolean;
 }
 
+const STATUS_OPTIONS: { value: StatusOption; label: string }[] = [
+  { value: 'scheduled', label: 'Scheduled' },
+  { value: 'passed', label: 'Passed' },
+  { value: 'failed', label: 'Failed' },
+];
+const JILID_OPTIONS: { value: JilidOption; label: string }[] = [
+  { value: 'Level 1', label: 'Level 1' },
+  { value: 'Level 2', label: 'Level 2' },
+  { value: 'Level 3', label: 'Level 3' },
+  { value: 'Level 4', label: 'Level 4' },
+  { value: 'Level 5', label: 'Level 5' },
+  { value: 'Level 6', label: 'Level 6' },
+];
+
 const TestFilters: React.FC<TestFiltersProps> = ({
   searchTerm = '',
-  status,
-  jilidLevel,
+  status = [],
+  jilidLevel = [],
   date,
   onFilterChange,
   showDateFilter = false,
 }) => {
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
   const clearFilters = () => {
     onFilterChange('searchTerm', '');
-    onFilterChange('status', undefined);
-    onFilterChange('jilidLevel', undefined);
+    onFilterChange('status', []);
+    onFilterChange('jilidLevel', []);
     if (showDateFilter) {
       onFilterChange('date', undefined);
     }
   };
 
-  const hasActiveFilters = status || jilidLevel || date;
-  const activeFiltersCount = [status, jilidLevel, date].filter(Boolean).length;
+  const hasActiveFilters = (status && status.length > 0) || (jilidLevel && jilidLevel.length > 0) || date;
+  const activeFiltersCount = [status?.length, jilidLevel?.length, date ? 1 : 0].filter(Boolean).reduce((a, b) => a + (b as number), 0);
 
   return (
-    <div className="space-y-4 bg-white p-4 rounded-lg border">
-      <div className="flex flex-col sm:flex-row gap-4">
-        {/* Search Bar */}
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-      <Input
+    <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-200 mb-6 px-0 sm:px-0">
+      <div className="px-6 pt-6 pb-2">
+        {/* Search Bar at the top of the card */}
+        <div className="relative w-full mb-4">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-blue-400" />
+          <Input
             placeholder="Search students by name..."
             value={searchTerm}
-        onChange={(e) => onFilterChange('searchTerm', e.target.value)}
-            className="pl-9 pr-4 w-full"
-      />
+            onChange={(e) => onFilterChange('searchTerm', e.target.value)}
+            className="pl-9 pr-4 w-full bg-blue-50 border border-blue-200 rounded-lg focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-base py-2 shadow-sm"
+          />
         </div>
-
-        {/* Status Filter */}
-        <div className="w-full sm:w-48">
-      <Select
-            value={status || 'all'} 
-            onValueChange={(value) => onFilterChange('status', value === 'all' ? undefined : value)}
-      >
-        <SelectTrigger>
-              <SelectValue placeholder="Filter by status" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Status</SelectItem>
-          <SelectItem value="scheduled">Scheduled</SelectItem>
-          <SelectItem value="passed">Passed</SelectItem>
-          <SelectItem value="failed">Failed</SelectItem>
-        </SelectContent>
-      </Select>
-        </div>
-
-        {/* Level Filter */}
-        <div className="w-full sm:w-48">
-      <Select
-            value={jilidLevel || 'all'} 
-            onValueChange={(value) => onFilterChange('jilidLevel', value === 'all' ? undefined : value)}
-      >
-        <SelectTrigger>
-              <SelectValue placeholder="Filter by level" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Levels</SelectItem>
-          <SelectItem value="Level 1">Level 1</SelectItem>
-          <SelectItem value="Level 2">Level 2</SelectItem>
-          <SelectItem value="Level 3">Level 3</SelectItem>
-          <SelectItem value="Level 4">Level 4</SelectItem>
-          <SelectItem value="Level 5">Level 5</SelectItem>
-          <SelectItem value="Level 6">Level 6</SelectItem>
-        </SelectContent>
-      </Select>
-        </div>
-
-        {/* Clear Filters Button */}
-        {hasActiveFilters && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={clearFilters}
-            className="w-full sm:w-auto"
-          >
-            Clear Filters
-            {activeFiltersCount > 0 && (
-              <Badge 
-                variant="secondary" 
-                className="ml-2 bg-gray-100"
-              >
-                {activeFiltersCount}
-              </Badge>
+        {/* Filter Toggle and Badges */}
+        <button
+          className="w-full flex items-center gap-3 px-0 py-3 border-b border-gray-100 hover:bg-gray-50 focus:outline-none"
+          onClick={() => setFiltersOpen((open) => !open)}
+          aria-expanded={filtersOpen}
+        >
+          <div className="p-2 bg-gray-100 rounded-lg">
+            <Filter className="h-4 w-4 text-gray-600" />
+          </div>
+          <div className="flex-1 text-left">
+            <h3 className="font-semibold text-gray-900 text-base sm:text-lg">Filters</h3>
+            <p className="text-xs sm:text-sm text-gray-500">Refine your search results</p>
+            {/* Show selected filter badges under description, even when collapsed */}
+            {hasActiveFilters && (
+              <div className="flex items-center gap-2 flex-wrap mt-2">
+                {status.length > 0 && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-50 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
+                    Status: {status.map(s => STATUS_OPTIONS.find(opt => opt.value === s)?.label || s).join(', ')}
+                  </span>
+                )}
+                {jilidLevel.length > 0 && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-50 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
+                    Level: {jilidLevel.map(j => JILID_OPTIONS.find(opt => opt.value === j)?.label || j).join(', ')}
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="ml-2 text-xs text-gray-500 hover:text-red-600 underline"
+                >
+                  Clear Filters
+                </button>
+              </div>
             )}
-          </Button>
-        )}
+          </div>
+          <span className="ml-auto text-xs text-gray-500">{filtersOpen ? 'Hide' : 'Show'}</span>
+        </button>
       </div>
-
-      {/* Active Filters Display */}
-      {hasActiveFilters && (
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-sm text-gray-500">Active filters:</span>
-          {status && (
-            <Badge 
-              variant="secondary" 
-              className="flex items-center gap-1 bg-gray-100"
-            >
-              Status: {status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
-            </Badge>
-          )}
-          {jilidLevel && (
-            <Badge 
-              variant="secondary" 
-              className="flex items-center gap-1 bg-gray-100"
-            >
-              Level: {jilidLevel === 'all' ? 'All' : jilidLevel}
-            </Badge>
-          )}
-          {date && (
-            <Badge 
-              variant="secondary" 
-              className="flex items-center gap-1 bg-gray-100"
-            >
-              Date: {new Date(date).toLocaleDateString()}
-            </Badge>
-          )}
+      {filtersOpen && (
+        <div className="px-6 pb-6 pt-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
+            {/* Status Multi-Select */}
+            <div className="space-y-2 sm:space-y-3">
+              <label className="text-xs sm:text-sm font-medium text-gray-700 flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                Status
+              </label>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {STATUS_OPTIONS.map(opt => (
+                  <div key={opt.value} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`status-filter-${opt.value}`}
+                      checked={status.includes(opt.value)}
+                      onCheckedChange={() => {
+                        const newStatus = status.includes(opt.value)
+                          ? status.filter(s => s !== opt.value)
+                          : [...status, opt.value];
+                        onFilterChange('status', newStatus);
+                      }}
+                      className="rounded-full"
+                    />
+                    <label htmlFor={`status-filter-${opt.value}`} className="text-sm text-gray-700 cursor-pointer">
+                      {opt.label}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Jilid Multi-Select */}
+            <div className="space-y-2 sm:space-y-3">
+              <label className="text-xs sm:text-sm font-medium text-gray-700 flex items-center gap-2">
+                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                Level
+              </label>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {JILID_OPTIONS.map(opt => (
+                  <div key={opt.value} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`jilid-filter-${opt.value}`}
+                      checked={jilidLevel.includes(opt.value)}
+                      onCheckedChange={() => {
+                        const newJilid = jilidLevel.includes(opt.value)
+                          ? jilidLevel.filter(j => j !== opt.value)
+                          : [...jilidLevel, opt.value];
+                        onFilterChange('jilidLevel', newJilid);
+                      }}
+                      className="rounded-full"
+                    />
+                    <label htmlFor={`jilid-filter-${opt.value}`} className="text-sm text-gray-700 cursor-pointer">
+                      {opt.label}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

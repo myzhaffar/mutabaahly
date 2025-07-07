@@ -12,14 +12,15 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchTestsWithFilters } from '@/utils/testQueries';
 import { calculateTilawahProgress } from '@/utils/progressCalculations';
-import type { TilawatiTest, TestStatus, TilawatiJilid, StudentForTest } from '@/types/tilawati';
+import type { TilawatiTest, StudentForTest } from '@/types/tilawati';
+import type { StatusOption, JilidOption } from '@/components/test-management/TestFilters';
 import { useNavigate } from 'react-router-dom';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 
 interface TestFilters {
   searchTerm?: string;
-  status?: TestStatus | 'all';
-  jilidLevel?: TilawatiJilid | 'all';
+  status?: StatusOption[];
+  jilidLevel?: JilidOption[];
   date?: string;
 }
 
@@ -30,7 +31,7 @@ const TeacherTestManagement: React.FC = () => {
   const queryClient = useQueryClient();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedTest, setSelectedTest] = useState<TilawatiTest | null>(null);
-  const [filters, setFilters] = useState<TestFilters>({});
+  const [filters, setFilters] = useState<TestFilters>({ status: [], jilidLevel: [] });
 
   const breadcrumbs = [
     { label: 'Dashboard', href: '/dashboard' },
@@ -95,7 +96,7 @@ const TeacherTestManagement: React.FC = () => {
         return {
           id: student.id,
           name: student.name,
-              current_tilawati_jilid: tilawahProgress.jilid as TilawatiJilid || "Jilid 1",
+              current_tilawati_jilid: tilawahProgress.jilid as JilidOption || "Jilid 1",
           class_name: student.group_name || '',
           teacher: student.teacher,
               progress_percentage: tilawahProgress.percentage,
@@ -134,10 +135,10 @@ const TeacherTestManagement: React.FC = () => {
     });
   };
 
-  const handleFilterChange = (key: string, value: string | undefined) => {
+  const handleFilterChange = (key: string, value: StatusOption[] | JilidOption[] | string | undefined) => {
     setFilters(prev => ({
       ...prev,
-      [key]: value === 'all' ? undefined : value,
+      [key]: value,
     }));
   };
 

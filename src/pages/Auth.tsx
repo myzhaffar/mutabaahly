@@ -102,7 +102,7 @@ const Auth = () => {
       setLoading(false);
     }
   };
-
+  
   const handleGoogleLogin = async () => {
     await supabase.auth.signInWithOAuth({ provider: 'google' });
   };
