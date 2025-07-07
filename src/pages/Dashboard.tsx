@@ -34,7 +34,6 @@ interface Student {
 
 interface FilterState {
   classes: string[];
-  teachers: string[];
 }
 
 const Dashboard = () => {
@@ -46,8 +45,7 @@ const Dashboard = () => {
   const [dataLoading, setDataLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<FilterState>({
-    classes: [],
-    teachers: []
+    classes: []
   });
   const [stats, setStats] = useState({
     totalStudents: 0,
@@ -205,21 +203,13 @@ const Dashboard = () => {
       );
     }
 
-    // Apply teacher filter
-    if (filters.teachers.length > 0) {
-      filtered = filtered.filter(student =>
-        filters.teachers.includes(student.teacher)
-      );
-    }
-
     setFilteredStudents(filtered);
   }, [students, searchTerm, filters]);
 
   // Get unique values for filter options
   const getFilterOptions = () => {
     const classes = [...new Set(students.map(s => s.group_name))].sort();
-    const teachers = [...new Set(students.map(s => s.teacher))].sort();
-    return { classes, teachers };
+    return { classes };
   };
 
   const handleSearchChange = (search: string) => {
@@ -246,7 +236,7 @@ const Dashboard = () => {
     );
   }
 
-  const { classes, teachers } = getFilterOptions();
+  const { classes } = getFilterOptions();
 
   // Group students by class
   const classGroups = students.reduce((acc, student) => {
@@ -300,40 +290,8 @@ const Dashboard = () => {
               <p className="text-gray-600">Parent Dashboard</p>
             </div>
           </div>
-          
           <StatsCards stats={stats} />
         </div>
-
-        {/* Multi-select teacher filter for parent role */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Teacher</label>
-          <div className="flex flex-wrap gap-3 mb-2">
-            {teachers.map((teacher) => (
-              <div key={teacher} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`teacher-filter-${teacher}`}
-                  checked={filters.teachers.includes(teacher)}
-                  onCheckedChange={() => {
-                    setFilters((prev) => {
-                      const exists = prev.teachers.includes(teacher);
-                      return {
-                        ...prev,
-                        teachers: exists
-                          ? prev.teachers.filter((t) => t !== teacher)
-                          : [...prev.teachers, teacher],
-                      };
-                    });
-                  }}
-                  className="rounded-full"
-                />
-                <label htmlFor={`teacher-filter-${teacher}`} className="text-sm text-gray-600 cursor-pointer">
-                  {teacher}
-                </label>
-              </div>
-            ))}
-          </div>
-        </div>
-
         <div className="mb-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">My Children's Overview</h2>
@@ -341,13 +299,9 @@ const Dashboard = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {Object.entries(classGroups).map(([className, classStudents]) => {
-              // Filter students by selected teachers
-              const filteredClassStudents = filters.teachers.length > 0
-                ? classStudents.filter((student) => filters.teachers.includes(student.teacher))
-                : classStudents;
-              if (filteredClassStudents.length === 0) return null;
+              if (classStudents.length === 0) return null;
               return (
-                <ClassCard key={className} className={className} classStudents={filteredClassStudents} />
+                <ClassCard key={className} className={className} classStudents={classStudents} />
               );
             })}
           </div>
