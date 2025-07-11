@@ -72,13 +72,13 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
             {/* Three dots menu for mobile (absolute top right) */}
             {isTeacher && (
               <div className="absolute right-0 top-0 lg:hidden">
-                <HoverDropdownMenu>
-                  <HoverDropdownMenuTrigger asChild>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8">
                       <MoreVertical className="h-4 w-4" />
                     </Button>
-                  </HoverDropdownMenuTrigger>
-                  <HoverDropdownMenuContent align="end">
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
                     <DropdownMenuItem onSelect={() => document.getElementById('edit-student-trigger')?.click()}>
                       <Pencil className="mr-2 h-4 w-4" />
                       Edit Profile
@@ -90,8 +90,8 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
                       <Trash2 className="mr-2 h-4 w-4" />
                       Delete Profile
                     </DropdownMenuItem>
-                  </HoverDropdownMenuContent>
-                </HoverDropdownMenu>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             )}
             <Avatar className="h-24 w-24 sm:h-28 sm:w-28 lg:h-32 lg:w-32">
@@ -136,13 +136,13 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
                   </div>
                 </div>
                 {isTeacher && (
-                  <HoverDropdownMenu>
-                    <HoverDropdownMenuTrigger asChild>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
                         <MoreVertical className="h-4 w-4" />
                       </Button>
-                    </HoverDropdownMenuTrigger>
-                    <HoverDropdownMenuContent align="end">
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
                       <DropdownMenuItem onSelect={() => document.getElementById('edit-student-trigger')?.click()}>
                         <Pencil className="mr-2 h-4 w-4" />
                         Edit Profile
@@ -154,8 +154,8 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete Profile
                       </DropdownMenuItem>
-                    </HoverDropdownMenuContent>
-                  </HoverDropdownMenu>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 )}
               </div>
             </div>

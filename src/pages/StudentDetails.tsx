@@ -74,6 +74,7 @@ const StudentDetails = () => {
         hafalanEntries={hafalanEntries}
         tilawahEntries={tilawahEntries}
         onProgressUpdated={refetchData}
+        studentId={student.id}
       />
     </>
   );
