@@ -1,11 +1,11 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useRouter } from 'next/navigation';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
 import ParentLayout from '@/components/layouts/ParentLayout';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/useAuth';
 import StudentsGrid from '@/components/dashboard/StudentsGrid';
-import StatsCards from '@/components/dashboard/StatsCards';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,10 +13,10 @@ import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/prog
 import { ChevronLeft, Filter, X } from 'lucide-react';
 import { FIXED_TEACHERS } from '@/utils/rankingDataService';
 
-interface Student {
+interface ClassStudent {
   id: string;
   name: string;
-  grade: string;
+  grade: string | null;
   group_name: string;
   teacher: string;
   photo: string | null;
@@ -31,10 +31,12 @@ interface Student {
 }
 
 const ClassDetail: React.FC = () => {
-  const { className } = useParams<{ className: string }>();
+  const params = useParams();
+  const className = decodeURIComponent(params?.className as string);
+  console.log('DEBUG: className param:', className); // Debug log
   const { profile } = useAuth();
-  const navigate = useNavigate();
-  const [students, setStudents] = useState<Student[]>([]);
+  const router = useRouter();
+  const [students, setStudents] = useState<ClassStudent[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedTeachers, setSelectedTeachers] = useState<string[]>([]);
@@ -47,6 +49,7 @@ const ClassDetail: React.FC = () => {
         .from('students')
         .select('*')
         .eq('group_name', className);
+      console.log('DEBUG: studentsData:', studentsData, 'studentsError:', studentsError); // Debug log
       if (studentsError || !studentsData) {
         setStudents([]);
         setLoading(false);
@@ -73,7 +76,7 @@ const ClassDetail: React.FC = () => {
               hafalan_progress: hafalanProgress.percentage > 0 ? hafalanProgress : null,
               tilawah_progress: tilawahProgress.percentage > 0 ? tilawahProgress : null
             };
-          } catch (error) {
+          } catch {
             return {
               ...student,
               hafalan_progress: null,
@@ -89,14 +92,14 @@ const ClassDetail: React.FC = () => {
   }, [className]);
 
   const handleViewDetails = (studentId: string) => {
-    navigate(`/student/${studentId}`);
+    router.push(`/student/${studentId}`);
   };
 
   // Use fixed teacher list for filter
   const teacherOptions = FIXED_TEACHERS;
 
   // Map student.teacher to ID if needed (for legacy data)
-  const getTeacherId = (student: Student) => {
+  const getTeacherId = (student: ClassStudent) => {
     // If already an ID, return as is
     if (teacherOptions.some(t => t.id === student.teacher)) return student.teacher;
     // Try to map by name
@@ -123,7 +126,7 @@ const ClassDetail: React.FC = () => {
         <div className="flex items-center gap-2 mb-1">
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => router.back()}
             className="p-0 m-0 bg-transparent border-none outline-none flex items-center mr-2"
             aria-label="Back"
           >
@@ -221,8 +224,14 @@ const ClassDetail: React.FC = () => {
         <div className="text-center py-12 text-gray-500">Loading students...</div>
       ) : (
         <StudentsGrid
-          students={students}
-          filteredStudents={filteredStudents}
+          students={students.map(student => ({
+            ...student,
+            grade: student.grade || 'Unknown'
+          }))}
+          filteredStudents={filteredStudents.map(student => ({
+            ...student,
+            grade: student.grade || 'Unknown'
+          }))}
           onViewDetails={handleViewDetails}
           userRole={profile?.role || 'parent'}
         />

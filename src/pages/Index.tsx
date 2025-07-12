@@ -1,6 +1,8 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,16 +22,16 @@ import PublicHeader from '@/components/layouts/PublicHeader';
 const Index = () => {
   const { user, loading } = useAuth();
   const { t } = useLanguage();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // Redirect authenticated users to dashboard
     if (!loading && user) {
-      navigate('/dashboard');
+      router.push('/dashboard');
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, router]);
 
   const testimonials = [
     {
@@ -64,7 +66,7 @@ const Index = () => {
     // Navigate to auth page with loading state
     setTimeout(() => {
       setIsLoading(false);
-      navigate('/auth');
+      router.push('/auth');
     }, 1000);
   };
 

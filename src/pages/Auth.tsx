@@ -1,10 +1,12 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/useAuth';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
 import { Home, Mail, Lock, Eye, User } from 'lucide-react';
@@ -23,7 +25,7 @@ const Auth = () => {
   const { signIn, signUp, user } = useAuth();
   const { t } = useLanguage();
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const allowedRoles = ['teacher', 'parent'];
 
@@ -43,9 +45,9 @@ const Auth = () => {
 
   useEffect(() => {
     if (user) {
-      navigate('/');
+      router.push('/');
     }
-  }, [user, navigate]);
+  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -229,7 +231,7 @@ const Auth = () => {
                 type="button"
                 variant="outline"
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-gray-700 border-gray-300"
-                onClick={() => navigate('/')}
+                onClick={() => router.push('/')}
               >
                 <Home className="h-5 w-5 mr-1" /> Back to Home
               </Button>

@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { X } from 'lucide-react';
 
 interface MobileNavProps {
@@ -26,7 +28,7 @@ const scrollToSection = (id: string, closeNav: () => void) => {
 
 const MobileNav: React.FC<MobileNavProps> = ({ isOpen, setIsOpen }) => {
   const closeNav = () => setIsOpen(false);
-  const navigate = useNavigate();
+  const router = useRouter();
   const [activeSection, setActiveSection] = useState('home');
 
   useEffect(() => {
@@ -48,7 +50,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ isOpen, setIsOpen }) => {
   }, []);
 
   const handleLogin = () => {
-    navigate('/auth');
+    router.push('/auth');
     closeNav();
   };
 

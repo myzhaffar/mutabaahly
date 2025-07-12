@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Edit } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast';
-import type { TilawatiTest, TestStatus, TilawatiJilid } from '@/types/tilawati';
+import type { TilawatiTest } from '@/types/tilawati';
 
 interface EditTestDialogProps {
   test: TilawatiTest;

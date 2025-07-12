@@ -1,6 +1,8 @@
+'use client';
+
 import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/useAuth';
+import { useRouter } from 'next/navigation';
 import TeacherSidebar from '@/components/TeacherSidebar';
 import Breadcrumbs, { BreadcrumbItem } from '@/components/ui/Breadcrumbs';
 
@@ -11,14 +13,14 @@ interface ProfileLayoutProps {
 
 const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children, breadcrumbs }) => {
   const { profile, loading } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (!loading && !profile) {
-      navigate('/auth');
+      router.push('/auth');
     }
-  }, [loading, profile, navigate]);
+  }, [loading, profile, router]);
 
   if (loading) {
     return (

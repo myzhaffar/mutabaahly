@@ -1,5 +1,7 @@
+'use client';
+
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 
 export interface BreadcrumbItem {
@@ -20,7 +22,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items }) => {
             {item.href && index < items.length - 1 ? (
               <div className="flex items-center">
                 <Link
-                  to={item.href}
+                  href={item.href}
                   className="text-sm font-medium text-gray-700 hover:text-blue-600"
                 >
                   {item.label}

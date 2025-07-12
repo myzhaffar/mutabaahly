@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Upload, Download, FileText, AlertCircle, CheckCircle, X, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/useAuth';
 import { FIXED_TEACHERS } from '@/utils/rankingDataService';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';

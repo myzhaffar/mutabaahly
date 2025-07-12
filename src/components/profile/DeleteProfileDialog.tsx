@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import {
   AlertDialog,
@@ -9,10 +11,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 interface DeleteProfileDialogProps {
   isOpen: boolean;
@@ -21,7 +23,7 @@ interface DeleteProfileDialogProps {
 
 export function DeleteProfileDialog({ isOpen, onClose }: DeleteProfileDialogProps) {
   const { profile, signOut } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
 
   const handleDelete = async () => {
@@ -43,7 +45,7 @@ export function DeleteProfileDialog({ isOpen, onClose }: DeleteProfileDialogProp
 
       // Sign out and redirect to home
       await signOut();
-      navigate('/');
+      router.push('/');
       toast.success('Account deleted successfully');
     } catch (error) {
       console.error('Error deleting account:', error);

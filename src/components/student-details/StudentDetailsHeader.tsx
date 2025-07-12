@@ -1,5 +1,7 @@
+'use client';
+
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 
@@ -23,7 +25,7 @@ const StudentDetailsHeader: React.FC<StudentDetailsHeaderProps> = ({
   userRole,
   profile,
 }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-6">
@@ -31,7 +33,7 @@ const StudentDetailsHeader: React.FC<StudentDetailsHeaderProps> = ({
       <div className="flex flex-row items-center gap-4 w-full sm:w-auto">
         <button
           type="button"
-          onClick={() => navigate(-1)}
+          onClick={() => router.back()}
           className="p-0 m-0 bg-transparent border-none outline-none flex items-center"
           aria-label="Back"
         >

@@ -1,17 +1,20 @@
+'use client';
+
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import StudentDetailsHeader from '@/components/student-details/StudentDetailsHeader';
 import StudentOverviewCard from '@/components/student-details/StudentOverviewCard';
 import DailyProgressTabs from '@/components/student-details/DailyProgressTabs';
 import { useStudentDetails } from '@/hooks/useStudentDetails';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/useAuth';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
 import ParentLayout from '@/components/layouts/ParentLayout';
 
 const StudentDetails = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  const params = useParams();
+  const id = params?.id as string;
+  const router = useRouter();
   const { profile } = useAuth();
   
   const {
@@ -24,7 +27,7 @@ const StudentDetails = () => {
   } = useStudentDetails(id);
 
   const handleStudentDeleted = () => {
-    navigate('/dashboard');
+    router.push('/dashboard');
   };
 
   if (loading) {
@@ -41,7 +44,7 @@ const StudentDetails = () => {
         <div className="container mx-auto px-6 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Student Not Found</h1>
-            <Button onClick={() => navigate(-1)}>
+            <Button onClick={() => router.back()}>
               Back
             </Button>
           </div>
@@ -59,9 +62,12 @@ const StudentDetails = () => {
   const MainContent = (
     <>
       <StudentDetailsHeader
-        student={student}
+        student={{
+          ...student,
+          grade: student.grade || 'Unknown'
+        }}
         userRole={profile?.role || 'parent'}
-        profile={profile}
+        profile={profile || undefined}
       />
       <StudentOverviewCard
         student={student}

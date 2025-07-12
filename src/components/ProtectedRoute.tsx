@@ -1,7 +1,8 @@
+'use client';
 
 import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/useAuth';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 interface ProtectedRouteProps {
@@ -11,17 +12,17 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
   const { user, profile, loading } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate('/auth');
+      router.push('/auth');
     }
     
     if (!loading && user && profile && requiredRole && profile.role !== requiredRole) {
-      navigate('/dashboard');
+      router.push('/dashboard');
     }
-  }, [user, profile, loading, navigate, requiredRole]);
+  }, [user, profile, loading, router, requiredRole]);
 
   if (loading) {
     return (

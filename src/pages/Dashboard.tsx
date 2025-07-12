@@ -1,10 +1,12 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SearchAndFilter from '@/components/SearchAndFilter';
 import StatsCards from '@/components/dashboard/StatsCards';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
 import AddStudentDialog from '@/components/AddStudentDialog';
@@ -14,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import ClassCard from '@/components/dashboard/ClassCard';
 import { Checkbox } from '@/components/ui/checkbox';
+import ParentLayout from '@/components/layouts/ParentLayout';
 
 interface Student {
   id: string;
@@ -36,10 +39,27 @@ interface FilterState {
   classes: string[];
 }
 
+// Simple skeleton components
+const StatsCardsSkeleton = () => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
+    {Array.from({ length: 4 }).map((_, i) => (
+      <div key={i} className="bg-gray-100 rounded-lg h-24 animate-pulse" />
+    ))}
+  </div>
+);
+
+const StudentGridSkeleton = () => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {Array.from({ length: 4 }).map((_, i) => (
+      <div key={i} className="bg-gray-100 rounded-lg h-40 animate-pulse" />
+    ))}
+  </div>
+);
+
 const Dashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
   const { t } = useLanguage();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [students, setStudents] = useState<Student[]>([]);
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
@@ -58,9 +78,9 @@ const Dashboard = () => {
     if (user && profile) {
       fetchStudents();
     } else if (!authLoading && !user) {
-      navigate('/auth');
+      router.push('/auth');
     }
-  }, [user, profile, authLoading, navigate]);
+  }, [user, profile, authLoading, router]);
 
   const fetchStudents = async () => {
     try {
@@ -221,20 +241,12 @@ const Dashboard = () => {
   };
 
   const handleViewDetails = (studentId: string) => {
-    navigate(`/student/${studentId}`);
+    router.push(`/student/${studentId}`);
   };
 
   const handleStudentAdded = () => {
     fetchStudents();
   };
-
-  if (authLoading || dataLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-islamic-500"></div>
-      </div>
-    );
-  }
 
   const { classes } = getFilterOptions();
 
@@ -246,31 +258,34 @@ const Dashboard = () => {
   }, {} as Record<string, Student[]>);
 
   if (profile?.role === 'teacher') {
-    const breadcrumbs = [{ label: 'Dashboard Overview' }];
+    const breadcrumbs = [{ label: 'Dashboard' }];
     return (
       <TeacherLayout breadcrumbs={breadcrumbs}>
-        <div className="bg-white rounded-lg shadow-sm px-0 sm:px-4 py-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
-          <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-              Welcome back, {profile?.full_name}
-            </h1>
-            <p className="text-gray-600">Teacher Dashboard</p>
-          </div>
-            <div className="flex justify-center gap-2 sm:justify-end">
-              <BulkUploadStudentsDialog onStudentsAdded={handleStudentAdded} />
-          <AddStudentDialog onStudentAdded={handleStudentAdded} />
+        <div className="container mx-auto px-0 py-0 md:px-6 md:py-6">
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                  Welcome back, {profile?.full_name}
+                </h1>
+                <p className="text-gray-600">Teacher Dashboard</p>
+              </div>
+              <div className="flex justify-center gap-2 sm:justify-end">
+                <BulkUploadStudentsDialog onStudentsAdded={handleStudentAdded} />
+                <AddStudentDialog onStudentAdded={handleStudentAdded} />
+              </div>
             </div>
-        </div>
-
-        <StatsCards stats={stats} />
-
-        <div className="mb-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {Object.entries(classGroups).map(([className, classStudents]) => (
-                <ClassCard key={className} className={className} classStudents={classStudents} />
-              ))}
-        </div>
+            {/* Stats Section */}
+            {dataLoading ? <StatsCardsSkeleton /> : <StatsCards stats={stats} />}
+            <div className="mb-6">
+              {dataLoading ? <StudentGridSkeleton /> : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {Object.entries(classGroups).map(([className, classStudents]) => (
+                    <ClassCard key={className} className={className} classStudents={classStudents} />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </TeacherLayout>
@@ -278,36 +293,41 @@ const Dashboard = () => {
   }
 
   // Parent view
+  const breadcrumbs = [{ label: 'Dashboard' }];
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-6 py-8">
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Welcome back, {profile?.full_name}
-              </h1>
-              <p className="text-gray-600">Parent Dashboard</p>
+    <ParentLayout breadcrumbs={breadcrumbs}>
+      <div className="container mx-auto px-0 py-0 md:px-6 md:py-6">
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="mb-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  Welcome back, {profile?.full_name}
+                </h1>
+                <p className="text-gray-600">Parent Dashboard</p>
+              </div>
             </div>
+            {dataLoading ? <StatsCardsSkeleton /> : <StatsCards stats={stats} />}
           </div>
-          <StatsCards stats={stats} />
-        </div>
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">My Children's Overview</h2>
-            {/* Removed filtered count for parent role */}
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {Object.entries(classGroups).map(([className, classStudents]) => {
-              if (classStudents.length === 0) return null;
-              return (
-                <ClassCard key={className} className={className} classStudents={classStudents} />
-              );
-            })}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">My Children's Overview</h2>
+              {/* Removed filtered count for parent role */}
+            </div>
+            {dataLoading ? <StudentGridSkeleton /> : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {Object.entries(classGroups).map(([className, classStudents]) => {
+                  if (classStudents.length === 0) return null;
+                  return (
+                    <ClassCard key={className} className={className} classStudents={classStudents} />
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </ParentLayout>
   );
 };
 

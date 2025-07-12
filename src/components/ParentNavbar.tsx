@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
+import { useAuth } from '@/contexts/useAuth';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
-  Menu,
-  X,
   Home,
   BookOpen,
   UserCircle,
@@ -22,13 +23,13 @@ import {
 
 const ParentNavbar = () => {
   const { profile, signOut } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+
 
   const handleSignOut = async () => {
     await signOut();
-    navigate('/');
+    router.push('/');
   };
 
   const navItems = [
@@ -39,8 +40,8 @@ const ParentNavbar = () => {
   ];
 
   const isActive = (path: string) => {
-    return location.pathname === path || 
-      (path !== '/dashboard' && location.pathname.startsWith(path));
+    return pathname === path || 
+      (path !== '/dashboard' && pathname?.startsWith(path));
   };
 
   return (
@@ -50,7 +51,7 @@ const ParentNavbar = () => {
           <div className="flex h-16 items-center justify-between md:justify-between">
             {/* Logo Section - center on mobile, left on desktop */}
             <div className="flex-1 flex justify-center md:justify-start items-center gap-2">
-              <Link to="/dashboard" className="flex items-center space-x-2">
+              <Link href="/dashboard" className="flex items-center space-x-2">
                 <div className="w-9 h-9 bg-gradient-to-r from-green-400 to-teal-500 rounded-lg flex items-center justify-center shadow-sm">
                   <span className="text-white font-bold text-xl">M</span>
                 </div>
@@ -65,7 +66,7 @@ const ParentNavbar = () => {
               {navItems.map((item) => (
                 <Link
                   key={item.label}
-                  to={item.href}
+                  href={item.href}
                   className={`
                     flex items-center gap-2 text-sm font-medium transition-colors
                     ${isActive(item.href)
@@ -118,7 +119,7 @@ const ParentNavbar = () => {
           {navItems.map((item) => (
             <Link
               key={item.label}
-              to={item.href}
+              href={item.href}
               className={`flex flex-col items-center justify-center flex-1 py-2 transition-colors ${
                 isActive(item.href)
                   ? 'text-teal-600'

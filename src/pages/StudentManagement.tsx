@@ -14,7 +14,7 @@ import {
 import { useToast } from '@/components/ui/use-toast';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/useAuth';
 import AddStudentDialog from '@/components/AddStudentDialog';
 import BulkUploadStudentsDialog from '@/components/BulkUploadStudentsDialog';
 

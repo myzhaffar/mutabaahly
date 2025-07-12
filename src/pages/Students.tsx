@@ -1,11 +1,13 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/useAuth';
 import ParentLayout from '@/components/layouts/ParentLayout';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, BookOpen, Award, Search, Filter, ChevronLeft, ChevronRight, Loader2, X } from 'lucide-react';
 import TilawatiTable from '@/components/TilawatiTable';
 import HafalanTable from '@/components/HafalanTable';
@@ -20,7 +22,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 const Students = () => {
   const { profile } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'tilawati' | 'hafalan'>('tilawati');
   
   // Filter states
@@ -98,13 +100,13 @@ const Students = () => {
   ];
 
   const MainContent = (
-    <div className="w-full flex justify-center py-0 px-0 sm:py-4 sm:px-4">
-      <div className="w-full max-w-5xl space-y-4">
+    <div className="w-full max-w-6xl mx-auto px-0 py-0 md:px-6 md:py-6">
+      <div className="w-full flex flex-col gap-6">
         {/* Header, left-aligned */}
-        <div className="flex items-center gap-3 sm:gap-4 mt-2">
+        <div className="flex items-center gap-3 sm:gap-4 mt-2 w-full">
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => router.back()}
             className="p-0 m-0 bg-transparent border-none outline-none flex items-center"
             aria-label="Back"
           >
@@ -114,7 +116,7 @@ const Students = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden p-0 sm:p-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden p-6 w-full">
           <button
             className="w-full flex items-center gap-3 px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100 hover:bg-gray-50 focus:outline-none"
             onClick={() => setFiltersOpen((open) => !open)}
@@ -188,8 +190,8 @@ const Students = () => {
         </div>
 
         {/* Table Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-0 sm:p-4">
-          <div className="flex flex-col xs:flex-row border-b border-gray-200 overflow-x-auto min-w-0">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 w-full">
+          <div className="flex flex-col xs:flex-row border-b border-gray-200 overflow-x-auto min-w-0 w-full">
             <button
               onClick={() => setActiveTab('tilawati')}
               className={`flex-1 px-2 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-medium transition-colors ${
@@ -218,7 +220,7 @@ const Students = () => {
             </button>
           </div>
           {/* Tab Content */}
-          <div className="p-2 sm:p-6 min-w-0">
+          <div className="p-6 min-w-0 w-full">
             {activeTab === 'tilawati' ? (
               <TilawatiTable
                 filters={{

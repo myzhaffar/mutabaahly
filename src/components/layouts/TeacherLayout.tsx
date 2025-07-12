@@ -1,6 +1,8 @@
+'use client';
+
 import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/useAuth';
+import { useRouter } from 'next/navigation';
 import TeacherSidebar from '@/components/TeacherSidebar';
 import Breadcrumbs, { BreadcrumbItem } from '@/components/ui/Breadcrumbs';
 import { Menu } from 'lucide-react';
@@ -12,14 +14,14 @@ interface TeacherLayoutProps {
 
 const TeacherLayout: React.FC<TeacherLayoutProps> = ({ children, breadcrumbs }) => {
   const { profile, loading } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   React.useEffect(() => {
     if (!loading && profile?.role !== 'teacher') {
-      navigate('/dashboard');
+      router.push('/dashboard');
     }
-  }, [loading, profile, navigate]);
+  }, [loading, profile, router]);
 
   if (loading) {
     return (

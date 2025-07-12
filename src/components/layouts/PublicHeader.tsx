@@ -1,10 +1,12 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import MobileNav from './MobileNav';
 
 const Logo = () => (
-  <Link to="/" className="flex items-center space-x-2">
+  <Link href="/" className="flex items-center space-x-2">
     <div className="h-8 w-8 bg-gradient-to-r from-green-400 to-teal-500 rounded-md flex items-center justify-center relative">
       <span className="text-white font-bold text-2xl">ق</span>
       <div className="absolute -top-1 -right-1 w-4 h-4 bg-teal-300 rounded-full flex items-center justify-center">
@@ -89,7 +91,7 @@ const PublicHeader: React.FC = () => {
                   {link.label}
                 </a>
               ))}
-              <Link to="/auth" className="ml-4">
+              <Link href="/auth" className="ml-4">
                 <button className="bg-gradient-to-r from-emerald-500 to-teal-400 hover:opacity-90 text-white font-semibold px-6 py-2 rounded-lg shadow transition-colors">Login</button>
               </Link>
             </nav>

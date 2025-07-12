@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/useAuth';
 import { Database } from '@/types/supabase';
 
 type Student = Database['public']['Tables']['students']['Row'];
@@ -69,6 +69,8 @@ export const useStudentDetails = (id: string | undefined) => {
       // Only fetch progress if student exists
       if (!student) return;
 
+      if (!id) return;
+      
       const { data: entries, error } = await supabase
         .from('progress_entries')
         .select('*')
@@ -93,8 +95,8 @@ export const useStudentDetails = (id: string | undefined) => {
       });
 
       // Only teachers can update progress in database
-      if (profile.role === 'teacher') {
-        if (hafalan.length > 0) {
+      if (profile?.role === 'teacher') {
+        if (hafalan.length > 0 && id) {
           await supabase
             .from('hafalan_progress')
             .upsert({
@@ -105,7 +107,7 @@ export const useStudentDetails = (id: string | undefined) => {
             });
         }
 
-        if (tilawah.length > 0) {
+        if (tilawah.length > 0 && id) {
           await supabase
             .from('tilawah_progress')
             .upsert({

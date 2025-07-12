@@ -1,6 +1,8 @@
-import { Link } from "react-router-dom";
+'use client';
+
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -19,7 +21,7 @@ export default function Navbar() {
     <nav className="border-b">
       <div className="flex h-16 items-center px-4">
         <div className="flex items-center space-x-4">
-          <Link to="/" className="font-bold text-xl">
+          <Link href="/" className="font-bold text-xl">
             Mutabaahly
           </Link>
         </div>
@@ -45,7 +47,7 @@ export default function Navbar() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to="/profile" className="cursor-pointer">
+                  <Link href="/profile" className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
                   </Link>
@@ -57,7 +59,7 @@ export default function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Link to="/login">
+            <Link href="/auth">
               <Button>Sign In</Button>
             </Link>
           )}

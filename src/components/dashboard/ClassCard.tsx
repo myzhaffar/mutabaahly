@@ -1,7 +1,9 @@
+'use client';
+
 import React from 'react';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 
 interface Student {
@@ -44,7 +46,7 @@ function getAccentColor(className: string) {
 }
 
 const ClassCard: React.FC<ClassCardProps> = ({ className, classStudents }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const accent = getAccentColor(className);
   return (
     <div
@@ -62,7 +64,7 @@ const ClassCard: React.FC<ClassCardProps> = ({ className, classStudents }) => {
         <div className="flex justify-end mt-6">
           <button
             className="w-full py-2 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm shadow transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2"
-            onClick={() => navigate(`/class/${encodeURIComponent(className)}`)}
+            onClick={() => router.push(`/class/${encodeURIComponent(className)}`)}
           >
             View Students in Class
           </button>

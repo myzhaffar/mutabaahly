@@ -6,7 +6,7 @@ import { Award, BookOpen, User, MoreVertical, Pencil, Trash2 } from 'lucide-reac
 import AddProgressDialog from '@/components/AddProgressDialog';
 import EditStudentDialog from '@/components/EditStudentDialog';
 import DeleteStudentDialog from '@/components/DeleteStudentDialog';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/useAuth';
 import { ProgressData } from '@/types/progress';
 import {
   DropdownMenu,

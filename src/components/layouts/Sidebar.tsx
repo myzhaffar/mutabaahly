@@ -1,7 +1,10 @@
-import { Link, useLocation } from "react-router-dom";
+'use client';
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   BookOpen,
@@ -17,10 +20,10 @@ import { useState } from "react";
 
 export function Sidebar({ className }: { className?: string }) {
   const { profile, signOut } = useAuth();
-  const location = useLocation();
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => pathname === path;
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -74,7 +77,7 @@ export function Sidebar({ className }: { className?: string }) {
       >
         <div className="flex h-full flex-col">
           <div className="flex h-16 items-center border-b px-6">
-            <Link to="/" className="font-bold text-xl">
+            <Link href="/" className="font-bold text-xl">
               Mutabaahly
             </Link>
           </div>
@@ -94,7 +97,7 @@ export function Sidebar({ className }: { className?: string }) {
                 {menuItems.map((item) => (
                   <Link
                     key={item.href}
-                    to={item.href}
+                    href={item.href}
                     className={cn(
                       "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                       isActive(item.href)

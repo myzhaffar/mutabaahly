@@ -34,8 +34,8 @@ const HafalanTable: React.FC<HafalanTableProps> = ({ filters, pagination }) => {
       
       try {
         const rankingFilters: RankingFilters = {
-          teacher: filters.teachers,
-          grade: filters.grades
+          teacher: filters.teachers?.[0] || '',
+          grade: filters.grades[0] || ''
         };
         
         const data = await fetchHafalanRankingData(rankingFilters);

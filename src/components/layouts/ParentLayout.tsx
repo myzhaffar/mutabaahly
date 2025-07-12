@@ -1,7 +1,10 @@
+'use client';
+
 import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/useAuth';
+import { useRouter } from 'next/navigation';
 import Breadcrumbs, { BreadcrumbItem } from '@/components/ui/Breadcrumbs';
+import ParentNavbar from '@/components/ParentNavbar';
 
 interface ParentLayoutProps {
   children: React.ReactNode;
@@ -10,13 +13,13 @@ interface ParentLayoutProps {
 
 const ParentLayout: React.FC<ParentLayoutProps> = ({ children, breadcrumbs }) => {
   const { profile, loading } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   React.useEffect(() => {
     if (!loading && profile?.role !== 'parent') {
-      navigate('/dashboard');
+      router.push('/dashboard');
     }
-  }, [loading, profile, navigate]);
+  }, [loading, profile, router]);
 
   if (loading) {
     return (
@@ -32,6 +35,7 @@ const ParentLayout: React.FC<ParentLayoutProps> = ({ children, breadcrumbs }) =>
 
   return (
     <div className="min-h-screen bg-gray-100 pt-0">
+      <ParentNavbar />
       {breadcrumbs && <div className="pt-6 px-4 lg:px-8"><Breadcrumbs items={breadcrumbs} /></div>}
       <main className="container mx-auto pt-2 pb-6 px-4 lg:px-8">
         <div className="bg-white rounded-lg shadow-sm p-4">

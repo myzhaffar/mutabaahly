@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Home, Users, BookMarked, UserCircle, Menu, X, LogOut } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/useAuth';
+import { Home, Users, BookMarked, UserCircle, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 interface TeacherSidebarProps {
   isMobileMenuOpen: boolean;
@@ -13,9 +14,8 @@ interface TeacherSidebarProps {
 }
 
 const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
-  const location = useLocation();
-  const pathname = location.pathname;
-  const navigate = useNavigate();
+  const pathname = usePathname();
+  const router = useRouter();
   const { profile, signOut } = useAuth();
 
   // Close mobile menu when route changes
@@ -39,7 +39,7 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIs
 
   const handleSignOut = async () => {
     await signOut();
-    navigate('/');
+    router.push('/');
   };
 
   if (profile?.role !== 'teacher') {
@@ -76,7 +76,7 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIs
       >
         <div className="sticky top-0 bg-gradient-to-r from-green-400 to-teal-500 pt-6 pb-4 px-5">
           <Link 
-            to="/dashboard" 
+            href="/dashboard" 
             className="flex items-center space-x-3"
             onClick={() => setIsMobileMenuOpen(false)}
           >
@@ -92,11 +92,11 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIs
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href || 
-              (item.href !== '/dashboard' && pathname.startsWith(item.href) && item.href !== '/');
+              (item.href !== '/dashboard' && pathname?.startsWith(item.href) && item.href !== '/');
             return (
               <Link
                 key={item.label}
-                to={item.href}
+                href={item.href}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`
                   flex items-center space-x-3 p-3 rounded-xl text-gray-200 
