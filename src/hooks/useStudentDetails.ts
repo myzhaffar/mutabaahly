@@ -29,10 +29,12 @@ export const useStudentDetails = (id: string | undefined) => {
   });
   const [hafalanEntries, setHafalanEntries] = useState<ProgressEntry[]>([]);
   const [tilawahEntries, setTilawahEntries] = useState<ProgressEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingStudent, setLoadingStudent] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState(true);
 
   const fetchStudentData = async () => {
     try {
+      setLoadingStudent(true);
       if (!id || !profile) {
         setStudent(null);
         return;
@@ -60,12 +62,13 @@ export const useStudentDetails = (id: string | undefined) => {
       console.error('Error fetching student data:', error);
       setStudent(null);
     } finally {
-      setLoading(false);
+      setLoadingStudent(false);
     }
   };
 
   const fetchProgressEntries = async () => {
     try {
+      setLoadingProgress(true);
       // Only fetch progress if student exists
       if (!student) return;
 
@@ -121,6 +124,8 @@ export const useStudentDetails = (id: string | undefined) => {
 
     } catch (error) {
       console.error('Error fetching progress entries:', error);
+    } finally {
+      setLoadingProgress(false);
     }
   };
 
@@ -146,7 +151,9 @@ export const useStudentDetails = (id: string | undefined) => {
     progressData,
     hafalanEntries,
     tilawahEntries,
-    loading,
+    loading: loadingStudent || loadingProgress,
+    loadingStudent,
+    loadingProgress,
     refetchData
   };
 };
