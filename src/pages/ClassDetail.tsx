@@ -160,7 +160,7 @@ const ClassDetail: React.FC = () => {
         <div className="border-t border-gray-100 mx-6" />
         <button
           type="button"
-          className="w-full flex items-center gap-3 px-6 py-4 border-b border-gray-100 hover:bg-gray-50 focus:outline-none"
+          className="w-full flex items-center gap-3 px-6 py-4 focus:outline-none"
           onClick={() => setTeacherFilterOpen(open => !open)}
           aria-expanded={teacherFilterOpen}
         >
