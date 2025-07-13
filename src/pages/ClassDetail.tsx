@@ -130,7 +130,7 @@ const ClassDetail: React.FC = () => {
   const MainContent = (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-2 mb-1">
+        <div className="flex items-center gap-2 mb-1 pt-2">
           <button
             type="button"
             onClick={() => router.back()}

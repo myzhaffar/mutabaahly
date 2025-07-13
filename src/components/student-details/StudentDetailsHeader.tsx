@@ -23,7 +23,7 @@ const StudentDetailsHeader: React.FC<StudentDetailsHeaderProps> = () => {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-6">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-6 pt-2">
       {/* Left Section - Back Button and Title */}
       <div className="flex flex-row items-center gap-4 w-full sm:w-auto">
         <button

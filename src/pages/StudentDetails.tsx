@@ -42,7 +42,7 @@ const StudentDetails = () => {
   }
 
   const MainContent = (
-    <div className="container mx-auto md:px-6 md:py-6">
+    <div className="container mx-auto px-0 py-0 md:px-6 md:py-6">
       {loadingStudent ? (
         <>
           {/* Skeleton for Header */}
