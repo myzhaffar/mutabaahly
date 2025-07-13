@@ -12,6 +12,7 @@ import AddStudentDialog from '@/components/AddStudentDialog';
 import BulkUploadStudentsDialog from '@/components/BulkUploadStudentsDialog';
 import ClassCard from '@/components/dashboard/ClassCard';
 import ParentLayout from '@/components/layouts/ParentLayout';
+import { useToast } from '@/hooks/use-toast';
 
 interface Student {
   id: string;
@@ -53,6 +54,7 @@ const StudentGridSkeleton = () => (
 
 const Dashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
+  const { toast } = useToast();
 
   const router = useRouter();
   const [students, setStudents] = useState<Student[]>([]);
@@ -84,6 +86,11 @@ const Dashboard = () => {
         .select('*');
 
       if (studentsError) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch students. Please try again.",
+          variant: "destructive",
+        });
         console.error('Error fetching students:', studentsError);
         return;
       }
@@ -194,6 +201,11 @@ const Dashboard = () => {
       });
 
     } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while fetching students.",
+        variant: "destructive",
+      });
       console.error('Error in fetchStudents:', error);
     } finally {
       setDataLoading(false);

@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
 import { ChevronLeft, Filter, X } from 'lucide-react';
 import { FIXED_TEACHERS } from '@/utils/rankingDataService';
+import { useToast } from '@/hooks/use-toast';
 
 interface ClassStudent {
   id: string;
@@ -41,6 +42,7 @@ const ClassDetail: React.FC = () => {
   const [search, setSearch] = useState('');
   const [selectedTeachers, setSelectedTeachers] = useState<string[]>([]);
   const [teacherFilterOpen, setTeacherFilterOpen] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -51,6 +53,11 @@ const ClassDetail: React.FC = () => {
         .eq('group_name', className);
       console.log('DEBUG: studentsData:', studentsData, 'studentsError:', studentsError); // Debug log
       if (studentsError || !studentsData) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch students for this class. Please try again.",
+          variant: "destructive",
+        });
         setStudents([]);
         setLoading(false);
         return;

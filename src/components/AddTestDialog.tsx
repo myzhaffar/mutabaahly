@@ -25,6 +25,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/contexts/useAuth';
 import { saveTest } from '@/utils/testQueries';
 import type { StudentForTest, TilawatiTest, TilawatiJilid, TestStatus } from '@/types/tilawati';
+import { useToast } from '@/hooks/use-toast';
 
 interface AddTestDialogProps {
   isOpen: boolean;
@@ -50,6 +51,7 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
   currentTest,
 }) => {
   const { profile } = useAuth();
+  const { toast } = useToast();
   const [studentId, setStudentId] = useState('');
   const [className, setClassName] = useState('');
   const [tilawatiLevel, setTilawatiLevel] = useState<TilawatiJilid | ''>('');
@@ -120,6 +122,11 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
       onClose();
     } catch (error) {
       console.error("Error saving test:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "An unexpected error occurred while saving the test.",
+        variant: "destructive",
+      });
       setError(error instanceof Error ? error.message : "An unexpected error occurred.");
     } finally {
       setIsLoading(false);

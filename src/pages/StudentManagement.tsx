@@ -47,6 +47,11 @@ const StudentManagement: React.FC = () => {
 
       if (error) {
         console.error('Error fetching students:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch students. Please try again.',
+          variant: 'destructive',
+        });
         throw error;
       }
 

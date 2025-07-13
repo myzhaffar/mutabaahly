@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import AppProviders from '@/components/AppProviders';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export const metadata: Metadata = {
   title: 'Mutabaahly',
@@ -28,9 +29,11 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AppProviders>
-          <div className="min-h-screen bg-gradient-to-br from-islamic-50 to-islamic-100">
-            {children}
-          </div>
+          <ErrorBoundary>
+            <div className="min-h-screen bg-gradient-to-br from-islamic-50 to-islamic-100">
+              {children}
+            </div>
+          </ErrorBoundary>
         </AppProviders>
       </body>
     </html>

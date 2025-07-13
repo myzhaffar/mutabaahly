@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { BookOpen, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { fetchTilawatiRankingData, StudentRankingData, RankingFilters } from '@/utils/rankingDataService';
+import { useToast } from '@/hooks/use-toast';
 
 interface Filters {
   teachers?: string[];
@@ -25,6 +26,7 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
   const [allStudents, setAllStudents] = useState<StudentRankingData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   // Fetch data when filters change
   useEffect(() => {
@@ -45,6 +47,11 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
       } catch (err) {
         console.error('Error fetching Tilawati ranking data:', err);
         setError('Failed to load ranking data');
+        toast({
+          title: "Error",
+          description: "Failed to load Tilawati ranking data. Please try again.",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
