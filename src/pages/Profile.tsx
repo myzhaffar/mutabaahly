@@ -184,7 +184,7 @@ const Profile: React.FC = () => {
     default:
       return (
         <ProfileLayout breadcrumbs={breadcrumbs}>
-          <div className="container mx-auto md:px-6 md:py-6">
+          <div className="container mx-auto px-0 py-0 md:px-6 md:py-6">
             {/* Header with Back Button and Label */}
             <div className="flex items-center gap-4 mt-2 mb-6">
               <button
