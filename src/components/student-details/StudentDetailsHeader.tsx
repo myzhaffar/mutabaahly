@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 
 interface Student {
@@ -20,11 +19,7 @@ interface StudentDetailsHeaderProps {
   profile?: { role: string };
 }
 
-const StudentDetailsHeader: React.FC<StudentDetailsHeaderProps> = ({
-  student,
-  userRole,
-  profile,
-}) => {
+const StudentDetailsHeader: React.FC<StudentDetailsHeaderProps> = () => {
   const router = useRouter();
 
   return (

@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/useAuth';
-import { useLanguage } from '@/contexts/LanguageContext';
-import SearchAndFilter from '@/components/SearchAndFilter';
+
 import StatsCards from '@/components/dashboard/StatsCards';
 import { supabase } from '@/integrations/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -11,11 +10,7 @@ import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/prog
 import TeacherLayout from '@/components/layouts/TeacherLayout';
 import AddStudentDialog from '@/components/AddStudentDialog';
 import BulkUploadStudentsDialog from '@/components/BulkUploadStudentsDialog';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import ClassCard from '@/components/dashboard/ClassCard';
-import { Checkbox } from '@/components/ui/checkbox';
 import ParentLayout from '@/components/layouts/ParentLayout';
 
 interface Student {
@@ -58,13 +53,12 @@ const StudentGridSkeleton = () => (
 
 const Dashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
-  const { t } = useLanguage();
+
   const router = useRouter();
   const [students, setStudents] = useState<Student[]>([]);
-  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState<FilterState>({
+  const [searchTerm] = useState('');
+  const [filters] = useState<FilterState>({
     classes: []
   });
   const [stats, setStats] = useState({
@@ -207,48 +201,26 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    let filtered = students;
 
-    // Apply search filter
-    if (searchTerm) {
-      filtered = filtered.filter(student =>
-        student.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Apply class filter
-    if (filters.classes.length > 0) {
-      filtered = filtered.filter(student =>
-        filters.classes.includes(student.group_name)
-      );
-    }
-
-    setFilteredStudents(filtered);
   }, [students, searchTerm, filters]);
 
-  // Get unique values for filter options
-  const getFilterOptions = () => {
-    const classes = [...new Set(students.map(s => s.group_name))].sort();
-    return { classes };
-  };
 
-  const handleSearchChange = (search: string) => {
-    setSearchTerm(search);
-  };
 
-  const handleFiltersChange = (newFilters: FilterState) => {
-    setFilters(newFilters);
-  };
+  // const handleSearchChange = (search: string) => { // This function is removed as per the edit hint
+  //   setSearchTerm(search);
+  // };
 
-  const handleViewDetails = (studentId: string) => {
-    router.push(`/student/${studentId}`);
-  };
+  // const handleFiltersChange = (newFilters: FilterState) => { // This function is removed as per the edit hint
+  //   setFilters(newFilters);
+  // };
+
+
 
   const handleStudentAdded = () => {
     fetchStudents();
   };
 
-  const { classes } = getFilterOptions();
+
 
   // Group students by class
   const classGroups = students.reduce((acc, student) => {
@@ -311,7 +283,7 @@ const Dashboard = () => {
           </div>
           <div className="mb-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">My Children's Overview</h2>
+              <h2 className="text-2xl font-bold text-gray-900">My Children&apos;s Overview</h2>
               {/* Removed filtered count for parent role */}
             </div>
             {dataLoading ? <StudentGridSkeleton /> : (

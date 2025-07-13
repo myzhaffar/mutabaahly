@@ -56,7 +56,7 @@ const TestResultsTable: React.FC<TestResultsTableProps> = ({
         month: 'short',
         year: 'numeric',
       });
-    } catch (e) {
+    } catch {
       console.warn("Invalid date string for formatting:", dateString);
       return dateString; 
     }

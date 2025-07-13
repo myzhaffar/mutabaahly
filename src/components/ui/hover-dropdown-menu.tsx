@@ -7,7 +7,7 @@ const HoverDropdownMenu = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Root> & {
     children: React.ReactNode;
   }
->(({ children, ...props }, ref) => {
+>(({ children }, ref) => {
   const [open, setOpen] = React.useState(false);
   const timeoutRef = React.useRef<NodeJS.Timeout>();
 
@@ -50,11 +50,10 @@ HoverDropdownMenu.displayName = "HoverDropdownMenu";
 const HoverDropdownMenuTrigger = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
+>(({ className, children }, ref) => (
   <DropdownMenuPrimitive.Trigger
     ref={ref}
     className={cn("outline-none data-[state=open]:bg-accent", className)}
-    {...props}
   >
     {children}
   </DropdownMenuPrimitive.Trigger>

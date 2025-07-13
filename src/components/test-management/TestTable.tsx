@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Edit, Trash2 } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import type { TilawatiTest, TestStatus } from '@/types/tilawati';
 import EditTestDialog from '@/components/EditTestDialog';
 import DeleteTestDialog from '@/components/DeleteTestDialog';

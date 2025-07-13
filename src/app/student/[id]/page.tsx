@@ -3,7 +3,7 @@
 import StudentDetails from '@/pages/StudentDetails';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
-export default function StudentDetailsPage({ params: { id } }: { params: { id: string } }) {
+export default function StudentDetailsPage() {
   return (
     <ProtectedRoute>
       <StudentDetails />

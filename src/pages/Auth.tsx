@@ -4,10 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/useAuth';
 import { useRouter } from 'next/navigation';
-import { useLanguage } from '@/contexts/LanguageContext';
+
 import { useToast } from '@/hooks/use-toast';
 import { Home, Mail, Lock, Eye, User } from 'lucide-react';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
@@ -23,7 +23,7 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   
   const { signIn, signUp, user } = useAuth();
-  const { t } = useLanguage();
+
   const { toast } = useToast();
   const router = useRouter();
 
@@ -94,7 +94,7 @@ const Auth = () => {
           });
         }
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "An unexpected error occurred",

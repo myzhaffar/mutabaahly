@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Trophy, Award, BookOpen, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { Award, BookOpen, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { fetchHafalanRankingData, StudentRankingData, RankingFilters } from '@/utils/rankingDataService';
 
 interface Filters {

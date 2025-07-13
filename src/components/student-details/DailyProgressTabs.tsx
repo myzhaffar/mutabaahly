@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProgressEntriesTable from './ProgressEntriesTable';
 import { Button } from '@/components/ui/button';
 import ExportProgressDialog from './ExportProgressDialog';
-import { v4 as uuidv4 } from 'uuid';
+
 import { supabase } from '@/integrations/supabase/client';
 
 interface ProgressEntry {

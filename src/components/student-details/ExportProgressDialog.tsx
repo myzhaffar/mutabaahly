@@ -4,9 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
-import { Loader2, Pencil, Trash2, Copy } from 'lucide-react';
+
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog';
-import { v4 as uuidv4 } from 'uuid';
 
 interface ProgressEntry {
   id: string;
@@ -57,7 +56,7 @@ const ExportProgressDialog: React.FC<ExportProgressDialogProps> = ({
   tilawahEntries,
 }) => {
   // Use local state for entries to allow duplication
-  const [localEntries, setLocalEntries] = useState([...hafalanEntries, ...tilawahEntries]);
+  const [localEntries] = useState([...hafalanEntries, ...tilawahEntries]);
   const parsedEntries = localEntries.map(entry => ({
     ...entry,
     parsedDate: parseDate(entry.date)
@@ -93,16 +92,7 @@ const ExportProgressDialog: React.FC<ExportProgressDialogProps> = ({
     rangeLabel = `This Month (${monthStart.toLocaleDateString()} - ${monthEnd.toLocaleDateString()})`;
   }
 
-  // Duplicate entry handler
-  const handleDuplicateEntry = (entry) => {
-    const newEntry = {
-      ...entry,
-      id: uuidv4(),
-      date: new Date().toISOString().split('T')[0],
-      parsedDate: new Date(),
-    };
-    setLocalEntries([newEntry, ...localEntries]);
-  };
+
 
   const handleExportExcel = () => {
     if (filteredEntries.length === 0) return;
@@ -161,7 +151,7 @@ const ExportProgressDialog: React.FC<ExportProgressDialogProps> = ({
       doc.text('Notes', 150, y);
       doc.line(20, y + 2, 190, y + 2);
       y += 8;
-      filteredEntries.forEach((entry, idx) => {
+      filteredEntries.forEach((entry) => {
         if (y > 280) {
           doc.addPage();
           y = 20;
@@ -200,8 +190,7 @@ const ExportProgressDialog: React.FC<ExportProgressDialogProps> = ({
     setPendingExport(null);
   };
 
-  const previewEntries = filteredEntries.slice(0, 3);
-  const moreCount = filteredEntries.length - previewEntries.length;
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -224,7 +213,7 @@ const ExportProgressDialog: React.FC<ExportProgressDialogProps> = ({
               <SelectItem value="month">This Month</SelectItem>
             </SelectContent>
           </Select>
-          <div className="text-xs text-gray-600 mt-2 mb-1">{rangeLabel}</div>
+          <p className="text-xs text-gray-600 mt-2 mb-1">{rangeLabel.replace(/'/g, "&apos;")}</p>
           <div className="text-xs text-gray-600">{filteredEntries.length} entries will be exported.</div>
 
           {/* Progress Entries Table without Pagination or Actions */}

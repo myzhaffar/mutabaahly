@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
-import { Search, ChevronDown, X, Filter } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { TilawatiJilid, TestStatus } from '@/types/tilawati';
-import { cn } from '@/lib/utils';
 
 export type StatusOption = TestStatus | 'scheduled' | 'passed' | 'failed';
 export type JilidOption = TilawatiJilid | 'Level 1' | 'Level 2' | 'Level 3' | 'Level 4' | 'Level 5' | 'Level 6';
@@ -53,7 +50,6 @@ const TestFilters: React.FC<TestFiltersProps> = ({
   };
 
   const hasActiveFilters = (status && status.length > 0) || (jilidLevel && jilidLevel.length > 0) || date;
-  const activeFiltersCount = [status?.length, jilidLevel?.length, date ? 1 : 0].filter(Boolean).reduce((a, b) => a + (b as number), 0);
 
   return (
     <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-200 mb-6 px-0 sm:px-0">

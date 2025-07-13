@@ -103,19 +103,17 @@ export const calculateTilawahProgress = (entries: ProgressEntry[]) => {
       const pageRange = latestEntry.ayat_or_page;
       console.log('Processing page range:', pageRange);
 
-      if (pageRange.includes('-')) {
+      if (pageRange && pageRange.includes('-')) {
         // If it's a range, take the higher number
-        const [_, end] = pageRange.split('-').map(num => parseInt(num.trim()));
+        const [, end] = pageRange.split('-').map(num => parseInt(num.trim()));
         if (!isNaN(end)) {
           currentPage = end;
-          console.log('Found page range, using end page:', end);
         }
-      } else {
-        // If it's a single page
-        const page = parseInt(pageRange);
-        if (!isNaN(page)) {
-          currentPage = page;
-          console.log('Found single page:', page);
+      } else if (pageRange) {
+        // If it's a single number
+        const pageNum = parseInt(pageRange.trim());
+        if (!isNaN(pageNum)) {
+          currentPage = pageNum;
         }
       }
     }

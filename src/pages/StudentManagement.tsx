@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -55,14 +54,6 @@ const StudentManagement: React.FC = () => {
     },
     enabled: !!profile?.id,
   });
-
-  const handleAddStudent = async () => {
-    // TODO: Implement add student dialog
-    toast({
-      title: "Coming Soon",
-      description: "Add student functionality will be implemented soon.",
-    });
-  };
 
   const handleStudentAdded = () => {
     refetch();

@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import EditProgressDialog from '@/components/EditProgressDialog';
 import DeleteProgressDialog from '@/components/DeleteProgressDialog';
 import { useAuth } from '@/contexts/useAuth';
-import { Copy, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Copy, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 

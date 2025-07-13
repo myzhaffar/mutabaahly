@@ -2,9 +2,9 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useLanguage } from '@/contexts/LanguageContext';
+
 import { BookOpen, Award, User } from 'lucide-react';
 
 interface StudentCardProps {
@@ -29,7 +29,6 @@ interface StudentCardProps {
 }
 
 const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => {
-  const { t } = useLanguage();
 
   const getStatusVariant = (status: string) => {
     switch (status) {

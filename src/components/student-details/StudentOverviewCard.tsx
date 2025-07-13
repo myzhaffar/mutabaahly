@@ -16,11 +16,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  HoverDropdownMenu,
-  HoverDropdownMenuTrigger,
-  HoverDropdownMenuContent,
-} from "@/components/ui/hover-dropdown-menu";
 
 interface Student {
   id: string;

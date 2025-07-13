@@ -3,14 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/useAuth';
-import { useLanguage } from '@/contexts/LanguageContext';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
   BookOpen, 
   Users, 
   Award, 
-  TrendingUp, 
   ArrowRight, 
   Star, 
   BarChart3,
@@ -21,7 +20,7 @@ import PublicHeader from '@/components/layouts/PublicHeader';
 
 const Index = () => {
   const { user, loading } = useAuth();
-  const { t } = useLanguage();
+
   const router = useRouter();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +36,7 @@ const Index = () => {
     {
       name: "Ustadz Ahmad Rahman",
       role: "Al-Quran Teacher at SDIT Al-Hikmah",
-      text: "This platform really helps us monitor students' memorization progress in real-time. Parents can also see their children's development.",
+      text: "This platform really helps us monitor students&apos; memorization progress in real-time. Parents can also see their children&apos;s development.",
       rating: 5
     },
     {
@@ -281,7 +280,7 @@ const Index = () => {
                       ))}
                     </div>
                     <blockquote className="text-xl text-gray-700 mb-8 leading-relaxed italic">
-                      "{testimonials[currentTestimonial].text}"
+                      {testimonials[currentTestimonial].text.replace(/"/g, '&quot;')}
                     </blockquote>
                     <div className="border-t pt-6">
                       <p className="font-bold text-gray-900 text-lg">

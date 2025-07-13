@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { X } from 'lucide-react';
+
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -18,13 +18,7 @@ const sections = [
   { id: 'cta', label: 'Contact' },
 ];
 
-const scrollToSection = (id: string, closeNav: () => void) => {
-  const el = document.getElementById(id);
-  if (el) {
-    el.scrollIntoView({ behavior: 'smooth' });
-    closeNav();
-  }
-};
+
 
 const MobileNav: React.FC<MobileNavProps> = ({ isOpen, setIsOpen }) => {
   const closeNav = () => setIsOpen(false);

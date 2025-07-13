@@ -1,10 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Card, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import { ArrowRight } from 'lucide-react';
 
 interface Student {
   id: string;

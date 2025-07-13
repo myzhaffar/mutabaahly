@@ -2,23 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/useAuth';
+
 import ParentLayout from '@/components/layouts/ParentLayout';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, BookOpen, Award, Search, Filter, ChevronLeft, ChevronRight, Loader2, X } from 'lucide-react';
 import TilawatiTable from '@/components/TilawatiTable';
 import HafalanTable from '@/components/HafalanTable';
-import { fetchGrades, FIXED_TEACHERS } from '@/utils/rankingDataService';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuCheckboxItem,
-} from '@/components/ui/dropdown-menu';
+import { fetchGrades } from '@/utils/rankingDataService';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useRouter } from 'next/navigation';
+import { BookOpen, Award, ChevronLeft, Filter, Loader2 } from 'lucide-react';
 
 const Students = () => {
   const { profile } = useAuth();
@@ -91,8 +83,6 @@ const Students = () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
-
-  const hasActiveFilters = selectedGrades.length > 0 && !selectedGrades.includes('all');
 
   const breadcrumbs = [
     { label: 'Dashboard', href: '/dashboard' },
