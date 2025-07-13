@@ -34,8 +34,8 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
       
       try {
         const rankingFilters: RankingFilters = {
-          teacher: filters.teachers?.length === 0 ? '' : filters.teachers?.join(','),
-          grade: filters.grades.length === 0 ? '' : filters.grades.join(',')
+          teacher: filters.teachers?.[0] || '',
+          grade: filters.grades[0] || ''
         };
         
         const data = await fetchTilawatiRankingData(rankingFilters);

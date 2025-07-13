@@ -74,7 +74,7 @@ const StudentManagement: React.FC = () => {
 
   return (
     <TeacherLayout>
-      <div className="container mx-auto py-6 space-y-6">
+      <div className="container mx-auto px-0 py-0 md:px-6 md:py-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">Student List</h1>
           <div className="flex items-center gap-2">

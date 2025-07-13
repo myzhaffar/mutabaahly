@@ -149,9 +149,9 @@ const TeacherTestManagement: React.FC = () => {
 
   return (
     <TeacherLayout breadcrumbs={breadcrumbs}>
-      <div className="container mx-auto px-0 sm:px-4 py-4 space-y-6">
+      <div className="container mx-auto px-0 md:px-6 md:py-6">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-4 w-full mb-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 w-full mb-6">
           <div className="flex flex-row items-center gap-3 sm:gap-4 mt-2">
             <button
               type="button"

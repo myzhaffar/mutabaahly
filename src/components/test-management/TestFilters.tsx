@@ -57,7 +57,7 @@ const TestFilters: React.FC<TestFiltersProps> = ({
 
   return (
     <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-200 mb-6 px-0 sm:px-0">
-      <div className="px-6 pt-6 pb-2">
+      <div className="p-4">
         {/* Search Bar at the top of the card */}
         <div className="relative w-full mb-4">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-blue-400" />
@@ -107,7 +107,7 @@ const TestFilters: React.FC<TestFiltersProps> = ({
         </button>
       </div>
       {filtersOpen && (
-        <div className="px-6 pb-6 pt-2">
+        <div className="p-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
             {/* Status Multi-Select */}
             <div className="space-y-2 sm:space-y-3">

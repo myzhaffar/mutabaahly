@@ -56,7 +56,7 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children, breadcrumbs }) 
         <TeacherSidebar isMobileMenuOpen={sidebarOpen} setIsMobileMenuOpen={setSidebarOpen} />
         <main className="lg:pl-64 min-h-screen">
           {breadcrumbs && <div className="pt-6 px-4 lg:px-8"><Breadcrumbs items={breadcrumbs} /></div>}
-          <div className="container mx-auto pt-2 pb-6 px-2 sm:pt-6 sm:px-4">
+          <div className="container mx-auto pt-2 pb-6 px-4 lg:px-8">
             <div className="bg-white rounded-lg shadow-sm p-4">
               {children}
             </div>

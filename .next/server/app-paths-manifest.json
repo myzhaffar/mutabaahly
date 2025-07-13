@@ -1,7 +1,4 @@
 {
-  "/profile/page": "app/profile/page.js",
-  "/tests/view/page": "app/tests/view/page.js",
-  "/class/[className]/page": "app/class/[className]/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/students/page": "app/students/page.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/page": "app/page.js"
 }

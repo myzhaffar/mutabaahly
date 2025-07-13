@@ -242,7 +242,11 @@ const ClassDetail: React.FC = () => {
   if (profile?.role === 'parent') {
     return <ParentLayout breadcrumbs={breadcrumbs}>{MainContent}</ParentLayout>;
   }
-  return <TeacherLayout breadcrumbs={breadcrumbs}>{MainContent}</TeacherLayout>;
+  return <TeacherLayout breadcrumbs={breadcrumbs}>
+    <div className="container mx-auto px-0 py-0 md:px-6 md:py-6">
+      {MainContent}
+    </div>
+  </TeacherLayout>;
 };
 
 export default ClassDetail; 

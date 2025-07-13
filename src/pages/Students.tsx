@@ -100,7 +100,7 @@ const Students = () => {
   ];
 
   const MainContent = (
-    <div className="w-full max-w-6xl mx-auto px-0 py-0 md:px-6 md:py-6">
+    <div className="container mx-auto px-0 py-0 md:px-6 md:py-6">
       <div className="w-full flex flex-col gap-6">
         {/* Header, left-aligned */}
         <div className="flex items-center gap-3 sm:gap-4 mt-2 w-full">
@@ -116,7 +116,7 @@ const Students = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden p-6 w-full">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden p-4 w-full">
           <button
             className="w-full flex items-center gap-3 px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100 hover:bg-gray-50 focus:outline-none"
             onClick={() => setFiltersOpen((open) => !open)}
@@ -190,7 +190,7 @@ const Students = () => {
         </div>
 
         {/* Table Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 w-full">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full">
           <div className="flex flex-col xs:flex-row border-b border-gray-200 overflow-x-auto min-w-0 w-full">
             <button
               onClick={() => setActiveTab('tilawati')}
@@ -220,7 +220,7 @@ const Students = () => {
             </button>
           </div>
           {/* Tab Content */}
-          <div className="p-6 min-w-0 w-full">
+          <div className="p-0 min-w-0 w-full">
             {activeTab === 'tilawati' ? (
               <TilawatiTable
                 filters={{

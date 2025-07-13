@@ -262,8 +262,8 @@ const Dashboard = () => {
     return (
       <TeacherLayout breadcrumbs={breadcrumbs}>
         <div className="container mx-auto px-0 py-0 md:px-6 md:py-6">
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+          <div className="bg-white rounded-lg shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4 pt-2">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
                   Welcome back, {profile?.full_name}
@@ -297,8 +297,8 @@ const Dashboard = () => {
   return (
     <ParentLayout breadcrumbs={breadcrumbs}>
       <div className="container mx-auto px-0 py-0 md:px-6 md:py-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="mb-8">
+        <div className="bg-white rounded-lg shadow-sm">
+          <div className="mb-8 pt-2">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">

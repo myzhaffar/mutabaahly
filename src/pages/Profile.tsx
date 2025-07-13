@@ -72,7 +72,7 @@ const Profile: React.FC = () => {
         <ParentLayout breadcrumbs={breadcrumbs}>
           <div className="container mx-auto px-0 py-0 md:px-6 md:py-6 flex flex-col gap-6">
             {/* Header with Back Button and Label */}
-            <div className="flex items-center gap-4 mt-2 px-0 md:px-6">
+            <div className="flex items-center gap-4 mt-2">
               <button
                 type="button"
                 onClick={() => router.back()}
@@ -184,9 +184,9 @@ const Profile: React.FC = () => {
     default:
       return (
         <ProfileLayout breadcrumbs={breadcrumbs}>
-          <div className="container mx-auto px-0 py-0 md:px-6 md:py-6">
+          <div className="container mx-auto px-0 lg:px-8">
             {/* Header with Back Button and Label */}
-            <div className="flex items-center gap-4 mt-2 mb-6 px-0 md:px-6">
+            <div className="flex items-center gap-4 mt-2 mb-6">
               <button
                 type="button"
                 onClick={() => router.back()}

@@ -92,7 +92,7 @@ Notes: ${test.notes || 'No notes available'}`;
 
   return (
     <ParentLayout breadcrumbs={breadcrumbs}>
-      <div className="w-full max-w-6xl mx-auto px-0 py-0 md:px-6 md:py-6 flex flex-col gap-6">
+      <div className="container mx-auto px-0 py-0 md:px-6 md:py-6 flex flex-col gap-6">
         {/* Header Section */}
         <div className="flex items-center gap-4 mt-2 w-full">
           <button
@@ -144,7 +144,7 @@ Notes: ${test.notes || 'No notes available'}`;
         </div>
 
         {/* Table Section */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden p-6 w-full">
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden w-full">
           <ParentTestTable
             tests={tests || []}
             isLoading={isLoading}
