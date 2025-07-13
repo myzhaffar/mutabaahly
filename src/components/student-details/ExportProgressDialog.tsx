@@ -198,7 +198,7 @@ const ExportProgressDialog: React.FC<ExportProgressDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Export Progress Entries</DialogTitle>
           <DialogDescription>
-            Choose a range and export the student's progress as Excel or PDF.
+            Choose a range and export the student&apos;s progress as Excel or PDF.
           </DialogDescription>
         </DialogHeader>
         <div className="mb-4 bg-gray-50 rounded p-3">
@@ -260,7 +260,9 @@ const ExportProgressDialog: React.FC<ExportProgressDialogProps> = ({
               <AlertDialogHeader>
                 <AlertDialogTitle>Confirm Export</AlertDialogTitle>
                 <AlertDialogDescription>
-                  {`Are you sure you want to export progress for ${rangeLabel}?`}
+                  {"Are you sure you want to export progress for "}
+                  {rangeLabel.replace(/'/g, "&apos;")}
+                  {"?"}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -284,7 +286,9 @@ const ExportProgressDialog: React.FC<ExportProgressDialogProps> = ({
               <AlertDialogHeader>
                 <AlertDialogTitle>Confirm Export</AlertDialogTitle>
                 <AlertDialogDescription>
-                  {`Are you sure you want to export progress for ${rangeLabel}?`}
+                  {"Are you sure you want to export progress for "}
+                  {rangeLabel.replace(/'/g, "&apos;")}
+                  {"?"}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
