@@ -110,7 +110,7 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
             progress: tilawahProgress.percentage || calculatedProgress.percentage,
             juz: null,
             surah: null,
-            verse: 0
+            verse: 0,
           };
         } catch (error) {
           console.error(`Error processing student ${student.id}:`, error);
@@ -126,7 +126,7 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
             progress: 0,
             juz: null,
             surah: null,
-            verse: 0
+            verse: 0,
           };
         }
       })
