@@ -156,7 +156,7 @@ const Profile: React.FC = () => {
               </CardContent>
             </Card>
             {/* Mobile-only Sign Out button for parent role, under Account Information card */}
-            <div className="md:hidden mt-6">
+            <div className="md:hidden">
               <Button
                 onClick={handleSignOut}
                 variant="outline"
