@@ -152,6 +152,43 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
         throw new Error('Unsupported file format. Please upload a CSV or Excel file.');
       }
 
+      // Mitigation: Strictly validate headers
+      const allowedHeaders = ['name', 'group_name', 'teacher', 'grade'];
+      const headers = Object.keys(data[0] || {});
+      const hasAllHeaders = ['name', 'group_name', 'teacher'].every(h => headers.includes(h));
+      if (!hasAllHeaders) {
+        toast({
+          title: "Error",
+          description: "File is missing required columns (name, group_name, teacher).",
+          variant: "destructive",
+        });
+        return;
+      }
+      if (headers.some(h => !allowedHeaders.includes(h))) {
+        toast({
+          title: "Error",
+          description: "File contains unexpected columns.",
+          variant: "destructive",
+        });
+        return;
+      }
+      // Mitigation: Limit max rows
+      if (data.length > 1000) {
+        toast({
+          title: "Error",
+          description: "File too large. Max 1000 rows allowed.",
+          variant: "destructive",
+        });
+        return;
+      }
+      // Mitigation: Sanitize all string fields
+      data = data.map(row => ({
+        name: (row.name || '').toString().trim(),
+        group_name: (row.group_name || '').toString().trim(),
+        teacher: (row.teacher || '').toString().trim(),
+        grade: row.grade ? row.grade.toString().trim() : undefined,
+      }));
+
       // Validate the data
       const errors = validateStudentData(data, 2); // Start from row 2 (after header)
       setValidationErrors(errors);
@@ -182,6 +219,26 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      // Mitigation: Limit file size to 5MB
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Error",
+          description: "File size must be less than 5MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+      // Mitigation: Only allow .csv, .xlsx, .xls
+      const allowedTypes = ['csv', 'xlsx', 'xls'];
+      const ext = file.name.split('.').pop()?.toLowerCase();
+      if (!ext || !allowedTypes.includes(ext)) {
+        toast({
+          title: "Error",
+          description: "Only CSV or Excel files are allowed.",
+          variant: "destructive",
+        });
+        return;
+      }
       setSelectedFile(file);
       setPreviewData([]);
       setValidationErrors([]);
