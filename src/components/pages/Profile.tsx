@@ -131,7 +131,7 @@ const Profile: React.FC = () => {
                   Account Information
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6 p-6 pt-0">
+              <CardContent className="space-y-6 p-6">
                 <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
                   <User className="h-5 w-5 text-teal-500" />
                   <div>
@@ -245,7 +245,7 @@ const Profile: React.FC = () => {
                   Account Information
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6 p-6 pt-0">
+              <CardContent className="space-y-6 p-6">
                 <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
                   <User className="h-5 w-5 text-teal-500" />
                   <div>

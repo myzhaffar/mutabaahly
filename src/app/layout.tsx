@@ -6,17 +6,10 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 export const metadata: Metadata = {
   title: 'Mutabaahly',
   description: 'Monitoring student progress in Al-Quran memorizing and Tilawati reciting',
-  authors: [{ name: 'Lovable' }],
   openGraph: {
     title: 'Mutabaahly',
     description: 'Monitoring student progress in Al-Quran memorizing and Tilawati reciting',
     type: 'website',
-    images: ['https://lovable.dev/opengraph-image-p98pqg.png'],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    site: '@lovable_dev',
-    images: ['https://lovable.dev/opengraph-image-p98pqg.png'],
   },
 };
 
