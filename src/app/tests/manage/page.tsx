@@ -1,6 +1,6 @@
 'use client';
 
-import TeacherTestManagement from '@/pages/TeacherTestManagement';
+import TeacherTestManagement from '@/components/pages/TeacherTestManagement';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 export default function TeacherTestManagementPage() {

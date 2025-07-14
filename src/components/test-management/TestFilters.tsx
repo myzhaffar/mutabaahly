@@ -54,50 +54,50 @@ const TestFilters: React.FC<TestFiltersProps> = ({
   return (
     <div className="sticky top-14 z-20 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-200 mb-6 px-0 sm:px-0">
       <div className="px-6 pt-6 pb-2">
-        <Input
-          placeholder="Search students by name..."
-          value={searchTerm}
-          onChange={(e) => onFilterChange('searchTerm', e.target.value)}
+          <Input
+            placeholder="Search students by name..."
+            value={searchTerm}
+            onChange={(e) => onFilterChange('searchTerm', e.target.value)}
           className="w-full bg-gray-50 border border-gray-200 rounded-lg focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-base py-2 px-4 shadow-sm"
-        />
-      </div>
+          />
+        </div>
       <div className="border-t border-gray-100 mx-6" />
-      <button
+        <button
         className="w-full flex items-center gap-3 px-6 py-4 focus:outline-none"
-        onClick={() => setFiltersOpen((open) => !open)}
-        aria-expanded={filtersOpen}
-      >
+          onClick={() => setFiltersOpen((open) => !open)}
+          aria-expanded={filtersOpen}
+        >
         <div className="p-2 bg-blue-50 rounded-lg">
           <Filter className="h-4 w-4 text-blue-600" />
-        </div>
-        <div className="flex-1 text-left">
-          <h3 className="font-semibold text-gray-900 text-base sm:text-lg">Filters</h3>
-          <p className="text-xs sm:text-sm text-gray-500">Refine your search results</p>
-          {/* Show selected filter badges under description, even when collapsed */}
-          {hasActiveFilters && (
-            <div className="flex items-center gap-2 flex-wrap mt-2">
-              {status.length > 0 && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-50 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
-                  Status: {status.map(s => STATUS_OPTIONS.find(opt => opt.value === s)?.label || s).join(', ')}
-                </span>
-              )}
-              {jilidLevel.length > 0 && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-50 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
-                  Level: {jilidLevel.map(j => JILID_OPTIONS.find(opt => opt.value === j)?.label || j).join(', ')}
-                </span>
-              )}
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="ml-2 text-xs text-gray-500 hover:text-red-600 underline"
-              >
-                Clear Filters
-              </button>
-            </div>
-          )}
-        </div>
-        <span className="ml-auto text-xs text-gray-500">{filtersOpen ? 'Hide' : 'Show'}</span>
-      </button>
+          </div>
+          <div className="flex-1 text-left">
+            <h3 className="font-semibold text-gray-900 text-base sm:text-lg">Filters</h3>
+            <p className="text-xs sm:text-sm text-gray-500">Refine your search results</p>
+            {/* Show selected filter badges under description, even when collapsed */}
+            {hasActiveFilters && (
+              <div className="flex items-center gap-2 flex-wrap mt-2">
+                {status.length > 0 && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-50 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
+                    Status: {status.map(s => STATUS_OPTIONS.find(opt => opt.value === s)?.label || s).join(', ')}
+                  </span>
+                )}
+                {jilidLevel.length > 0 && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-50 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
+                    Level: {jilidLevel.map(j => JILID_OPTIONS.find(opt => opt.value === j)?.label || j).join(', ')}
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="ml-2 text-xs text-gray-500 hover:text-red-600 underline"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            )}
+          </div>
+          <span className="ml-auto text-xs text-gray-500">{filtersOpen ? 'Hide' : 'Show'}</span>
+        </button>
       {filtersOpen && (
         <div className="p-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">

@@ -1,4 +1,4 @@
-import Profile from '@/pages/Profile';
+import Profile from '@/components/pages/Profile';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 export const metadata = {

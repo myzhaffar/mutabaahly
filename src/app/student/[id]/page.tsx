@@ -1,4 +1,4 @@
-import StudentDetails from '@/pages/StudentDetails';
+import StudentDetails from '@/components/pages/StudentDetails';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 export const metadata = {

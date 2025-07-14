@@ -1,6 +1,6 @@
 'use client';
 
-import ParentTestView from '@/pages/ParentTestView';
+import ParentTestView from '@/components/pages/ParentTestView';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 export default function ParentTestViewPage() {

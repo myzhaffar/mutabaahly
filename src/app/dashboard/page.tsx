@@ -1,4 +1,4 @@
-import Dashboard from '@/pages/Dashboard';
+import Dashboard from '@/components/pages/Dashboard';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 export const metadata = {

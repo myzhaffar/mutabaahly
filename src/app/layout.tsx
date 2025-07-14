@@ -30,9 +30,9 @@ export default function RootLayout({
       <body>
         <AppProviders>
           <ErrorBoundary>
-            <div className="min-h-screen bg-gradient-to-br from-islamic-50 to-islamic-100">
-              {children}
-            </div>
+          <div className="min-h-screen bg-gradient-to-br from-islamic-50 to-islamic-100">
+            {children}
+          </div>
           </ErrorBoundary>
         </AppProviders>
       </body>
