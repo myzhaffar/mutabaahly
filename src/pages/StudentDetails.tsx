@@ -22,7 +22,6 @@ const StudentDetails = () => {
     progressData,
     hafalanEntries,
     tilawahEntries,
-    loading,
     loadingStudent,
     loadingProgress,
     refetchData

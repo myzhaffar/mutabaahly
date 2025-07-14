@@ -127,6 +127,7 @@ const Auth = () => {
               className="w-full flex items-center justify-center gap-2 border border-gray-200 rounded-lg py-3 font-medium text-gray-700 hover:bg-gray-50 transition mb-6"
               onClick={handleGoogleLogin}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="h-5 w-5" />
               Continue with Google
             </button>

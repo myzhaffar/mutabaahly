@@ -212,6 +212,7 @@ const Dashboard = () => {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
 
   }, [students, searchTerm, filters]);

@@ -140,6 +140,7 @@ export const useStudentDetails = (id: string | undefined) => {
     }
   }, [id, profile]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (student) {
       fetchProgressEntries();

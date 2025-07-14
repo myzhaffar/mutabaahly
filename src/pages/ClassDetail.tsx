@@ -44,6 +44,7 @@ const ClassDetail: React.FC = () => {
   const [teacherFilterOpen, setTeacherFilterOpen] = useState(false);
   const { toast } = useToast();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const fetchStudents = async () => {
       setLoading(true);

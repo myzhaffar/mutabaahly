@@ -29,6 +29,7 @@ const HafalanTable: React.FC<HafalanTableProps> = ({ filters, pagination }) => {
   const { toast } = useToast();
 
   // Fetch data when filters change
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
