@@ -59,7 +59,7 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
     };
 
     fetchData();
-  }, [filters.teachers, filters.grades]);
+  }, [filters, toast]);
 
   // Apply filters
   const filteredStudents = allStudents.filter(student => {

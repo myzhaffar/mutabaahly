@@ -1,8 +1,12 @@
 {
-  "/profile/page": "app/profile/page.js",
+  "/auth/page": "app/auth/page.js",
+  "/page": "app/page.js",
   "/tests/manage/page": "app/tests/manage/page.js",
-  "/students/page": "app/students/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/tests/view/page": "app/tests/view/page.js",
+  "/student/[id]/page": "app/student/[id]/page.js",
   "/class/[className]/page": "app/class/[className]/page.js",
-  "/student/[id]/page": "app/student/[id]/page.js"
+  "/profile/page": "app/profile/page.js",
+  "/students/page": "app/students/page.js",
+  "/dashboard/page": "app/dashboard/page.js"
 }

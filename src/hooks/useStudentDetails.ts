@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
 import { useAuth } from '@/contexts/useAuth';
@@ -32,7 +32,7 @@ export const useStudentDetails = (id: string | undefined) => {
   const [loadingStudent, setLoadingStudent] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(true);
 
-  const fetchStudentData = async () => {
+  const fetchStudentData = useCallback(async () => {
     try {
       setLoadingStudent(true);
       if (!id || !profile) {
@@ -64,9 +64,9 @@ export const useStudentDetails = (id: string | undefined) => {
     } finally {
       setLoadingStudent(false);
     }
-  };
+  }, [id, profile]);
 
-  const fetchProgressEntries = async () => {
+  const fetchProgressEntries = useCallback(async () => {
     try {
       setLoadingProgress(true);
       // Only fetch progress if student exists
@@ -127,7 +127,7 @@ export const useStudentDetails = (id: string | undefined) => {
     } finally {
       setLoadingProgress(false);
     }
-  };
+  }, [student, id, profile]);
 
   const refetchData = () => {
     fetchStudentData();
@@ -138,14 +138,14 @@ export const useStudentDetails = (id: string | undefined) => {
     if (id) {
       fetchStudentData();
     }
-  }, [id, profile]);
+  }, [id, profile, fetchStudentData]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (student) {
       fetchProgressEntries();
     }
-  }, [student]);
+  }, [student, fetchProgressEntries]);
 
   return {
     student,

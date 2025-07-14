@@ -57,7 +57,7 @@ const HafalanTable: React.FC<HafalanTableProps> = ({ filters, pagination }) => {
     };
 
     fetchData();
-  }, [filters.teachers, filters.grades]);
+  }, [filters.teachers, filters.grades, toast]);
 
   // Apply filters
   const filteredStudents = allStudents.filter(student => {
