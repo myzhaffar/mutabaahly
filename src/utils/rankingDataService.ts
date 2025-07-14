@@ -13,9 +13,9 @@ export interface StudentRankingData {
   level?: number;
   page?: number;
   // Hafalan specific
-  juz?: number;
-  surah?: string;
-  verse?: number;
+  juz: number | null;
+  surah: string | null;
+  verse: number;
   // Common
   progress: number;
 }
@@ -107,7 +107,10 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
             grade: student.group_name || 'Unknown',
             level: levelNumber,
             page: currentPage,
-            progress: tilawahProgress.percentage || calculatedProgress.percentage
+            progress: tilawahProgress.percentage || calculatedProgress.percentage,
+            juz: null,
+            surah: null,
+            verse: 0
           };
         } catch (error) {
           console.error(`Error processing student ${student.id}:`, error);
@@ -120,7 +123,10 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
             grade: student.group_name || 'Unknown',
             level: 1,
             page: 0,
-            progress: 0
+            progress: 0,
+            juz: null,
+            surah: null,
+            verse: 0
           };
         }
       })
@@ -234,12 +240,13 @@ export const fetchHafalanRankingData = async (filters: RankingFilters): Promise<
     );
 
     // Filter out null values and sort by custom ranking logic
-    const validStudents = studentsWithProgress.filter(student => 
-      student !== null && typeof student.verse === 'number' && student.verse > 0
-    );
-    
-    // Sort by custom Hafalan ranking logic
-    const sortedStudents = validStudents.sort((a, b) => {
+    const sortedStudents = studentsWithProgress
+      .filter((student): student is StudentRankingData =>
+        student !== null &&
+        typeof student.verse === 'number' &&
+        student.verse > 0
+      )
+      .sort((a, b) => {
       // If both students are in Juz 30, rank by Surah (An-Naba highest to An-Nas lowest)
       if (a.juz === 30 && b.juz === 30) {
         const surahRankA = getJuz30SurahRank(a.surah);
