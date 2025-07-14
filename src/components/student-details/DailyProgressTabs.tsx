@@ -31,7 +31,7 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
 }) => {
   const [exportOpen, setExportOpen] = React.useState(false);
 
-  const handleDuplicate = async (type: 'hafalan' | 'tilawah', entry: ProgressEntry) => {
+  const handleDuplicate = async (entry: ProgressEntry) => {
     if (!studentId) return;
     const newEntry = {
       student_id: studentId,
@@ -81,7 +81,7 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
               entries={hafalanEntries}
               type="hafalan"
               onProgressUpdated={onProgressUpdated}
-              onDuplicateEntry={entry => handleDuplicate('hafalan', entry)}
+              onDuplicateEntry={entry => handleDuplicate(entry)}
             />
           </TabsContent>
           
@@ -90,7 +90,7 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
               entries={tilawahEntries}
               type="tilawah"
               onProgressUpdated={onProgressUpdated}
-              onDuplicateEntry={entry => handleDuplicate('tilawah', entry)}
+              onDuplicateEntry={entry => handleDuplicate(entry)}
             />
           </TabsContent>
         </Tabs>
