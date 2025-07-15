@@ -181,36 +181,46 @@ const Students = () => {
 
         {/* Table Section */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full">
-          <div className="flex flex-col xs:flex-row border-b border-gray-200 overflow-x-auto min-w-0 w-full">
-            <button
-              onClick={() => setActiveTab('tilawati')}
-              className={`flex-1 px-2 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-medium transition-colors ${
-                activeTab === 'tilawati'
-                  ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              <div className="flex items-center justify-center gap-1 sm:gap-2">
-                <BookOpen className="h-4 w-4" />
-                Tilawati Standing
-              </div>
-            </button>
-            <button
-              onClick={() => setActiveTab('hafalan')}
-              className={`flex-1 px-2 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-medium transition-colors ${
-                activeTab === 'hafalan'
-                  ? 'text-green-600 border-b-2 border-green-600 bg-green-50'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              <div className="flex items-center justify-center gap-1 sm:gap-2">
-                <Award className="h-4 w-4" />
-                Tahfidz Standing
-              </div>
-            </button>
-          </div>
+         <div className="flex flex-row gap-2 mb-0">
+           <button
+             type="button"
+             onClick={() => setActiveTab('tilawati')}
+             className={`flex items-center gap-2 px-6 py-2 text-lg font-semibold focus:outline-none transition-all duration-200
+               rounded-t-xl rounded-b-md
+               ${activeTab === 'tilawati'
+                 ? 'bg-blue-50 text-blue-700 shadow-sm border-b-0 z-10'
+                 : 'bg-transparent text-gray-400 hover:text-blue-600'}`}
+             style={{
+               borderBottomLeftRadius: activeTab === 'tilawati' ? 0 : '0.75rem',
+               borderBottomRightRadius: activeTab === 'tilawati' ? 0 : '0.75rem',
+               marginBottom: activeTab === 'tilawati' ? '-1px' : 0,
+               borderBottom: activeTab === 'tilawati' ? '2px solid #3b82f6' : 'none',
+             }}
+             aria-current={activeTab === 'tilawati' ? 'page' : undefined}
+           >
+             <BookOpen className="h-5 w-5" /> Tahsin
+           </button>
+           <button
+             type="button"
+             onClick={() => setActiveTab('hafalan')}
+             className={`flex items-center gap-2 px-6 py-2 text-lg font-semibold focus:outline-none transition-all duration-200
+               rounded-t-xl rounded-b-md
+               ${activeTab === 'hafalan'
+                 ? 'bg-green-50 text-green-700 shadow-sm border-b-0 z-10'
+                 : 'bg-transparent text-gray-400 hover:text-green-600'}`}
+             style={{
+               borderBottomLeftRadius: activeTab === 'hafalan' ? 0 : '0.75rem',
+               borderBottomRightRadius: activeTab === 'hafalan' ? 0 : '0.75rem',
+               marginBottom: activeTab === 'hafalan' ? '-1px' : 0,
+               borderBottom: activeTab === 'hafalan' ? '2px solid #22c55e' : 'none',
+             }}
+             aria-current={activeTab === 'hafalan' ? 'page' : undefined}
+           >
+             <Award className="h-5 w-5" /> Tahfidz
+           </button>
+         </div>
           {/* Tab Content */}
-          <div className="p-0 min-w-0 w-full">
+          <div className="p-0 min-w-0 w-full mt-0">
             {activeTab === 'tilawati' ? (
               <TilawatiTable
                 filters={{

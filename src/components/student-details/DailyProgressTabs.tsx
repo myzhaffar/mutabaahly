@@ -21,15 +21,29 @@ interface DailyProgressTabsProps {
   tilawahEntries: ProgressEntry[];
   onProgressUpdated: () => void;
   studentId: string;
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
 }
 
 const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
   hafalanEntries,
   tilawahEntries,
   onProgressUpdated,
-  studentId
+  studentId,
+  activeTab,
+  onTabChange
 }) => {
   const [exportOpen, setExportOpen] = React.useState(false);
+  const [tab, setTab] = React.useState(activeTab || 'hafalan');
+
+  React.useEffect(() => {
+    if (activeTab && activeTab !== tab) setTab(activeTab);
+  }, [activeTab]);
+
+  const handleTabChange = (value: string) => {
+    setTab(value);
+    if (onTabChange) onTabChange(value);
+  };
 
   const handleDuplicate = async (entry: ProgressEntry) => {
     if (!studentId) return;
@@ -60,7 +74,7 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
         />
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="hafalan" className="w-full">
+        <Tabs value={tab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger
               value="hafalan"
@@ -82,6 +96,7 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
               type="hafalan"
               onProgressUpdated={onProgressUpdated}
               onDuplicateEntry={entry => handleDuplicate(entry)}
+              setActiveTab={onTabChange}
             />
           </TabsContent>
           
@@ -91,6 +106,7 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
               type="tilawah"
               onProgressUpdated={onProgressUpdated}
               onDuplicateEntry={entry => handleDuplicate(entry)}
+              setActiveTab={onTabChange}
             />
           </TabsContent>
         </Tabs>

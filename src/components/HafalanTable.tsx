@@ -159,7 +159,7 @@ const HafalanTable: React.FC<HafalanTableProps> = ({ filters, pagination }) => {
         <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-gray-100">
           <CardTitle className="flex items-center gap-3 text-gray-800">
             <Award className="h-6 w-6 text-green-600" />
-            Al-Quran Memorization Rankings
+            Tahfidz Rankings
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">

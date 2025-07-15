@@ -3,8 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { BookOpen, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
-import { fetchTilawatiRankingData, StudentRankingData, RankingFilters } from '@/utils/rankingDataService';
+import { fetchTilawatiRankingData, StudentRankingData as BaseStudentRankingData, RankingFilters } from '@/utils/rankingDataService';
 import { useToast } from '@/hooks/use-toast';
+
+type StudentRankingData = BaseStudentRankingData & { standing?: 'quran' | 'tilawati' };
 
 interface Filters {
   teachers?: string[];
@@ -161,7 +163,7 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
         <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-100">
           <CardTitle className="flex items-center gap-3 text-gray-800">
             <BookOpen className="h-6 w-6 text-blue-600" />
-            Tilawati Reading Rankings
+            Tahsin Standing
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -181,11 +183,12 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Teacher
                   </th>
+                  {/* Dynamic columns for Tilawati or Quran */}
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Level
+                    Level/Surah
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Page
+                    Page/Ayat
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Progress
@@ -217,13 +220,20 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{student.teacher}</div>
                       </td>
+                      {/* Dynamic columns for Tilawati or Quran */}
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge variant="outline" className="border-blue-200 text-blue-700">
-                          Level {student.level}
-                        </Badge>
+                        {student.standing === 'quran' ? (
+                          <span className="text-sm text-green-700 font-semibold">{student.surah}</span>
+                        ) : (
+                          <Badge variant="outline" className="border-blue-200 text-blue-700">Level {student.level}</Badge>
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">Page {student.page}</div>
+                        {student.standing === 'quran' ? (
+                          <span className="text-sm text-green-700 font-semibold">{student.verse}</span>
+                        ) : (
+                          <span className="text-sm text-blue-700 font-semibold">{student.page}</span>
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">

@@ -19,7 +19,10 @@ interface StudentData {
   name: string;
   group_name: string;
   teacher: string;
-  grade?: string;
+  tahsin_type?: string;
+  tahsin_level_or_ayah?: string;
+  tahfidz_surah?: string;
+  tahfidz_last_ayah?: string;
 }
 
 interface ValidationError {
@@ -145,7 +148,10 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
             name: student.name || '',
             group_name: student.group_name || '',
             teacher: student.teacher || '',
-            grade: student.grade
+            tahsin_type: student.tahsin_type,
+            tahsin_level_or_ayah: student.tahsin_level_or_ayah,
+            tahfidz_surah: student.tahfidz_surah,
+            tahfidz_last_ayah: student.tahfidz_last_ayah,
           } as StudentData;
         });
       } else {
@@ -153,13 +159,13 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
       }
 
       // Mitigation: Strictly validate headers
-      const allowedHeaders = ['name', 'group_name', 'teacher', 'grade'];
+      const allowedHeaders = ['name', 'group_name', 'teacher', 'tahsin_type', 'tahsin_level_or_ayah', 'tahfidz_surah', 'tahfidz_last_ayah'];
       const headers = Object.keys(data[0] || {});
-      const hasAllHeaders = ['name', 'group_name', 'teacher'].every(h => headers.includes(h));
+      const hasAllHeaders = allowedHeaders.every(h => headers.includes(h));
       if (!hasAllHeaders) {
         toast({
           title: "Error",
-          description: "File is missing required columns (name, group_name, teacher).",
+          description: "File is missing required columns (name, group_name, teacher, tahsin_type, tahsin_level_or_ayah, tahfidz_surah, tahfidz_last_ayah).",
           variant: "destructive",
         });
         return;
@@ -186,7 +192,10 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
         name: (row.name || '').toString().trim(),
         group_name: (row.group_name || '').toString().trim(),
         teacher: (row.teacher || '').toString().trim(),
-        grade: row.grade ? row.grade.toString().trim() : undefined,
+        tahsin_type: (row.tahsin_type || '').toString().trim(),
+        tahsin_level_or_ayah: (row.tahsin_level_or_ayah || '').toString().trim(),
+        tahfidz_surah: (row.tahfidz_surah || '').toString().trim(),
+        tahfidz_last_ayah: (row.tahfidz_last_ayah || '').toString().trim(),
       }));
 
       // Validate the data
@@ -256,11 +265,17 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
     setUploadProgress({ current: 0, total: previewData.length, success: 0, failed: 0 });
 
     try {
+      // Prepare two arrays: one for student insert, one for progress
       const validStudents = previewData.map(student => ({
         name: student.name.trim(),
         group_name: student.group_name.trim(),
         teacher: student.teacher.trim(),
-        grade: student.grade?.trim() || null
+      }));
+      const progressInfo = previewData.map(student => ({
+        tahsin_type: student.tahsin_type?.trim() || '',
+        tahsin_level_or_ayah: student.tahsin_level_or_ayah?.trim() || '',
+        tahfidz_surah: student.tahfidz_surah?.trim() || '',
+        tahfidz_last_ayah: student.tahfidz_last_ayah?.trim() || '',
       }));
 
       // Insert students in batches
@@ -270,16 +285,47 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
 
       for (let i = 0; i < validStudents.length; i += batchSize) {
         const batch = validStudents.slice(i, i + batchSize);
-        
-        const { error } = await supabase
+        const batchProgress = progressInfo.slice(i, i + batchSize);
+        // Insert students and get their ids
+        const { data: inserted, error } = await supabase
           .from('students')
-          .insert(batch);
+          .insert(batch)
+          .select();
 
-        if (error) {
+        if (error || !inserted) {
           console.error('Error inserting batch:', error);
           failedCount += batch.length;
         } else {
           successCount += batch.length;
+          // For each inserted student, insert progress_entries if needed
+          for (let j = 0; j < inserted.length; j++) {
+            const studentProgress = batchProgress[j];
+            const newStudent = inserted[j];
+            if (studentProgress.tahsin_type && studentProgress.tahsin_level_or_ayah) {
+              await supabase.from('progress_entries').insert([
+                {
+                  student_id: newStudent.id,
+                  type: 'tilawah',
+                  surah_or_jilid: studentProgress.tahsin_type === 'tilawati' ? studentProgress.tahsin_level_or_ayah : studentProgress.tahsin_type === 'surah' ? studentProgress.tahsin_level_or_ayah : null,
+                  ayat_or_page: null,
+                  date: new Date().toISOString().split('T')[0],
+                  notes: 'Imported from bulk upload',
+                },
+              ]);
+            }
+            if (studentProgress.tahfidz_surah && studentProgress.tahfidz_last_ayah) {
+              await supabase.from('progress_entries').insert([
+                {
+                  student_id: newStudent.id,
+                  type: 'hafalan',
+                  surah_or_jilid: studentProgress.tahfidz_surah,
+                  ayat_or_page: studentProgress.tahfidz_last_ayah,
+                  date: new Date().toISOString().split('T')[0],
+                  notes: 'Imported from bulk upload',
+                },
+              ]);
+            }
+          }
         }
 
         setUploadProgress(prev => ({
@@ -317,19 +363,32 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
   };
 
   const downloadTemplate = () => {
-    // Only one header row, followed by student data (no grade column)
+    // Template with only header and one sample row, no grade column
     const templateData = [
-      { name: 'Ahmad Ali', group_name: 'Class A', teacher: 'Pak Muzhaffar' },
-      { name: 'Fatima Zahra', group_name: 'Class B', teacher: 'Bu Titin' },
-      { name: 'Muhammad Hassan', group_name: 'Class A', teacher: 'Pak Heri' },
-      { name: 'Aisha Rahman', group_name: 'Class C', teacher: 'Bu Liana' },
-      { name: 'Yusuf Ibrahim', group_name: 'Class B', teacher: 'Bu Witri' }
+      {
+        name: 'Ahmad Ali',
+        group_name: 'Class A',
+        teacher: 'Ust. Ahmad',
+        tahsin_type: 'tilawati',
+        tahsin_level_or_ayah: 'Level 4',
+        tahfidz_surah: 'Al-Baqarah',
+        tahfidz_last_ayah: '1-30', // Example range
+      },
     ];
 
-    const worksheet = XLSX.utils.json_to_sheet(templateData, { header: ["name", "group_name", "teacher"] });
+    const worksheet = XLSX.utils.json_to_sheet(templateData, {
+      header: [
+        'name',
+        'group_name',
+        'teacher',
+        'tahsin_type',
+        'tahsin_level_or_ayah',
+        'tahfidz_surah',
+        'tahfidz_last_ayah',
+      ],
+    });
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Students Template');
-    
     XLSX.writeFile(workbook, 'students_template.xlsx');
   };
 

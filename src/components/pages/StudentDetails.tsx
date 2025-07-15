@@ -40,6 +40,8 @@ const StudentDetails = () => {
     ];
   }
 
+  const [activeTab, setActiveTab] = React.useState('hafalan');
+
   const MainContent = (
     <div className="container mx-auto px-0 py-0 md:px-6 md:py-6">
       {loadingStudent ? (
@@ -97,6 +99,7 @@ const StudentDetails = () => {
         onProgressAdded={refetchData}
         onStudentUpdated={refetchData}
         onStudentDeleted={handleStudentDeleted}
+        setActiveTab={setActiveTab}
       />
           {loadingProgress ? (
             <div className="w-full max-w-4xl">
@@ -119,6 +122,8 @@ const StudentDetails = () => {
         tilawahEntries={tilawahEntries}
         onProgressUpdated={refetchData}
         studentId={student.id}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
           )}
     </>

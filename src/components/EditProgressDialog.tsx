@@ -22,9 +22,10 @@ interface ProgressEntry {
 interface EditProgressDialogProps {
   entry: ProgressEntry;
   onProgressUpdated: () => void;
+  setActiveTab?: (tab: string) => void;
 }
 
-const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgressUpdated }) => {
+const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgressUpdated, setActiveTab }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -34,6 +35,12 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
     notes: entry.notes || ''
   });
   const { toast } = useToast();
+
+  // Detect tahsin mode for tilawah
+  const initialTahsinMode = entry.type === 'tilawah'
+    ? (/^level\s*\d+$/i.test(entry.surah_or_jilid || '') ? 'tilawati' : 'alquran')
+    : '';
+  const [tahsinMode, setTahsinMode] = useState<'tilawati' | 'alquran' | ''>(initialTahsinMode);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +61,7 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
 
       setOpen(false);
       onProgressUpdated();
+      if (entry.type === 'tilawah' && setActiveTab) setActiveTab('tilawah');
     } catch (error) {
       console.error('Error updating progress:', error);
       toast({
@@ -95,13 +103,26 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
               required
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="surah_or_jilid">
-              {entry.type === 'hafalan' ? 'Surah' : 'Jilid/Level'}
-            </Label>
-            {entry.type === 'hafalan' ? (
-              <Select 
-                value={formData.surah_or_jilid} 
+          {entry.type === 'tilawah' && (
+            <div className="space-y-2">
+              <Label htmlFor="tahsin_mode">Tahsin Mode</Label>
+              <Select value={tahsinMode} onValueChange={(value) => setTahsinMode(value as 'tilawati' | 'alquran' | '')}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose mode" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="tilawati">Tilawati</SelectItem>
+                  <SelectItem value="alquran">Al Quran</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          {/* Surah/Jilid/Level selection */}
+          {entry.type === 'hafalan' && (
+            <div className="space-y-2">
+              <Label htmlFor="surah_or_jilid">Surah</Label>
+              <Select
+                value={formData.surah_or_jilid}
                 onValueChange={(value) => handleInputChange('surah_or_jilid', value)}
               >
                 <SelectTrigger>
@@ -115,26 +136,80 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
                   ))}
                 </SelectContent>
               </Select>
-            ) : (
+            </div>
+          )}
+          {entry.type === 'tilawah' && tahsinMode === 'tilawati' && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="surah_or_jilid">Level</Label>
+                <Select
+                  value={formData.surah_or_jilid}
+                  onValueChange={(value) => handleInputChange('surah_or_jilid', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1,2,3,4,5,6].map((level) => (
+                      <SelectItem key={level} value={`Level ${level}`}>{`Level ${level}`}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="ayat_or_page">Page</Label>
+                <Input
+                  id="ayat_or_page"
+                  value={formData.ayat_or_page}
+                  onChange={(e) => handleInputChange('ayat_or_page', e.target.value)}
+                  placeholder="e.g., 1-44"
+                />
+              </div>
+            </>
+          )}
+          {entry.type === 'tilawah' && tahsinMode === 'alquran' && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="surah_or_jilid">Surah</Label>
+                <Select
+                  value={formData.surah_or_jilid}
+                  onValueChange={(value) => handleInputChange('surah_or_jilid', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a surah" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {quranSurahs.map((surah) => (
+                      <SelectItem key={surah.number} value={surah.name}>
+                        {surah.name} ({surah.verses} verses)
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="ayat_or_page">Ayat/Verse</Label>
+                <Input
+                  id="ayat_or_page"
+                  value={formData.ayat_or_page}
+                  onChange={(e) => handleInputChange('ayat_or_page', e.target.value)}
+                  placeholder="e.g., 1-7"
+                />
+              </div>
+            </>
+          )}
+          {/* Hafalan ayat input (already handled above) */}
+          {entry.type === 'hafalan' && (
+            <div className="space-y-2">
+              <Label htmlFor="ayat_or_page">Ayat</Label>
               <Input
-                id="surah_or_jilid"
-                value={formData.surah_or_jilid}
-                onChange={(e) => handleInputChange('surah_or_jilid', e.target.value)}
-                placeholder="e.g., Jilid 1"
+                id="ayat_or_page"
+                value={formData.ayat_or_page}
+                onChange={(e) => handleInputChange('ayat_or_page', e.target.value)}
+                placeholder="e.g., 1-7"
               />
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="ayat_or_page">
-              {entry.type === 'hafalan' ? 'Ayat' : 'Page'}
-            </Label>
-            <Input
-              id="ayat_or_page"
-              value={formData.ayat_or_page}
-              onChange={(e) => handleInputChange('ayat_or_page', e.target.value)}
-              placeholder={entry.type === 'hafalan' ? 'e.g., 1-7' : 'e.g., 5'}
-            />
-          </div>
+            </div>
+          )}
           <div className="space-y-2">
             <Label htmlFor="notes">Notes</Label>
             <Textarea

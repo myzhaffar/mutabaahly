@@ -1,6 +1,4 @@
-name,group_name,teacher,grade
-Ahmad Ali,Class A,Pak Muzhaffar,Grade 1
-Fatima Zahra,Class B,Bu Titin,Grade 2
-Muhammad Hassan,Class A,Pak Heri,Grade 1
-Aisha Rahman,Class C,Bu Liana,Grade 3
-Yusuf Ibrahim,Class B,Bu Witri,Grade 2 
+name,group_name,teacher,grade,tahsin_type,tahsin_level_or_ayah,tahfidz_surah,tahfidz_last_ayah
+Ahmad Ali,Class A,Ustaz Ahmad,Grade 1,tilawati,Level 4,Al-Baqarah,25
+Fatima Zahra,Class B,Ustazah Sarah,Grade 2,surah,Al-Fatihah,,
+Ali Yusuf,Class C,Ustazah Lina,Grade 3,,,, 

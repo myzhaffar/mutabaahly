@@ -53,7 +53,7 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
     const { data: students, error } = await query;
 
     if (error) {
-      console.error('Error fetching students for Tilawati ranking:', error);
+      console.error('Error fetching students for Tahsin ranking:', error);
       return [];
     }
 
@@ -65,14 +65,7 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
     const studentsWithProgress = await Promise.all(
       students.map(async (student) => {
         try {
-          // Fetch tilawah progress from the dedicated table first
-          const { data: tilawahProgressData } = await supabase
-            .from('tilawah_progress')
-            .select('*')
-            .eq('student_id', student.id)
-            .maybeSingle();
-
-          // Also fetch progress entries for backup calculation
+          // Fetch progress entries for tilawah (tahsin)
           const { data: tilawahEntries } = await supabase
             .from('progress_entries')
             .select('*')
@@ -80,69 +73,89 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
             .eq('type', 'tilawah')
             .order('date', { ascending: false });
 
-          // Calculate progress from entries as backup
           const calculatedProgress = calculateTilawahProgress(tilawahEntries || []);
 
-          // Use the dedicated progress table data if available, otherwise use calculated
-          const tilawahProgress = tilawahProgressData || {
-            percentage: calculatedProgress.percentage,
-            jilid: calculatedProgress.jilid,
-            page: calculatedProgress.total_pages || 0
-          };
-
-          // Get current level from multiple sources in order of priority:
-          // 1. jilid from tilawah_progress table
-          // 2. jilid from calculated progress
-          const currentLevel = tilawahProgress.jilid || calculatedProgress.jilid;
-          
-          const levelNumber = getTilawatiLevelNumber(currentLevel);
-          const currentPage = tilawahProgress.page || calculatedProgress.total_pages || 0;
-
-          return {
-            id: student.id,
-            name: student.name,
-            class: student.group_name || 'Unknown',
-            teacher: student.teacher || 'Unknown',
-            teacherId: student.teacher,
-            grade: student.group_name || 'Unknown',
-            level: levelNumber,
-            page: currentPage,
-            progress: tilawahProgress.percentage || calculatedProgress.percentage,
-            juz: null,
-            surah: null,
-            verse: 0,
-          };
+          // If student has Quran progress (surah is a valid surah name), treat as Quran
+          const surahIsQuran = calculatedProgress.surah && isNaN(Number(calculatedProgress.surah));
+          if (surahIsQuran) {
+            return {
+              id: student.id,
+              name: student.name,
+              class: student.group_name || 'Unknown',
+              teacher: student.teacher || 'Unknown',
+              teacherId: student.teacher,
+              grade: student.group_name || 'Unknown',
+              level: undefined,
+              page: undefined,
+              surah: calculatedProgress.surah,
+              verse: calculatedProgress.ayat || 0,
+              progress: calculatedProgress.percentage,
+              standing: 'quran',
+              juz: null,
+            };
+          } else if (calculatedProgress.jilid || (!isNaN(Number(calculatedProgress.surah)))) {
+            // Otherwise, treat as Tilawati (either jilid or surah is a number)
+            const levelNumber = getTilawatiLevelNumber(calculatedProgress.jilid || calculatedProgress.surah);
+            const currentPage = calculatedProgress.total_pages || calculatedProgress.ayat || 0;
+            return {
+              id: student.id,
+              name: student.name,
+              class: student.group_name || 'Unknown',
+              teacher: student.teacher || 'Unknown',
+              teacherId: student.teacher,
+              grade: student.group_name || 'Unknown',
+              level: levelNumber,
+              page: currentPage,
+              surah: null,
+              verse: 0,
+              progress: calculatedProgress.percentage,
+              standing: 'tilawati',
+              juz: null,
+            };
+          } else {
+            // No progress
+            return null;
+          }
         } catch (error) {
           console.error(`Error processing student ${student.id}:`, error);
-          return {
-            id: student.id,
-            name: student.name,
-            class: student.group_name || 'Unknown',
-            teacher: student.teacher || 'Unknown',
-            teacherId: student.teacher,
-            grade: student.group_name || 'Unknown',
-            level: 1,
-            page: 0,
-            progress: 0,
-            juz: null,
-            surah: null,
-            verse: 0,
-          };
+          return null;
         }
       })
     );
 
-    // Filter out students with no progress and sort by level (6 to 1) then by page (44 to 1)
-    const validStudents = studentsWithProgress.filter(student => student.level > 0 && student.page > 0);
-    
-    // Sort by level (descending, 6 to 1) then by page (descending, 44 to 1)
-    const sortedStudents = validStudents.sort((a, b) => {
-      // First sort by level (higher level = higher rank)
-      if (a.level !== b.level) {
-        return b.level - a.level;
+    // Filter out students with no progress
+    const validStudents = studentsWithProgress.filter(student => student !== null);
+
+    // Debug: print level values and types for Tilawati students
+    validStudents.forEach(s => {
+      if (s && s.standing === 'tilawati') {
+        // eslint-disable-next-line no-console
+        console.log('[DEBUG] Tilawati student:', s.name, 'level:', s.level, 'type:', typeof s.level);
       }
-      // If same level, sort by page (higher page = higher rank)
-      return b.page - a.page;
+    });
+
+    // Sort: All Quran students first (regardless of surah/ayat), then Tilawati students by level/page
+    const sortedStudents = validStudents.sort((a, b) => {
+      // Quran students first (regardless of surah/ayat)
+      if (a.standing === 'quran' && b.standing !== 'quran') return -1;
+      if (a.standing !== 'quran' && b.standing === 'quran') return 1;
+      // Among Quran students, rank by surah number DESC (An-Nas=114 highest), then ayat DESC
+      if (a.standing === 'quran' && b.standing === 'quran') {
+        const surahRankA = getSurahRank(a.surah);
+        const surahRankB = getSurahRank(b.surah);
+        if (surahRankA !== surahRankB) return surahRankB - surahRankA;
+        return (b.verse || 0) - (a.verse || 0);
+      }
+      // Among Tilawati students only, by level DESC, then page DESC only if level is the same
+      if (a.standing === 'tilawati' && b.standing === 'tilawati') {
+        const levelA = a.level || 0;
+        const levelB = b.level || 0;
+        if (levelA !== levelB) return levelB - levelA;
+        // Only compare page if level is the same
+        return (b.page || 0) - (a.page || 0);
+      }
+      // Otherwise, keep original order
+      return 0;
     });
 
     return sortedStudents;

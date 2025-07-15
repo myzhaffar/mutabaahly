@@ -21,13 +21,15 @@ interface ProgressEntriesTableProps {
   type: 'hafalan' | 'tilawah';
   onProgressUpdated: () => void;
   onDuplicateEntry?: (entry: ProgressEntry) => void;
+  setActiveTab?: (tab: string) => void;
 }
 
 const ProgressEntriesTable: React.FC<ProgressEntriesTableProps> = ({
   entries,
   type,
   onProgressUpdated,
-  onDuplicateEntry
+  onDuplicateEntry,
+  setActiveTab
 }) => {
   const { profile } = useAuth();
   const isTeacher = profile?.role === 'teacher';
@@ -71,7 +73,7 @@ const ProgressEntriesTable: React.FC<ProgressEntriesTableProps> = ({
                 {isTeacher && (
                   <TableCell>
                     <div className="flex space-x-1">
-                      <EditProgressDialog entry={entry} onProgressUpdated={onProgressUpdated} />
+                      <EditProgressDialog entry={entry} onProgressUpdated={onProgressUpdated} setActiveTab={setActiveTab} />
                       <button
                         type="button"
                         className="inline-flex items-center justify-center rounded p-2 text-black transition-transform duration-150 hover:scale-110 hover:text-blue-600 focus:outline-none"
