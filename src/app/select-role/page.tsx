@@ -16,7 +16,7 @@ export default function SelectRolePage() {
 
   useEffect(() => {
     // If user already has a role, redirect away
-    if (profile && profile.role) {
+    if (profile && (profile.role === "teacher" || profile.role === "parent")) {
       router.replace("/");
     }
     // If not logged in, redirect to auth
@@ -54,12 +54,16 @@ export default function SelectRolePage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-teal-50 p-4">
       <div className="w-full max-w-md">
-        <Card className="rounded-2xl shadow-xl border-0">
+        <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur">
           <CardContent className="p-8">
-            <h2 className="text-2xl font-bold mb-6 text-center">Select Your Role</h2>
+            <h2 className="text-2xl font-bold mb-6 text-center text-emerald-700">Select Your Role</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="flex flex-col gap-4">
-                <label className={`border rounded-lg p-4 cursor-pointer flex items-center gap-3 ${selectedRole === "teacher" ? "border-emerald-500 bg-emerald-50" : "border-gray-200"}`}> 
+                <label className={`border-2 rounded-xl p-4 cursor-pointer flex items-center gap-3 transition-all duration-200 font-medium text-lg shadow-sm
+                  ${selectedRole === "teacher"
+                    ? "border-emerald-500 bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-700"
+                    : "border-gray-200 bg-white hover:border-emerald-300 hover:bg-emerald-50"}`}
+                >
                   <input
                     type="radio"
                     name="role"
@@ -68,9 +72,13 @@ export default function SelectRolePage() {
                     onChange={() => setSelectedRole("teacher")}
                     className="accent-emerald-500"
                   />
-                  <span className="font-medium">Teacher / Mentor</span>
+                  <span>Teacher / Mentor</span>
                 </label>
-                <label className={`border rounded-lg p-4 cursor-pointer flex items-center gap-3 ${selectedRole === "parent" ? "border-orange-500 bg-orange-50" : "border-gray-200"}`}> 
+                <label className={`border-2 rounded-xl p-4 cursor-pointer flex items-center gap-3 transition-all duration-200 font-medium text-lg shadow-sm
+                  ${selectedRole === "parent"
+                    ? "border-orange-500 bg-gradient-to-r from-orange-100 to-orange-50 text-orange-700"
+                    : "border-gray-200 bg-white hover:border-orange-300 hover:bg-orange-50"}`}
+                >
                   <input
                     type="radio"
                     name="role"
@@ -79,10 +87,10 @@ export default function SelectRolePage() {
                     onChange={() => setSelectedRole("parent")}
                     className="accent-orange-500"
                   />
-                  <span className="font-medium">Parent</span>
+                  <span>Parent</span>
                 </label>
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full bg-gradient-to-r from-emerald-500 to-teal-400 text-white text-lg font-semibold rounded-lg py-3 flex items-center justify-center gap-2 hover:opacity-90" disabled={loading}>
                 {loading ? "Saving..." : "Continue"}
               </Button>
             </form>
