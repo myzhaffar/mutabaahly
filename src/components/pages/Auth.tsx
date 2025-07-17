@@ -45,10 +45,10 @@ const Auth = () => {
   }, [quotes.length]);
 
   useEffect(() => {
-    // Robustly check for missing role: null, undefined, or empty string
-    if (user && profile && (profile.role == null || profile.role === '')) {
+    // Type-safe check for valid role
+    if (user && profile && (profile.role !== 'teacher' && profile.role !== 'parent')) {
       router.push('/select-role');
-    } else if (user && profile && profile.role) {
+    } else if (user && profile && (profile.role === 'teacher' || profile.role === 'parent')) {
       router.push('/');
     }
   }, [user, profile, router]);
