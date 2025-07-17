@@ -92,6 +92,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Fetch user profile
           setTimeout(async () => {
             await fetchProfile(session.user.id);
+            // Check if profile exists
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single();
+            if (!profileData && !profileError) {
+              // Create profile with no role for new Google user
+              await supabase.from('profiles').insert([
+                {
+                  id: session.user.id,
+                  full_name: session.user.user_metadata.full_name || session.user.user_metadata.name || '',
+                  // Do not set role, let it be undefined
+                  email: session.user.email || undefined,
+                  avatar_url: null,
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString(),
+                },
+              ]);
+              // Refetch profile after creation
+              await fetchProfile(session.user.id);
+            }
             setLoading(false);
           }, 0);
         } else {
