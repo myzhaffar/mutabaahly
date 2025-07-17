@@ -23,7 +23,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, user, profile } = useAuth();
 
   const { toast } = useToast();
   const router = useRouter();
@@ -45,10 +45,13 @@ const Auth = () => {
   }, [quotes.length]);
 
   useEffect(() => {
-    if (user) {
+    // Robustly check for missing role: null, undefined, or empty string
+    if (user && profile && (profile.role == null || profile.role === '')) {
+      router.push('/select-role');
+    } else if (user && profile && profile.role) {
       router.push('/');
     }
-  }, [user, router]);
+  }, [user, profile, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
