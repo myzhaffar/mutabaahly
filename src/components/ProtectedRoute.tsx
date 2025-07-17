@@ -17,9 +17,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole 
   useEffect(() => {
     if (!loading && !user) {
       router.push('/auth');
-    }
-    
-    if (!loading && user && profile && requiredRole && profile.role !== requiredRole) {
+    } else if (!loading && user && profile && (profile.role !== 'teacher' && profile.role !== 'parent')) {
+      router.push('/select-role');
+    } else if (!loading && user && profile && requiredRole && profile.role !== requiredRole) {
       router.push('/dashboard');
     }
   }, [user, profile, loading, router, requiredRole]);
