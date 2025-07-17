@@ -39,9 +39,14 @@ export function DeleteProfileDialog({ isOpen, onClose }: DeleteProfileDialogProp
 
       if (profileError) throw profileError;
 
-      // Then, delete the user account
-      const { error: userError } = await supabase.auth.admin.deleteUser(profile.id);
-      if (userError) throw userError;
+      // Then, delete the user account via API route
+      const res = await fetch('/api/delete-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: profile.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete user');
 
       // Sign out and redirect to home
       await signOut();

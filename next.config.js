@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['localhost'],
+    domains: ['localhost', 'isyhakwwgdozgtlquzis.supabase.co'],
   },
   webpack: (config) => {
     config.resolve.fallback = {

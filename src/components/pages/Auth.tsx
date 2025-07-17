@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Home, Mail, Lock, Eye, User } from 'lucide-react';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
+import Image from 'next/image';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -127,8 +128,7 @@ const Auth = () => {
               className="w-full flex items-center justify-center gap-2 border border-gray-200 rounded-lg py-3 font-medium text-gray-700 hover:bg-gray-50 transition mb-6"
               onClick={handleGoogleLogin}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="h-5 w-5" />
+              <Image src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width={20} height={20} className="h-5 w-5" />
               Continue with Google
             </button>
             <div className="flex items-center my-6">

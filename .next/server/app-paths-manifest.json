@@ -1,10 +1,8 @@
 {
   "/page": "app/page.js",
-  "/_not-found/page": "app/_not-found/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
   "/auth/page": "app/auth/page.js",
-  "/class/[className]/page": "app/class/[className]/page.js",
-  "/students/page": "app/students/page.js",
-  "/tests/view/page": "app/tests/view/page.js",
-  "/profile/page": "app/profile/page.js"
+  "/api/delete-user/route": "app/api/delete-user/route.js",
+  "/profile/page": "app/profile/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/students/page": "app/students/page.js"
 }
