@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Search, Filter, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { FIXED_TEACHERS } from '@/utils/rankingDataService';
 
 interface SearchAndFilterProps {
   onSearchChange: (search: string) => void;
@@ -143,25 +144,51 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
               {availableTeachers.length > 0 && (
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-gray-700">Teacher</Label>
-                  <div className="space-y-2 max-h-32 overflow-y-auto">
-                    {availableTeachers.map((teacher) => (
-                      <div key={teacher} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`teacher-${teacher}`}
-                          checked={currentFilters.teachers.includes(teacher)}
-                          onCheckedChange={(checked) => 
-                            handleFilterChange('teachers', teacher, checked as boolean)
-                          }
-                          className="rounded-full"
-                        />
-                        <Label 
-                          htmlFor={`teacher-${teacher}`}
-                          className="text-sm text-gray-600 cursor-pointer"
-                        >
-                          {teacher}
-                        </Label>
-                      </div>
-                    ))}
+                  <div className="flex gap-4">
+                    {/* Female Teachers */}
+                    <div className="flex-1 space-y-2 max-h-32 overflow-y-auto">
+                      <div className="font-semibold text-emerald-700 mb-1">Female</div>
+                      {FIXED_TEACHERS.filter(t => t.name.startsWith('Ustz.')).map((teacher) => (
+                        <div key={teacher.name} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`teacher-${teacher.name}`}
+                            checked={currentFilters.teachers.includes(teacher.name)}
+                            onCheckedChange={(checked) => 
+                              handleFilterChange('teachers', teacher.name, checked as boolean)
+                            }
+                            className="rounded-full"
+                          />
+                          <Label 
+                            htmlFor={`teacher-${teacher.name}`}
+                            className="text-sm text-gray-600 cursor-pointer"
+                          >
+                            {teacher.name}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Male Teachers */}
+                    <div className="flex-1 space-y-2 max-h-32 overflow-y-auto">
+                      <div className="font-semibold text-teal-700 mb-1">Male</div>
+                      {FIXED_TEACHERS.filter(t => t.name.startsWith('Ust.')).map((teacher) => (
+                        <div key={teacher.name} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`teacher-${teacher.name}`}
+                            checked={currentFilters.teachers.includes(teacher.name)}
+                            onCheckedChange={(checked) => 
+                              handleFilterChange('teachers', teacher.name, checked as boolean)
+                            }
+                            className="rounded-full"
+                          />
+                          <Label 
+                            htmlFor={`teacher-${teacher.name}`}
+                            className="text-sm text-gray-600 cursor-pointer"
+                          >
+                            {teacher.name}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}

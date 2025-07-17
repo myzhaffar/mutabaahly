@@ -619,17 +619,17 @@ export const fetchGrades = async (): Promise<{ id: string; name: string }[]> => 
 
 // Fixed teacher list for dropdowns and filters
 export const FIXED_TEACHERS = [
-  { id: 'titin', name: 'Ustz. Titin' },
-  { id: 'kholilah', name: 'Ustz. Kholilah' },
+  { id: 'ade', name: 'Ustz. Ade' },
+  { id: 'aliza', name: 'Ustz. Aliza' },
   { id: 'aulia', name: 'Ustz. Aulia' },
-  { id: 'witri', name: 'Ustz. Witri' },
+  { id: 'kholilah', name: 'Ustz. Kholilah' },
   { id: 'liana', name: 'Ustz. Liana' },
   { id: 'talia', name: 'Ustz. Talia' },
-  { id: 'aliza', name: 'Ustz. Aliza' },
-  { id: 'ade', name: 'Ustz. Ade' },
-  { id: 'zaedun', name: 'Ust. Zaedun' },
-  { id: 'lalu', name: 'Ust. Lalu' },
+  { id: 'titin', name: 'Ustz. Titin' },
+  { id: 'witri', name: 'Ustz. Witri' },
   { id: 'chasib', name: 'Ust. Chasib' },
   { id: 'hery', name: 'Ust. Hery' },
+  { id: 'lalu', name: 'Ust. Lalu' },
   { id: 'rizky', name: 'Ust. Rizky' },
+  { id: 'zaedun', name: 'Ust. Zaedun' },
 ]; 
