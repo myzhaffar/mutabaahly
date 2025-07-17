@@ -148,7 +148,7 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="group_name">Group/Class</Label>
+            <Label htmlFor="group_name">Class</Label>
             <Input
               id="group_name"
               value={formData.group_name}
