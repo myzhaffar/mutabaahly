@@ -73,10 +73,14 @@ const Dashboard = () => {
 
   const fetchStudents = useCallback(async () => {
     try {
-      // Fetch all students for all roles (including parent)
-      const { data: studentsData, error: studentsError } = await supabase
+      let studentsQuery = supabase
         .from('students')
         .select('*');
+      // If parent, filter by parent_id
+      if (profile?.role === 'parent' && profile?.id) {
+        studentsQuery = studentsQuery.eq('parent_id', profile.id);
+      }
+      const { data: studentsData, error: studentsError } = await studentsQuery;
 
       if (studentsError) {
         toast({
@@ -212,7 +216,7 @@ const Dashboard = () => {
     } finally {
       setDataLoading(false);
     }
-  }, [toast]);
+  }, [toast, profile]);
 
   useEffect(() => {
     if (user && profile) {

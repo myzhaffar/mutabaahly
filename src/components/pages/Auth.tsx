@@ -49,7 +49,7 @@ const Auth = () => {
     if (user && profile && profile.role !== 'teacher' && profile.role !== 'parent') {
       router.push('/select-role');
     } else if (user && profile && (profile.role === 'teacher' || profile.role === 'parent')) {
-      router.push('/');
+      router.push('/dashboard');
     }
   }, [user, profile, router]);
 

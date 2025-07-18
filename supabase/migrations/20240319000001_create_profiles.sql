@@ -12,7 +12,7 @@ CREATE TABLE profiles (
 -- Enable RLS
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
--- Users can view their own profile
+-- -- Users can view their own profile
 CREATE POLICY "Users can view own profile" ON profiles
     FOR SELECT
     TO authenticated
@@ -24,7 +24,7 @@ CREATE POLICY "Users can update own profile" ON profiles
     TO authenticated
     USING (auth.uid() = id);
 
--- Users can insert their own profile
+-- -- Users can insert their own profile
 CREATE POLICY "Users can insert own profile" ON profiles
     FOR INSERT
     TO authenticated

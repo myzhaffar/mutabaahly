@@ -161,17 +161,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       },
     });
 
-    if (data.user && !error) {
-      try {
-        await createProfile(data.user, role);
-      } catch (profileError) {
-        console.error('Error creating profile:', profileError);
-        // If profile creation fails, we should probably delete the user
-        await supabase.auth.admin.deleteUser(data.user.id);
-        return { data: { user: null, session: null }, error: profileError as AuthError };
-      }
-    }
-
     return { data, error };
   };
 
