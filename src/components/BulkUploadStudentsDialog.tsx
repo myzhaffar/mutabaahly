@@ -300,30 +300,36 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
           // For each inserted student, insert progress_entries if needed
           for (let j = 0; j < inserted.length; j++) {
             const studentProgress = batchProgress[j];
-            const newStudent = inserted[j];
+            // const newStudent = inserted[j]; // Disabled: unused when progress_entries is not saved
             if (studentProgress.tahsin_type && studentProgress.tahsin_level_or_ayah) {
-              await supabase.from('progress_entries').insert([
-                {
-                  student_id: newStudent.id,
-                  type: 'tilawah',
-                  surah_or_jilid: studentProgress.tahsin_type === 'tilawati' ? studentProgress.tahsin_level_or_ayah : studentProgress.tahsin_type === 'surah' ? studentProgress.tahsin_level_or_ayah : null,
-                  ayat_or_page: null,
-                  date: new Date().toISOString().split('T')[0],
-                  notes: 'Imported from bulk upload',
-                },
-              ]);
+              // TODO: Disabled because 'progress_entries' table does not exist in production DB.
+              // await supabase.from('progress_entries').insert([
+              //   {
+              //     student_id: newStudent.id,
+              //     type: 'tilawah',
+              //     // ...other fields
+              //   }
+              // ]);
+              toast({
+                title: 'Not Implemented',
+                description: 'Progress entry saving is temporarily disabled. Please contact admin.',
+                variant: 'destructive',
+              });
             }
             if (studentProgress.tahfidz_surah && studentProgress.tahfidz_last_ayah) {
-              await supabase.from('progress_entries').insert([
-                {
-                  student_id: newStudent.id,
-                  type: 'hafalan',
-                  surah_or_jilid: studentProgress.tahfidz_surah,
-                  ayat_or_page: studentProgress.tahfidz_last_ayah,
-                  date: new Date().toISOString().split('T')[0],
-                  notes: 'Imported from bulk upload',
-                },
-              ]);
+              // TODO: Disabled because 'progress_entries' table does not exist in production DB.
+              // await supabase.from('progress_entries').insert([
+              //   {
+              //     student_id: newStudent.id,
+              //     type: 'hafalan',
+              //     // ...other fields
+              //   }
+              // ]);
+              toast({
+                title: 'Not Implemented',
+                description: 'Progress entry saving is temporarily disabled. Please contact admin.',
+                variant: 'destructive',
+              });
             }
           }
         }
