@@ -16,13 +16,13 @@ import { Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface DeleteProgressDialogProps {
-  entryId: string;
+  // entryId: string; // Remove unused prop
   entryType: string;
   onProgressDeleted: () => void;
 }
 
 const DeleteProgressDialog: React.FC<DeleteProgressDialogProps> = ({
-  entryId,
+  // entryId, // Remove unused prop
   entryType,
   onProgressDeleted
 }) => {
