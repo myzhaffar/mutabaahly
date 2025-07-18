@@ -67,16 +67,21 @@ const ClassDetail: React.FC = () => {
       const studentsWithProgress = await Promise.all(
         studentsData.map(async (student) => {
           try {
-            const { data: hafalanEntries } = await supabase
-              .from('progress_entries')
-              .select('*')
-              .eq('student_id', student.id)
-              .eq('type', 'hafalan');
-            const { data: tilawahEntries } = await supabase
-              .from('progress_entries')
-              .select('*')
-              .eq('student_id', student.id)
-              .eq('type', 'tilawah');
+            // TODO: Disabled because 'progress_entries' table does not exist in production DB.
+            // const { data: hafalanEntries } = await supabase
+            //   .from('progress_entries')
+            //   .select('*')
+            //   .eq('student_id', student.id)
+            //   .eq('type', 'hafalan');
+            // const { data: tilawahEntries } = await supabase
+            //   .from('progress_entries')
+            //   .select('*')
+            //   .eq('student_id', student.id)
+            //   .eq('type', 'tilawah');
+            // If needed, set empty arrays or fallback:
+            const hafalanEntries = [];
+            const tilawahEntries = [];
+            // Optionally, show a warning in the UI if this data is required.
             const hafalanProgress = calculateHafalanProgress(hafalanEntries || []);
             const tilawahProgress = calculateTilawahProgress(tilawahEntries || []);
             return {
