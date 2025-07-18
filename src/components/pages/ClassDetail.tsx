@@ -13,6 +13,7 @@ import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/prog
 import { ChevronLeft, Filter, X } from 'lucide-react';
 import { FIXED_TEACHERS } from '@/utils/rankingDataService';
 import { useToast } from '@/hooks/use-toast';
+import type { ProgressEntry } from '@/types/progress';
 
 interface ClassStudent {
   id: string;
