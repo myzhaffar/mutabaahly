@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Edit } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { quranSurahs } from '@/utils/quranData';
 
@@ -47,12 +46,16 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
     setLoading(true);
 
     try {
-      const { error } = await supabase
-        .from('progress_entries')
-        .update(formData)
-        .eq('id', entry.id);
-
-      if (error) throw error;
+      // TODO: Disabled because 'progress_entries' table does not exist in production DB.
+      // const { error } = await supabase
+      //   .from('progress_entries')
+      //   .update(formData)
+      //   .eq('id', entry.id);
+      toast({
+        title: 'Not Implemented',
+        description: 'Progress entry editing is temporarily disabled. Please contact admin.',
+        variant: 'destructive',
+      });
 
       toast({
         title: "Success",
