@@ -79,8 +79,8 @@ const ClassDetail: React.FC = () => {
             //   .eq('student_id', student.id)
             //   .eq('type', 'tilawah');
             // If needed, set empty arrays or fallback:
-            const hafalanEntries = [];
-            const tilawahEntries = [];
+            const hafalanEntries: ProgressEntry[] = [];
+            const tilawahEntries: ProgressEntry[] = [];
             // Optionally, show a warning in the UI if this data is required.
             const hafalanProgress = calculateHafalanProgress(hafalanEntries || []);
             const tilawahProgress = calculateTilawahProgress(tilawahEntries || []);
