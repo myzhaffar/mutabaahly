@@ -99,6 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               .eq('id', session.user.id)
               .single();
             if (!profileData && !profileError) {
+              console.log('DEBUG: user_metadata before profile insert:', session.user.user_metadata);
               // Create profile with role from user metadata
               await supabase.from('profiles').insert([
                 {
