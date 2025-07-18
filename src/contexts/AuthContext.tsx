@@ -99,12 +99,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               .eq('id', session.user.id)
               .single();
             if (!profileData && !profileError) {
-              // Create profile with no role for new Google user
+              // Create profile with role from user metadata
               await supabase.from('profiles').insert([
                 {
                   id: session.user.id,
                   full_name: session.user.user_metadata.full_name || session.user.user_metadata.name || '',
-                  // Do not set role, let it be undefined
+                  role: session.user.user_metadata.role || undefined, // <-- set role from metadata
                   email: session.user.email || undefined,
                   avatar_url: null,
                   created_at: new Date().toISOString(),
