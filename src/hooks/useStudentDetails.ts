@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
 import { useAuth } from '@/contexts/useAuth';
-import { Database } from '@/types/supabase';
+import { Database } from '@/integrations/supabase/types';
 
 type Student = Database['public']['Tables']['students']['Row'];
 
@@ -23,6 +23,7 @@ interface ProgressData {
 export const useStudentDetails = (id: string | undefined) => {
   const { profile } = useAuth();
   const [student, setStudent] = useState<Student | null>(null);
+  const [className, setClassName] = useState<string | null>(null);
   const [progressData, setProgressData] = useState<ProgressData>({
     hafalan_progress: null,
     tilawah_progress: null
@@ -37,6 +38,7 @@ export const useStudentDetails = (id: string | undefined) => {
       setLoadingStudent(true);
       if (!id || !profile) {
         setStudent(null);
+        setClassName(null);
         return;
       }
 
@@ -52,15 +54,18 @@ export const useStudentDetails = (id: string | undefined) => {
       // If no student found
       if (!studentData) {
         setStudent(null);
+        setClassName(null);
         return;
       }
 
-      // Set student data regardless of role
       setStudent(studentData);
+      // Use group_name directly from studentData
+      setClassName(studentData.group_name || null);
 
     } catch (error) {
       console.error('Error fetching student data:', error);
       setStudent(null);
+      setClassName(null);
     } finally {
       setLoadingStudent(false);
     }
@@ -149,6 +154,7 @@ export const useStudentDetails = (id: string | undefined) => {
 
   return {
     student,
+    className,
     progressData,
     hafalanEntries,
     tilawahEntries,

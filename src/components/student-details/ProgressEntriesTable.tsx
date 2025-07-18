@@ -83,7 +83,6 @@ const ProgressEntriesTable: React.FC<ProgressEntriesTableProps> = ({
                         <Copy className="h-4 w-4" />
                       </button>
                       <DeleteProgressDialog 
-                        entryId={entry.id} 
                         entryType={type} 
                         onProgressDeleted={onProgressUpdated} 
                       />

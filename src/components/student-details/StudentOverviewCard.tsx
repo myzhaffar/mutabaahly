@@ -28,19 +28,15 @@ interface Student {
 interface StudentOverviewCardProps {
   student: Student;
   progressData: ProgressData;
-  onProgressAdded: () => void;
   onStudentUpdated: () => void;
   onStudentDeleted: () => void;
-  setActiveTab?: (tab: string) => void;
 }
 
 const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
   student,
   progressData,
-  onProgressAdded,
   onStudentUpdated,
-  onStudentDeleted,
-  setActiveTab
+  onStudentDeleted
 }) => {
   const { profile } = useAuth();
   const isTeacher = profile?.role === 'teacher';
@@ -172,7 +168,7 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-foreground">Progress Overview</h3>
                 {isTeacher && (
-                  <AddProgressDialog studentId={student.id} onProgressAdded={onProgressAdded} setActiveTab={setActiveTab} />
+                  <AddProgressDialog open={false} setOpen={() => {}} />
                 )}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">

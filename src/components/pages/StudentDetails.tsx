@@ -19,6 +19,7 @@ const StudentDetails = () => {
   
   const {
     student,
+    className,
     progressData,
     hafalanEntries,
     tilawahEntries,
@@ -35,7 +36,7 @@ const StudentDetails = () => {
   if (student) {
     breadcrumbs = [
       { label: 'Dashboard', href: '/dashboard' },
-      { label: student.group_name, href: `/class/${encodeURIComponent(student.group_name)}` },
+      { label: className || 'Unknown Class', href: `/class/${encodeURIComponent(className || 'unknown')}` },
       { label: student.name }
     ];
   }
@@ -87,19 +88,27 @@ const StudentDetails = () => {
     <>
       <StudentDetailsHeader
         student={{
-          ...student,
-          grade: student.grade || 'Unknown'
+          id: student.id,
+          name: student.name,
+          grade: (student as Partial<Record<string, unknown>>)?.grade as string || 'Unknown',
+          group_name: className || (student as Partial<Record<string, unknown>>)?.group_name as string || 'Unknown Class',
+          teacher: (student as Partial<Record<string, unknown>>)?.teacher as string || 'Unknown',
+          photo: (student as Partial<Record<string, unknown>>)?.photo as string || null
         }}
         userRole={profile?.role || 'parent'}
-        profile={profile || undefined}
+        profile={profile && profile.role ? { role: profile.role || 'parent' } : undefined}
       />
       <StudentOverviewCard
-        student={student}
+        student={{
+          id: student.id,
+          name: student.name,
+          group_name: className || (student as Partial<Record<string, unknown>>)?.group_name as string || 'Unknown Class',
+          teacher: (student as Partial<Record<string, unknown>>)?.teacher as string || 'Unknown',
+          photo: (student as Partial<Record<string, unknown>>)?.photo as string || null
+        }}
         progressData={progressData}
-        onProgressAdded={refetchData}
         onStudentUpdated={refetchData}
         onStudentDeleted={handleStudentDeleted}
-        setActiveTab={setActiveTab}
       />
           {loadingProgress ? (
             <div className="w-full max-w-4xl">
