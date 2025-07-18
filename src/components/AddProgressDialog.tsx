@@ -7,19 +7,16 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/useAuth';
 import { quranSurahs } from '@/utils/quranData';
 
 interface AddProgressDialogProps {
-  studentId: string;
-  onProgressAdded: () => void;
-  setActiveTab?: (tab: string) => void;
+  open: boolean;
+  setOpen: (open: boolean) => void;
 }
 
-const AddProgressDialog: React.FC<AddProgressDialogProps> = ({ studentId, onProgressAdded, setActiveTab }) => {
-  const [open, setOpen] = useState(false);
+const AddProgressDialog: React.FC<AddProgressDialogProps> = ({ open, setOpen }) => {
   const [loading, setLoading] = useState(false);
   const { profile } = useAuth();
   const [formData, setFormData] = useState({
@@ -52,30 +49,29 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({ studentId, onProg
         return;
       }
 
-      const { error } = await supabase
-        .from('progress_entries')
-        .insert([{
-          student_id: studentId,
-          ...formData
-        }]);
-
-      if (error) throw error;
-
+      // TODO: The following code is disabled because the 'progress_entries' table does not exist in the current DB schema.
+      // const { error } = await supabase
+      //   .from('progress_entries')
+      //   .insert([{ student_id: studentId, ...formData }]);
+      // if (error) {
+      //   setLoading(false);
+      //   toast({
+      //     title: 'Error',
+      //     description: 'Failed to add progress entry.',
+      //     variant: 'destructive',
+      //   });
+      //   return;
+      // }
+      // onProgressAdded();
+      // setLoading(false);
+      // onOpenChange(false);
+      // Instead, just show a warning for now:
       toast({
-        title: "Success",
-        description: "Progress entry added successfully!",
+        title: 'Not Implemented',
+        description: 'Progress entry saving is temporarily disabled. Please contact admin.',
+        variant: 'destructive',
       });
-
-      setFormData({
-        type: '',
-        date: new Date().toISOString().split('T')[0],
-        surah_or_jilid: '',
-        ayat_or_page: '',
-        notes: ''
-      });
-      setOpen(false);
-      onProgressAdded();
-      if (formData.type === 'tilawah' && setActiveTab) setActiveTab('tilawah');
+      setLoading(false);
     } catch (error) {
       console.error('Error adding progress:', error);
       toast({
