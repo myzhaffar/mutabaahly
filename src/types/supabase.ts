@@ -7,237 +7,200 @@ export type Json =
   | Json[]
 
 export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          query?: string
+          operationName?: string
+          variables?: Json
+          extensions?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
-      hafalan_progress: {
+      class_teachers: {
         Row: {
-          created_at: string
-          id: string
-          last_surah: string | null
-          percentage: number
-          student_id: string
-          total_surah: number
-          updated_at: string
+          class_id: string
+          created_at: string | null
+          teacher_id: string
         }
         Insert: {
-          created_at?: string
-          id?: string
-          last_surah?: string | null
-          percentage?: number
-          student_id: string
-          total_surah?: number
-          updated_at?: string
+          class_id: string
+          created_at?: string | null
+          teacher_id: string
         }
         Update: {
-          created_at?: string
-          id?: string
-          last_surah?: string | null
-          percentage?: number
-          student_id?: string
-          total_surah?: number
-          updated_at?: string
+          class_id?: string
+          created_at?: string | null
+          teacher_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "hafalan_progress_student_id_fkey"
-            columns: ["student_id"]
+            foreignKeyName: "class_teachers_class_id_fkey"
+            columns: ["class_id"]
             isOneToOne: false
-            referencedRelation: "students"
+            referencedRelation: "classes"
             referencedColumns: ["id"]
           },
         ]
       }
-      profiles: {
+      classes: {
         Row: {
-          created_at: string
-          full_name: string
+          created_at: string | null
           id: string
-          role: string
-          updated_at: string
+          name: string
+          updated_at: string | null
         }
         Insert: {
-          created_at?: string
-          full_name: string
-          id: string
-          role?: string
-          updated_at?: string
+          created_at?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
         }
         Update: {
-          created_at?: string
-          full_name?: string
+          created_at?: string | null
           id?: string
-          role?: string
-          updated_at?: string
+          name?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
-      progress_entries: {
+      profiles: {
         Row: {
-          ayat_or_page: string | null
-          created_at: string
-          date: string
+          avatar_url: string | null
+          created_at: string | null
+          email: string | null
+          full_name: string
           id: string
-          notes: string | null
-          student_id: string
-          surah_or_jilid: string | null
-          type: string
+          role: string | null
+          updated_at: string | null
         }
         Insert: {
-          ayat_or_page?: string | null
-          created_at?: string
-          date?: string
-          id?: string
-          notes?: string | null
-          student_id: string
-          surah_or_jilid?: string | null
-          type: string
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name: string
+          id: string
+          role?: string | null
+          updated_at?: string | null
         }
         Update: {
-          ayat_or_page?: string | null
-          created_at?: string
-          date?: string
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string
           id?: string
-          notes?: string | null
-          student_id?: string
-          surah_or_jilid?: string | null
-          type?: string
+          role?: string | null
+          updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "progress_entries_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
-            referencedRelation: "students"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       students: {
         Row: {
-          created_at: string
-          grade: string | null
-          group_name: string
+          class_id: string | null
+          created_at: string | null
+          current_tilawati_jilid: string | null
           id: string
           name: string
           parent_id: string | null
-          photo: string | null
-          teacher: string
-          updated_at: string
+          teacher_id: string | null
+          updated_at: string | null
         }
         Insert: {
-          created_at?: string
-          grade?: string | null
-          group_name: string
+          class_id?: string | null
+          created_at?: string | null
+          current_tilawati_jilid?: string | null
           id?: string
           name: string
           parent_id?: string | null
-          photo?: string | null
-          teacher: string
-          updated_at?: string
+          teacher_id?: string | null
+          updated_at?: string | null
         }
         Update: {
-          created_at?: string
-          grade?: string | null
-          group_name?: string
+          class_id?: string | null
+          created_at?: string | null
+          current_tilawati_jilid?: string | null
           id?: string
           name?: string
           parent_id?: string | null
-          photo?: string | null
-          teacher?: string
-          updated_at?: string
+          teacher_id?: string | null
+          updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "students_parent_id_fkey"
-            columns: ["parent_id"]
+            foreignKeyName: "students_class_id_fkey"
+            columns: ["class_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      tilawah_progress: {
-        Row: {
-          created_at: string
-          id: string
-          jilid: string | null
-          page: number | null
-          percentage: number
-          student_id: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          jilid?: string | null
-          page?: number | null
-          percentage?: number
-          student_id: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          jilid?: string | null
-          page?: number | null
-          percentage?: number
-          student_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tilawah_progress_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
-            referencedRelation: "students"
+            referencedRelation: "classes"
             referencedColumns: ["id"]
           },
         ]
       }
       tilawati_level_tests: {
         Row: {
+          class_id: string | null
+          created_at: string | null
+          date: string
           id: string
-          student_id: string
-          current_jilid: string
-          target_jilid: string
-          test_date: string
-          examiner_name: string | null
-          status: 'scheduled' | 'passed' | 'failed' | 'pending_retake' | 'cancelled'
-          score: number | null
+          munaqisy: string
           notes: string | null
-          created_at: string
-          updated_at: string
+          status: Database["public"]["Enums"]["test_status"]
+          student_id: string
+          tilawati_level: string
+          updated_at: string | null
         }
         Insert: {
+          class_id?: string | null
+          created_at?: string | null
+          date: string
           id?: string
-          student_id: string
-          current_jilid: string
-          target_jilid: string
-          test_date?: string
-          examiner_name?: string | null
-          status?: 'scheduled' | 'passed' | 'failed' | 'pending_retake' | 'cancelled'
-          score?: number | null
+          munaqisy: string
           notes?: string | null
-          created_at?: string
-          updated_at?: string
+          status?: Database["public"]["Enums"]["test_status"]
+          student_id: string
+          tilawati_level: string
+          updated_at?: string | null
         }
         Update: {
+          class_id?: string | null
+          created_at?: string | null
+          date?: string
           id?: string
-          student_id?: string
-          current_jilid?: string
-          target_jilid?: string
-          test_date?: string
-          examiner_name?: string | null
-          status?: 'scheduled' | 'passed' | 'failed' | 'pending_retake' | 'cancelled'
-          score?: number | null
+          munaqisy?: string
           notes?: string | null
-          created_at?: string
-          updated_at?: string
+          status?: Database["public"]["Enums"]["test_status"]
+          student_id?: string
+          tilawati_level?: string
+          updated_at?: string | null
         }
         Relationships: [
           {
+            foreignKeyName: "tilawati_level_tests_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "tilawati_level_tests_student_id_fkey"
             columns: ["student_id"]
+            isOneToOne: false
             referencedRelation: "students"
             referencedColumns: ["id"]
           },
@@ -251,7 +214,12 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      test_status:
+        | "scheduled"
+        | "passed"
+        | "failed"
+        | "pending_retake"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -259,21 +227,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -291,14 +263,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -314,14 +288,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -337,14 +313,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -352,20 +330,34 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
-  public: {
+  graphql_public: {
     Enums: {},
   },
+  public: {
+    Enums: {
+      test_status: [
+        "scheduled",
+        "passed",
+        "failed",
+        "pending_retake",
+        "cancelled",
+      ],
+    },
+  },
 } as const
+

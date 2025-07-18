@@ -181,7 +181,6 @@ const Profile: React.FC = () => {
         </ParentLayout>
       );
     case 'teacher':
-    default:
       return (
         <ProfileLayout breadcrumbs={breadcrumbs}>
           <div className="container mx-auto px-0 py-0 md:px-6 md:py-6">
@@ -285,6 +284,10 @@ const Profile: React.FC = () => {
           />
         </ProfileLayout>
       );
+    default:
+      // Handle null role - redirect to select role page
+      router.push('/select-role');
+      return null;
   }
 };
 

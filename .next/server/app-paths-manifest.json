@@ -1,6 +1,8 @@
 {
-  "/page": "app/page.js",
+  "/auth/page": "app/auth/page.js",
+  "/profile/page": "app/profile/page.js",
   "/dashboard/page": "app/dashboard/page.js",
-  "/students/page": "app/students/page.js",
-  "/auth/page": "app/auth/page.js"
+  "/page": "app/page.js",
+  "/class/[className]/page": "app/class/[className]/page.js",
+  "/api/delete-user/route": "app/api/delete-user/route.js"
 }

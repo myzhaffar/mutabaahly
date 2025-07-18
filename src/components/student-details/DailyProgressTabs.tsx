@@ -5,8 +5,6 @@ import ProgressEntriesTable from './ProgressEntriesTable';
 import { Button } from '@/components/ui/button';
 import ExportProgressDialog from './ExportProgressDialog';
 
-import { supabase } from '@/integrations/supabase/client';
-
 interface ProgressEntry {
   id: string;
   date: string;
@@ -38,25 +36,29 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
 
   React.useEffect(() => {
     if (activeTab && activeTab !== tab) setTab(activeTab);
-  }, [activeTab]);
+  }, [activeTab, tab]);
 
   const handleTabChange = (value: string) => {
     setTab(value);
     if (onTabChange) onTabChange(value);
   };
 
-  const handleDuplicate = async (entry: ProgressEntry) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleDuplicate = async (_entry: ProgressEntry) => {
     if (!studentId) return;
-    const newEntry = {
-      student_id: studentId,
-      date: new Date().toISOString().split('T')[0],
-      type: entry.type,
-      surah_or_jilid: entry.surah_or_jilid,
-      ayat_or_page: entry.ayat_or_page,
-      notes: entry.notes,
-    };
-    const { error } = await supabase.from('progress_entries').insert([newEntry]);
-    if (!error) onProgressUpdated();
+    // const newEntry = {
+    //   student_id: studentId,
+    //   date: new Date().toISOString().split('T')[0],
+    //   type: entry.type,
+    //   surah_or_jilid: entry.surah_or_jilid,
+    //   ayat_or_page: entry.ayat_or_page,
+    //   notes: entry.notes,
+    // };
+    // const { error } = await supabase.from('progress_entries').insert([newEntry]);
+    // if (!error) onProgressUpdated();
+    
+    // TODO: Implement when progress_entries table is created
+    console.log('Duplicate functionality temporarily disabled - progress_entries table not available');
   };
 
   return (

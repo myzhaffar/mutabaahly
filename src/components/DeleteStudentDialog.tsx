@@ -41,7 +41,7 @@ const DeleteStudentDialog: React.FC<DeleteStudentDialogProps> = ({
     if (profile?.role !== 'teacher') {
       toast({
         title: "Error",
-        description: "You don't have permission to delete students.",
+        description: "You don&apos;t have permission to delete students.",
         variant: "destructive",
       });
       return;
@@ -51,22 +51,22 @@ const DeleteStudentDialog: React.FC<DeleteStudentDialogProps> = ({
 
     try {
       // Delete related progress entries first
-      await supabase
-        .from('progress_entries')
-        .delete()
-        .eq('student_id', studentId);
+      // await supabase
+      //   .from('progress_entries')
+      //   .delete()
+      //   .eq('student_id', studentId);
 
       // Delete related hafalan progress
-      await supabase
-        .from('hafalan_progress')
-        .delete()
-        .eq('student_id', studentId);
+      // await supabase
+      //   .from('hafalan_progress')
+      //   .delete()
+      //   .eq('student_id', studentId);
 
       // Delete related tilawah progress
-      await supabase
-        .from('tilawah_progress')
-        .delete()
-        .eq('student_id', studentId);
+      // await supabase
+      //   .from('tilawah_progress')
+      //   .delete()
+      //   .eq('student_id', studentId);
 
       // Finally delete the student
       const { error } = await supabase

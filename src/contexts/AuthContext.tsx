@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface Profile {
   id: string;
   full_name: string;
-  role: "parent" | "teacher";
+  role: "parent" | "teacher" | null;
   email?: string;
   avatar_url?: string | null;
   created_at: string;
@@ -67,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const typedProfile: Profile = {
           id: dbProfile.id,
           full_name: dbProfile.full_name,
-          role: dbProfile.role as 'teacher' | 'parent',
+          role: dbProfile.role as 'teacher' | 'parent' | null,
           email: dbProfile.email,
           avatar_url: dbProfile.avatar_url,
           created_at: dbProfile.created_at,
@@ -193,14 +193,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const createProfile = async (user: User, role: "parent" | "teacher") => {
+  const createProfile = async (user: User, role?: "parent" | "teacher") => {
     const { data, error } = await supabase
       .from("profiles")
       .insert([
         {
           id: user.id,
           full_name: user.user_metadata.full_name || "",
-          role,
+          role: role || undefined, // Use undefined instead of null
           email: user.email || undefined,
           avatar_url: null,
           created_at: new Date().toISOString(),

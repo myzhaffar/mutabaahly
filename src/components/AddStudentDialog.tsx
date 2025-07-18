@@ -4,12 +4,11 @@ import { Button } from '@/components/ui/button';
 import { GradientButton } from '@/components/ui/gradient-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus } from 'lucide-react';
+import { Plus, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import FileUpload from '@/components/ui/file-upload';
 import { useAuth } from '@/contexts/useAuth';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FIXED_TEACHERS } from '@/utils/rankingDataService';
 
 interface AddStudentDialogProps {
@@ -20,6 +19,7 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [teacherDropdownOpen, setTeacherDropdownOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     group_name: '',
@@ -63,7 +63,7 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
     if (profile?.role !== 'teacher') {
       toast({
         title: "Error",
-        description: "You don't have permission to add students.",
+        description: "You don&apos;t have permission to add students.",
         variant: "destructive",
       });
       return;
@@ -116,6 +116,9 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const femaleTeachers = FIXED_TEACHERS.filter(t => t.name.startsWith('Ustz.'));
+  const maleTeachers = FIXED_TEACHERS.filter(t => t.name.startsWith('Ust.'));
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -158,22 +161,62 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
           </div>
           <div className="space-y-2">
             <Label htmlFor="teacher">Teacher</Label>
-            <Select
-              value={formData.teacher}
-              onValueChange={(value) => handleInputChange('teacher', value)}
-              required
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select teacher" />
-              </SelectTrigger>
-              <SelectContent>
-                {FIXED_TEACHERS.map((teacher) => (
-                  <SelectItem key={teacher.id} value={teacher.name}>
-                    {teacher.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setTeacherDropdownOpen(!teacherDropdownOpen)}
+                className="w-full flex items-center justify-between px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              >
+                <span className={formData.teacher ? 'text-foreground' : 'text-muted-foreground'}>
+                  {formData.teacher || 'Select teacher'}
+                </span>
+                <ChevronDown className="h-4 w-4 opacity-50" />
+              </button>
+              
+              {teacherDropdownOpen && (
+                <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                  <div className="p-2">
+                    <div className="grid grid-cols-2 gap-4">
+                      {/* Female Teachers */}
+                      <div className="space-y-2">
+                        <div className="font-semibold text-emerald-700 text-sm mb-2">Female</div>
+                        {femaleTeachers.map((teacher) => (
+                          <button
+                            key={teacher.id}
+                            type="button"
+                            onClick={() => {
+                              handleInputChange('teacher', teacher.name);
+                              setTeacherDropdownOpen(false);
+                            }}
+                            className="w-full text-left px-2 py-1 text-sm hover:bg-gray-100 rounded"
+                          >
+                            {teacher.name}
+                          </button>
+                        ))}
+                      </div>
+                      
+                      {/* Male Teachers */}
+                      <div className="space-y-2">
+                        <div className="font-semibold text-teal-700 text-sm mb-2">Male</div>
+                        {maleTeachers.map((teacher) => (
+                          <button
+                            key={teacher.id}
+                            type="button"
+                            onClick={() => {
+                              handleInputChange('teacher', teacher.name);
+                              setTeacherDropdownOpen(false);
+                            }}
+                            className="w-full text-left px-2 py-1 text-sm hover:bg-gray-100 rounded"
+                          >
+                            {teacher.name}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
