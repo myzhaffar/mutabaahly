@@ -88,10 +88,10 @@ const ClassDetail: React.FC = () => {
             return {
               id: student.id,
               name: student.name,
-              grade: student.grade ?? null,
-              group_name: student.group_name ?? '',
-              teacher: student.teacher ?? '',
-              photo: student.photo ?? null,
+              grade: null,
+              group_name: '',
+              teacher: '',
+              photo: null,
               hafalan_progress: hafalanProgress.percentage > 0 ? hafalanProgress : null,
               tilawah_progress: tilawahProgress.percentage > 0 ? tilawahProgress : null,
             };
@@ -99,10 +99,10 @@ const ClassDetail: React.FC = () => {
             return {
               id: student.id,
               name: student.name,
-              grade: student.grade ?? null,
-              group_name: student.group_name ?? '',
-              teacher: student.teacher ?? '',
-              photo: student.photo ?? null,
+              grade: null,
+              group_name: '',
+              teacher: '',
+              photo: null,
               hafalan_progress: null,
               tilawah_progress: null,
             };
