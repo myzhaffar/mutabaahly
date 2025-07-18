@@ -1,7 +1,7 @@
 {
-  "/dashboard/page": "app/dashboard/page.js",
-  "/profile/page": "app/profile/page.js",
   "/auth/page": "app/auth/page.js",
+  "/class/[className]/page": "app/class/[className]/page.js",
   "/page": "app/page.js",
-  "/class/[className]/page": "app/class/[className]/page.js"
+  "/dashboard/page": "app/dashboard/page.js",
+  "/profile/page": "app/profile/page.js"
 }
