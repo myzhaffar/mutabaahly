@@ -13,6 +13,7 @@ import BulkUploadStudentsDialog from '@/components/BulkUploadStudentsDialog';
 import ClassCard from '@/components/dashboard/ClassCard';
 import ParentLayout from '@/components/layouts/ParentLayout';
 import { useToast } from '@/hooks/use-toast';
+import type { ProgressEntry } from '@/types/progress';
 
 interface Student {
   id: string;
@@ -91,29 +92,31 @@ const Dashboard = () => {
       const studentsWithProgress = await Promise.all(
         (studentsData || []).map(async (student) => {
           try {
-            // Fetch hafalan progress entries
-            const { data: hafalanEntries, error: hafalanError } = await supabase
-              .from('progress_entries')
-              .select('*')
-              .eq('student_id', student.id)
-              .eq('type', 'hafalan');
-
-            if (hafalanError) {
-              console.error(`Error fetching hafalan entries for student ${student.id} (${student.name}):`, hafalanError);
-              // Potentially skip this student's progress update or handle error appropriately
-            }
-
-            // Fetch tilawah progress entries
-            const { data: tilawahEntries, error: tilawahError } = await supabase
-              .from('progress_entries')
-              .select('*')
-              .eq('student_id', student.id)
-              .eq('type', 'tilawah');
-
-            if (tilawahError) {
-              console.error(`Error fetching tilawah entries for student ${student.id} (${student.name}):`, tilawahError);
-              // Potentially skip this student's progress update
-            }
+            // TODO: Disabled because 'progress_entries', 'hafalan_progress', and 'tilawah_progress' tables do not exist in production DB.
+            // const { data: hafalanEntries, error: hafalanError } = await supabase
+            //   .from('progress_entries')
+            //   .select('*')
+            //   .eq('student_id', student.id)
+            //   .eq('type', 'hafalan');
+            // const { data: tilawahEntries, error: tilawahError } = await supabase
+            //   .from('progress_entries')
+            //   .select('*')
+            //   .eq('student_id', student.id)
+            //   .eq('type', 'tilawah');
+            // if (hafalanEntries && hafalanEntries.length > 0 && !hafalanError) {
+            //   const { error: upsertHafalanError } = await supabase
+            //     .from('hafalan_progress')
+            //     .upsert(...);
+            // }
+            // if (tilawahEntries && tilawahEntries.length > 0 && !tilawahError) {
+            //   const { error: upsertTilawahError } = await supabase
+            //     .from('tilawah_progress')
+            //     .upsert(...);
+            // }
+            const hafalanEntries: ProgressEntry[] = [];
+            const tilawahEntries: ProgressEntry[] = [];
+            // Optionally, show a warning in the UI if this data is required.
+            // Provide fallback progress values if needed.
 
             // Calculate progress based on entries
             const hafalanProgress = calculateHafalanProgress(hafalanEntries || []);
@@ -121,36 +124,41 @@ const Dashboard = () => {
 
             // Update progress in database
             // Only attempt upsert if entries were successfully fetched and exist
-            if (hafalanEntries && hafalanEntries.length > 0 && !hafalanError) {
-              const { error: upsertHafalanError } = await supabase
-                .from('hafalan_progress')
-                .upsert({
-                  student_id: student.id,
-                  percentage: hafalanProgress.percentage,
-                  last_surah: hafalanProgress.last_surah,
-                  updated_at: new Date().toISOString()
-                });
-              if (upsertHafalanError) {
-                console.error(`Error upserting hafalan progress for student ${student.id} (${student.name}):`, upsertHafalanError);
-              }
+            if (hafalanEntries && hafalanEntries.length > 0) {
+              // const { error: upsertHafalanError } = await supabase
+              //   .from('hafalan_progress')
+              //   .upsert({
+              //     student_id: student.id,
+              //     percentage: hafalanProgress.percentage,
+              //     last_surah: hafalanProgress.last_surah,
+              //     updated_at: new Date().toISOString()
+              //   });
+              // if (upsertHafalanError) {
+              //   console.error(`Error upserting hafalan progress for student ${student.id} (${student.name}):`, upsertHafalanError);
+              // }
             }
 
-            if (tilawahEntries && tilawahEntries.length > 0 && !tilawahError) {
-              const { error: upsertTilawahError } = await supabase
-                .from('tilawah_progress')
-                .upsert({
-                  student_id: student.id,
-                  percentage: tilawahProgress.percentage,
-                  jilid: tilawahProgress.jilid,
-                  updated_at: new Date().toISOString()
-                });
-              if (upsertTilawahError) {
-                console.error(`Error upserting tilawah progress for student ${student.id} (${student.name}):`, upsertTilawahError);
-              }
+            if (tilawahEntries && tilawahEntries.length > 0) {
+              // const { error: upsertTilawahError } = await supabase
+              //   .from('tilawah_progress')
+              //   .upsert({
+              //     student_id: student.id,
+              //     percentage: tilawahProgress.percentage,
+              //     jilid: tilawahProgress.jilid,
+              //     updated_at: new Date().toISOString()
+              //   });
+              // if (upsertTilawahError) {
+              //   console.error(`Error upserting tilawah progress for student ${student.id} (${student.name}):`, upsertTilawahError);
+              // }
             }
 
             return {
-              ...student,
+              id: student.id,
+              name: student.name,
+              grade: '',
+              group_name: '',
+              teacher: '',
+              photo: null,
               hafalan_progress: hafalanProgress.percentage > 0 ? {
                 percentage: hafalanProgress.percentage,
                 last_surah: hafalanProgress.last_surah
@@ -162,11 +170,13 @@ const Dashboard = () => {
             };
           } catch (error) {
             console.error(`Failed to process or update progress for student ${student.id} (${student.name}):`, error);
-            // Return the original student object if an error occurs during processing
-            // This ensures the student still appears in the list.
-            // Add null progress fields to satisfy the Student type
-            return { 
-              ...student,
+            return {
+              id: student.id,
+              name: student.name,
+              grade: '',
+              group_name: '',
+              teacher: '',
+              photo: null,
               hafalan_progress: null,
               tilawah_progress: null
             };

@@ -2,6 +2,6 @@
   "/page": "app/page.js",
   "/dashboard/page": "app/dashboard/page.js",
   "/auth/page": "app/auth/page.js",
-  "/profile/page": "app/profile/page.js",
-  "/class/[className]/page": "app/class/[className]/page.js"
+  "/class/[className]/page": "app/class/[className]/page.js",
+  "/profile/page": "app/profile/page.js"
 }
