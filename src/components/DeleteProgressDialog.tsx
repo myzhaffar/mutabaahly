@@ -34,12 +34,19 @@ const DeleteProgressDialog: React.FC<DeleteProgressDialogProps> = ({
     setLoading(true);
 
     try {
-      const { error } = await supabase
-        .from('progress_entries')
-        .delete()
-        .eq('id', entryId);
+      // TODO: Disabled because 'progress_entries' table does not exist in production DB.
+      // const { error } = await supabase
+      //   .from('progress_entries')
+      //   .delete()
+      //   .eq('id', entryId);
+      toast({
+        title: 'Not Implemented',
+        description: 'Progress entry deletion is temporarily disabled. Please contact admin.',
+        variant: 'destructive',
+      });
 
-      if (error) throw error;
+      // Remove unused error check since deletion is disabled
+      // if (error) throw error;
 
       toast({
         title: "Success",
