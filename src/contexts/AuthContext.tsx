@@ -182,30 +182,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const createProfile = async (user: User, role?: "parent" | "teacher") => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .insert([
-        {
-          id: user.id,
-          full_name: user.user_metadata.full_name || "",
-          role: role || undefined, // Use undefined instead of null
-          email: user.email || undefined,
-          avatar_url: null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ])
-      .select()
-      .single();
 
-    if (error) {
-      console.error("Error creating profile:", error);
-      throw error;
-    }
-
-    return data;
-  };
 
   return (
     <AuthContext.Provider value={{
