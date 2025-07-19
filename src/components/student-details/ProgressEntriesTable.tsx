@@ -78,11 +78,12 @@ const ProgressEntriesTable: React.FC<ProgressEntriesTableProps> = ({
                         type="button"
                         className="inline-flex items-center justify-center rounded p-2 text-black transition-transform duration-150 hover:scale-110 hover:text-blue-600 focus:outline-none"
                         title="Duplicate"
-                        onClick={() => onDuplicateEntry && onDuplicateEntry(entry)}
+                        onClick={() => onDuplicateEntry ? onDuplicateEntry(entry) : undefined}
                       >
                         <Copy className="h-4 w-4" />
                       </button>
                       <DeleteProgressDialog 
+                        entryId={entry.id}
                         entryType={type} 
                         onProgressDeleted={onProgressUpdated} 
                       />

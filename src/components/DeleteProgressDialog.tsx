@@ -14,15 +14,16 @@ import {
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DeleteProgressDialogProps {
-  // entryId: string; // Remove unused prop
+  entryId: string;
   entryType: string;
   onProgressDeleted: () => void;
 }
 
 const DeleteProgressDialog: React.FC<DeleteProgressDialogProps> = ({
-  // entryId, // Remove unused prop
+  entryId,
   entryType,
   onProgressDeleted
 }) => {
@@ -31,27 +32,17 @@ const DeleteProgressDialog: React.FC<DeleteProgressDialogProps> = ({
 
   const handleDelete = async () => {
     setLoading(true);
-
     try {
-      // TODO: Disabled because 'progress_entries' table does not exist in production DB.
-      // const { error } = await supabase
-      //   .from('progress_entries')
-      //   .delete()
-      //   .eq('id', entryId);
-      toast({
-        title: 'Not Implemented',
-        description: 'Progress entry deletion is temporarily disabled. Please contact admin.',
-        variant: 'destructive',
-      });
-
-      // Remove unused error check since deletion is disabled
-      // if (error) throw error;
-
+      // Delete from progress_entries table
+      const { error } = await supabase
+        .from('progress_entries')
+        .delete()
+        .eq('id', entryId);
+      if (error) throw error;
       toast({
         title: "Success",
         description: "Progress entry deleted successfully!",
       });
-
       onProgressDeleted();
     } catch (error) {
       console.error('Error deleting progress:', error);

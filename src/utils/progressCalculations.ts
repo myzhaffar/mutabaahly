@@ -9,10 +9,15 @@ export const calculateHafalanProgress = (entries: ProgressEntry[]) => {
     return { percentage: 0, last_surah: null, total_verses: 0 };
   }
 
-  // Sort entries by date to get the most recent
+  // Sort entries by date descending
   const sortedEntries = [...entries].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
+
+  // Get the latest date
+  const latestDate = sortedEntries[0].date;
+  // Get all entries for the latest date
+  const latestDateEntries = entries.filter(e => e.date === latestDate);
 
   // Get the current surah from the latest entry
   const currentSurah = sortedEntries[0].surah_or_jilid;
@@ -22,59 +27,33 @@ export const calculateHafalanProgress = (entries: ProgressEntry[]) => {
     return { percentage: 0, last_surah: currentSurah, total_verses: 0 };
   }
 
-  // Find the latest surah change date
-  let latestSurahStartDate = new Date(sortedEntries[0].date);
-  for (let i = 1; i < sortedEntries.length; i++) {
-    if (sortedEntries[i].surah_or_jilid !== currentSurah) {
-      latestSurahStartDate = new Date(sortedEntries[0].date);
-      break;
-    }
-  }
-
-  // Get all entries for the current surah after the latest surah change
-  const currentSurahEntries = entries.filter(entry => 
-    entry.surah_or_jilid === currentSurah && 
-    new Date(entry.date) >= latestSurahStartDate
-  );
-  
-  // Track which verses have been memorized
-  const memorizedVerses = new Set<number>();
-
-  // Process all entries for the current surah
-  for (const entry of currentSurahEntries) {
+  // Find the highest ayat memorized on the latest date
+  let highestAyat = 0;
+  for (const entry of latestDateEntries) {
     if (entry.ayat_or_page) {
-        const ayatRange = entry.ayat_or_page;
-
-        if (ayatRange.includes('-')) {
-        // Handle verse range (e.g., "1-5")
-          const [start, end] = ayatRange.split('-').map(num => parseInt(num.trim()));
-          if (!isNaN(start) && !isNaN(end) && end >= start) {
-          // Add all verses in the range to the set
-          for (let verse = start; verse <= end; verse++) {
-            if (verse <= surahData.verses) { // Only add if within surah's verse count
-              memorizedVerses.add(verse);
-            }
-          }
-          }
-        } else {
-        // Handle single verse
-        const verse = parseInt(ayatRange);
-        if (!isNaN(verse) && verse <= surahData.verses) {
-          memorizedVerses.add(verse);
+      const ayatRange = entry.ayat_or_page;
+      if (ayatRange.includes('-')) {
+        const parts = ayatRange.split('-').map(num => parseInt(num.trim()));
+        if (parts.length === 2 && !isNaN(parts[1])) {
+          if (parts[1] > highestAyat) highestAyat = parts[1];
+        }
+      } else {
+        const ayatNum = parseInt(ayatRange.trim());
+        if (!isNaN(ayatNum) && ayatNum > highestAyat) highestAyat = ayatNum;
       }
     }
-    }
   }
 
-  // Calculate percentage based on unique verses memorized out of total verses in the surah
-  const uniqueVersesMemorized = memorizedVerses.size;
-  const percentage = Math.min(Math.round((uniqueVersesMemorized / surahData.verses) * 100), 100);
+  // Clamp to surah's total verses
+  if (highestAyat > surahData.verses) highestAyat = surahData.verses;
+
+  const percentage = Math.min(Math.round((highestAyat / surahData.verses) * 100), 100);
 
   return {
     percentage,
     last_surah: currentSurah,
-    total_verses: uniqueVersesMemorized,
-    start_date: latestSurahStartDate.toISOString().split('T')[0] // Add start date for reference
+    total_verses: highestAyat,
+    latest_date: latestDate
   };
 };
 

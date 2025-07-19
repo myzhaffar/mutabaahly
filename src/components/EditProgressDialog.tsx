@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Edit } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { quranSurahs } from '@/utils/quranData';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ProgressEntry {
   id: string;
@@ -46,22 +47,19 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
     setLoading(true);
 
     try {
-      // TODO: Disabled because 'progress_entries' table does not exist in production DB.
-      // const { error } = await supabase
-      //   .from('progress_entries')
-      //   .update(formData)
-      //   .eq('id', entry.id);
-      toast({
-        title: 'Not Implemented',
-        description: 'Progress entry editing is temporarily disabled. Please contact admin.',
-        variant: 'destructive',
-      });
-
+      const updatePayload = {
+        ...formData,
+        updated_at: new Date().toISOString(),
+      };
+      const { error } = await supabase
+        .from('progress_entries')
+        .update(updatePayload)
+        .eq('id', entry.id);
+      if (error) throw error;
       toast({
         title: "Success",
         description: "Progress updated successfully!",
       });
-
       setOpen(false);
       onProgressUpdated();
       if (entry.type === 'tilawah' && setActiveTab) setActiveTab('tilawah');
