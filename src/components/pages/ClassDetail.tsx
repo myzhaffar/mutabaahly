@@ -43,16 +43,23 @@ const ClassDetail: React.FC = () => {
   const [search, setSearch] = useState('');
   const [selectedTeachers, setSelectedTeachers] = useState<string[]>([]);
   const [teacherFilterOpen, setTeacherFilterOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('all');
+  // Removed allStudents state
+  const [subClasses, setSubClasses] = useState<string[]>([]);
   const { toast } = useToast();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const fetchStudents = async () => {
       setLoading(true);
-      const { data: studentsData, error: studentsError } = await supabase
-        .from('students')
-        .select('*')
-        .eq('group_name', className);
+      let studentsQuery = supabase.from('students').select('*');
+      // If className is a number, treat as grade; else as group_name
+      if (!isNaN(Number(className))) {
+        studentsQuery = studentsQuery.eq('grade', className);
+      } else {
+        studentsQuery = studentsQuery.eq('group_name', className);
+      }
+      const { data: studentsData, error: studentsError } = await studentsQuery;
       console.log('DEBUG: studentsData:', studentsData, 'studentsError:', studentsError); // Debug log
       if (studentsError || !studentsData) {
         toast({
@@ -63,6 +70,13 @@ const ClassDetail: React.FC = () => {
         setStudents([]);
         setLoading(false);
         return;
+      }
+      // For grade view, also extract all sub-classes
+      if (!isNaN(Number(className))) {
+        const uniqueClasses = Array.from(new Set(studentsData.map(s => s.group_name).filter(Boolean)));
+        setSubClasses(uniqueClasses);
+      } else {
+        setSubClasses([]);
       }
       // For each student, fetch their progress entries and calculate progress
       const studentsWithProgress = await Promise.all(
@@ -156,6 +170,16 @@ const ClassDetail: React.FC = () => {
   const hasAnyActiveTeacherFilter = selectedTeachers.length > 0;
   const clearTeacherFilters = () => setSelectedTeachers([]);
 
+  // Tabs logic
+  const showTabs = !isNaN(Number(className));
+  const tabList = ['all', ...subClasses];
+  const tabLabels: Record<string, string> = { all: 'All Classes' };
+  subClasses.forEach(cls => { tabLabels[cls] = cls; });
+  // Filter students for active tab
+  const studentsToShow = showTabs && activeTab !== 'all'
+    ? students.filter(s => s.group_name === activeTab)
+    : students;
+
   const breadcrumbs = [
     { label: 'Dashboard', href: '/dashboard' },
     { label: className }
@@ -176,11 +200,31 @@ const ClassDetail: React.FC = () => {
           <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
             {className}
             <span className="inline-flex items-center justify-center px-2 py-0.5 ml-1 text-xs font-semibold leading-none text-white bg-emerald-500 rounded-full">
-              {filteredStudents.length}
+              {studentsToShow.length}
             </span>
           </h1>
         </div>
       </div>
+      {/* Tabs for grade view */}
+      {showTabs && (
+        <div className="mb-4">
+          <div className="flex bg-gray-100 rounded-full p-1 overflow-x-auto whitespace-nowrap scrollbar-hide w-full max-w-full">
+            {tabList.map(tab => (
+              <button
+                key={tab}
+                className={`min-w-max px-4 py-2 rounded-full font-medium transition-all duration-200 focus:outline-none
+                  ${activeTab === tab
+                    ? 'bg-emerald-500 text-white shadow'
+                    : 'bg-transparent text-gray-700 hover:text-emerald-500'}
+                `}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tabLabels[tab]}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       {/* Modern Filter Card with Search and Teacher Filter */}
       <div className="sticky top-14 z-20 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-200 mb-6 px-0 sm:px-0">
         <div className="px-6 pt-6 pb-2">
@@ -265,11 +309,14 @@ const ClassDetail: React.FC = () => {
         <div className="text-center py-12 text-gray-500">Loading students...</div>
       ) : (
         <StudentsGrid
-          students={students.map(student => ({
+          students={studentsToShow.map(student => ({
             ...student,
             grade: student.grade || 'Unknown'
           }))}
-          filteredStudents={filteredStudents.map(student => ({
+          filteredStudents={studentsToShow.filter(student =>
+            student.name.toLowerCase().includes(search.toLowerCase()) &&
+            (selectedTeachers.length === 0 || selectedTeachers.includes(getTeacherId(student)))
+          ).map(student => ({
             ...student,
             grade: student.grade || 'Unknown'
           }))}

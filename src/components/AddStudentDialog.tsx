@@ -22,6 +22,7 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
   const [teacherDropdownOpen, setTeacherDropdownOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
+    grade: '',
     group_name: '',
     teacher: ''
   });
@@ -86,6 +87,7 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
         .from('students')
         .insert([{
           ...formData,
+          grade: formData.grade || null,
           photo: photoUrl
         }]);
 
@@ -96,7 +98,7 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
         description: "Student added successfully!",
       });
 
-      setFormData({ name: '', group_name: '', teacher: '' });
+      setFormData({ name: '', grade: '', group_name: '', teacher: '' });
       setSelectedFile(null);
       setOpen(false);
       onStudentAdded();
@@ -151,13 +153,34 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
             />
           </div>
           <div className="space-y-2">
+            <Label htmlFor="grade">Grade</Label>
+            <select
+              id="grade"
+              value={formData.grade}
+              onChange={e => handleInputChange('grade', e.target.value)}
+              required
+              className="w-full px-3 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            >
+              <option value="">Select grade</option>
+              {[1,2,3,4,5,6].map(g => (
+                <option key={g} value={g}>{g}</option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="group_name">Class</Label>
-            <Input
+            <select
               id="group_name"
               value={formData.group_name}
-              onChange={(e) => handleInputChange('group_name', e.target.value)}
+              onChange={e => handleInputChange('group_name', e.target.value)}
               required
-            />
+              className="w-full px-3 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            >
+              <option value="">Select class</option>
+              <option value="Makkah">Makkah</option>
+              <option value="Madinah">Madinah</option>
+              <option value="Aqsha">Aqsha</option>
+            </select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="teacher">Teacher</Label>

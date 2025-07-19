@@ -70,6 +70,7 @@ const Dashboard = () => {
     avgTilawahProgress: 0,
     completedStudents: 0
   });
+  const [groupedByGrade, setGroupedByGrade] = useState<Record<string, { students: Student[]; classes: string[] }>>({});
 
   const fetchStudents = useCallback(async () => {
     try {
@@ -133,7 +134,7 @@ const Dashboard = () => {
             return {
               id: student.id,
               name: student.name,
-              grade: '', // Not used in current schema
+              grade: student.grade || 'Unknown',
               group_name: student.group_name || 'Unknown Class',
               teacher: student.teacher || 'Unknown Teacher',
               photo: student.photo,
@@ -165,6 +166,22 @@ const Dashboard = () => {
       console.log('Processed students with progress:', studentsWithProgress);
       setStudents(studentsWithProgress as Student[]); // Explicitly cast to Student[]
       
+      // Group students by grade and collect unique sub-classes
+      const grouped: Record<string, { students: Student[]; classes: string[] }> = {};
+      for (const student of studentsWithProgress) {
+        const grade = student.grade || 'Unknown';
+        if (!grouped[grade]) {
+          grouped[grade] = { students: [], classes: [] };
+        }
+        grouped[grade].students.push(student);
+        if (student.group_name && !grouped[grade].classes.includes(student.group_name)) {
+          grouped[grade].classes.push(student.group_name);
+        }
+      }
+      setGroupedByGrade(grouped);
+      // TODO: Use groupedByGrade in the UI in the next step
+      console.log('Grouped by grade:', grouped);
+
       // Calculate stats
       const totalStudents = studentsWithProgress.length;
       const avgHafalan = studentsWithProgress.reduce((sum, s) => sum + (s.hafalan_progress?.percentage || 0), 0) / totalStudents;
@@ -231,6 +248,28 @@ const Dashboard = () => {
     return acc;
   }, {} as Record<string, Student[]>);
 
+  // UI: Render one card per grade
+  const gradeCards = Object.entries(groupedByGrade).map(([grade, info]) => (
+    <div key={grade} className="bg-white rounded-lg shadow-sm p-6 flex flex-col justify-between">
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Grade {grade}</h2>
+        <p className="text-gray-600 mb-2">{info.students.length} students</p>
+        <div className="mb-4">
+          <span className="text-sm text-gray-500">Classes: </span>
+          {info.classes.map(cls => (
+            <span key={cls} className="inline-block bg-gray-100 text-gray-700 rounded-full px-3 py-1 text-xs font-semibold mr-2 mb-2">{cls}</span>
+          ))}
+        </div>
+      </div>
+      <button
+        className="mt-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+        onClick={() => router.push(`/class/${encodeURIComponent(grade)}`)}
+      >
+        View Student Class
+      </button>
+    </div>
+  ));
+
   if (profile?.role === 'teacher') {
     const breadcrumbs = [{ label: 'Dashboard' }];
     return (
@@ -254,9 +293,7 @@ const Dashboard = () => {
             <div className="mb-6">
               {dataLoading ? <StudentGridSkeleton /> : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {Object.entries(classGroups).map(([className, classStudents]) => (
-                    <ClassCard key={className} className={className} classStudents={classStudents} />
-                  ))}
+                  {gradeCards}
                 </div>
               )}
             </div>
