@@ -99,7 +99,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               .eq('id', session.user.id)
               .single();
             if (!profileData && !profileError) {
-              console.log('DEBUG: user_metadata before profile insert:', session.user.user_metadata);
               // Create profile with role from user metadata
               await supabase.from('profiles').insert([
                 {
@@ -181,6 +180,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Error signing out:', error);
       return { error: error as AuthError | null };
     }
+  };
+
+  const createProfile = async (user: User, role?: "parent" | "teacher") => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .insert([
+        {
+          id: user.id,
+          full_name: user.user_metadata.full_name || "",
+          role: role || undefined, // Use undefined instead of null
+          email: user.email || undefined,
+          avatar_url: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error creating profile:", error);
+      throw error;
+    }
+
+    return data;
   };
 
   return (
