@@ -29,6 +29,41 @@ export interface Database {
           updated_at?: string;
         };
       };
+      progress_entries: {
+        Row: {
+          id: string;
+          student_id: string;
+          type: 'hafalan' | 'tilawah';
+          date: string;
+          surah_or_jilid: string | null;
+          ayat_or_page: string | null;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          student_id: string;
+          type: 'hafalan' | 'tilawah';
+          date: string;
+          surah_or_jilid?: string | null;
+          ayat_or_page?: string | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          student_id?: string;
+          type?: 'hafalan' | 'tilawah';
+          date?: string;
+          surah_or_jilid?: string | null;
+          ayat_or_page?: string | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
       tilawati_level_tests: {
         Row: {
           id: string;

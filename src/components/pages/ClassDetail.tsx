@@ -68,41 +68,58 @@ const ClassDetail: React.FC = () => {
       const studentsWithProgress = await Promise.all(
         studentsData.map(async (student) => {
           try {
-            // TODO: Disabled because 'progress_entries' table does not exist in production DB.
-            // const { data: hafalanEntries } = await supabase
-            //   .from('progress_entries')
-            //   .select('*')
-            //   .eq('student_id', student.id)
-            //   .eq('type', 'hafalan');
-            // const { data: tilawahEntries } = await supabase
-            //   .from('progress_entries')
-            //   .select('*')
-            //   .eq('student_id', student.id)
-            //   .eq('type', 'tilawah');
-            // If needed, set empty arrays or fallback:
-            const hafalanEntries: ProgressEntry[] = [];
-            const tilawahEntries: ProgressEntry[] = [];
-            // Optionally, show a warning in the UI if this data is required.
-            const hafalanProgress = calculateHafalanProgress(hafalanEntries || []);
-            const tilawahProgress = calculateTilawahProgress(tilawahEntries || []);
+            // Fetch progress entries from the database
+            const { data: progressEntries, error: progressError } = await supabase
+              .from('progress_entries')
+              .select('*')
+              .eq('student_id', student.id)
+              .order('date', { ascending: false });
+
+            if (progressError) {
+              console.error(`Error fetching progress for student ${student.id}:`, progressError);
+            }
+
+            console.log(`Progress entries for ${student.name}:`, progressEntries);
+
+            // Calculate progress based on actual entries
+            const hafalanEntries = progressEntries?.filter(entry => entry.type === 'hafalan') || [];
+            const tilawahEntries = progressEntries?.filter(entry => entry.type === 'tilawah') || [];
+
+            console.log(`Hafalan entries for ${student.name}:`, hafalanEntries);
+            console.log(`Tilawah entries for ${student.name}:`, tilawahEntries);
+
+            // Calculate progress percentages
+            const hafalanProgress = calculateHafalanProgress(hafalanEntries);
+            const tilawahProgress = calculateTilawahProgress(tilawahEntries);
+
+            console.log(`Student ${student.name}: class=${student.group_name}, teacher=${student.teacher}`);
+            console.log(`Progress - Hafalan: ${hafalanProgress.percentage}%, Tilawah: ${tilawahProgress.percentage}%`);
+
             return {
               id: student.id,
               name: student.name,
-              grade: null,
-              group_name: '',
-              teacher: '',
-              photo: null,
-              hafalan_progress: hafalanProgress.percentage > 0 ? hafalanProgress : null,
-              tilawah_progress: tilawahProgress.percentage > 0 ? tilawahProgress : null,
+              grade: student.grade || null,
+              group_name: student.group_name || '',
+              teacher: student.teacher || '',
+              photo: student.photo,
+              hafalan_progress: hafalanProgress.percentage > 0 ? {
+                percentage: hafalanProgress.percentage,
+                last_surah: hafalanProgress.last_surah
+              } : null,
+              tilawah_progress: tilawahProgress.percentage > 0 ? {
+                percentage: tilawahProgress.percentage,
+                jilid: tilawahProgress.jilid
+              } : null,
             };
-          } catch {
+          } catch (error) {
+            console.error(`Failed to process progress for student ${student.id} (${student.name}):`, error);
             return {
               id: student.id,
               name: student.name,
-              grade: null,
-              group_name: '',
-              teacher: '',
-              photo: null,
+              grade: student.grade || null,
+              group_name: student.group_name || '',
+              teacher: student.teacher || '',
+              photo: student.photo,
               hafalan_progress: null,
               tilawah_progress: null,
             };

@@ -10,13 +10,21 @@ import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/useAuth';
 import { quranSurahs } from '@/utils/quranData';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AddProgressDialogProps {
   open: boolean;
   setOpen: (open: boolean) => void;
+  studentId?: string;
+  onProgressAdded?: () => void;
 }
 
-const AddProgressDialog: React.FC<AddProgressDialogProps> = ({ open, setOpen }) => {
+const AddProgressDialog: React.FC<AddProgressDialogProps> = ({ 
+  open, 
+  setOpen, 
+  studentId, 
+  onProgressAdded 
+}) => {
   const [loading, setLoading] = useState(false);
   const { profile } = useAuth();
   const [formData, setFormData] = useState({
@@ -49,29 +57,73 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({ open, setOpen }) 
         return;
       }
 
-      // TODO: The following code is disabled because the 'progress_entries' table does not exist in the current DB schema.
-      // const { error } = await supabase
-      //   .from('progress_entries')
-      //   .insert([{ student_id: studentId, ...formData }]);
-      // if (error) {
-      //   setLoading(false);
-      //   toast({
-      //     title: 'Error',
-      //     description: 'Failed to add progress entry.',
-      //     variant: 'destructive',
-      //   });
-      //   return;
-      // }
-      // onProgressAdded();
-      // setLoading(false);
-      // onOpenChange(false);
-      // Instead, just show a warning for now:
-      toast({
-        title: 'Not Implemented',
-        description: 'Progress entry saving is temporarily disabled. Please contact admin.',
-        variant: 'destructive',
+      // Save progress entry to database
+      if (!studentId) {
+        toast({
+          title: 'Error',
+          description: 'Student ID is required to save progress.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      console.log('Saving progress entry:', {
+        student_id: studentId,
+        type: formData.type,
+        date: formData.date,
+        surah_or_jilid: formData.surah_or_jilid || null,
+        ayat_or_page: formData.ayat_or_page || null,
+        notes: formData.notes || null
       });
-      setLoading(false);
+
+      const { data, error } = await supabase
+        .from('progress_entries')
+        .insert([{ 
+          student_id: studentId, 
+          type: formData.type as 'hafalan' | 'tilawah',
+          date: formData.date,
+          surah_or_jilid: formData.surah_or_jilid || null,
+          ayat_or_page: formData.ayat_or_page || null,
+          notes: formData.notes || null
+        }])
+        .select();
+
+      if (error) {
+        console.error('Error saving progress entry:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to add progress entry. Please try again.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      console.log('Progress entry saved successfully:', data);
+      
+      // Show success message
+      toast({
+        title: 'Progress Added',
+        description: 'Progress entry has been added successfully!',
+      });
+      
+      // Reset form
+      setFormData({
+        type: '',
+        date: new Date().toISOString().split('T')[0],
+        surah_or_jilid: '',
+        ayat_or_page: '',
+        notes: ''
+      });
+      setTahsinMode('');
+      
+      // Close dialog
+      setOpen(false);
+      
+      // Call callback if provided
+      if (onProgressAdded) {
+        onProgressAdded();
+      }
+      
     } catch (error) {
       console.error('Error adding progress:', error);
       toast({

@@ -73,13 +73,16 @@ const Dashboard = () => {
 
   const fetchStudents = useCallback(async () => {
     try {
+      console.log('Fetching students...');
       let studentsQuery = supabase
         .from('students')
         .select('*');
+      
       // If parent, filter by parent_id
       if (profile?.role === 'parent' && profile?.id) {
         studentsQuery = studentsQuery.eq('parent_id', profile.id);
       }
+      
       const { data: studentsData, error: studentsError } = await studentsQuery;
 
       if (studentsError) {
@@ -92,77 +95,48 @@ const Dashboard = () => {
         return;
       }
 
+      console.log('Raw students data:', studentsData);
+
       // For each student, fetch their progress entries and calculate dynamic progress
       const studentsWithProgress = await Promise.all(
         (studentsData || []).map(async (student) => {
           try {
-            // TODO: Disabled because 'progress_entries', 'hafalan_progress', and 'tilawah_progress' tables do not exist in production DB.
-            // const { data: hafalanEntries, error: hafalanError } = await supabase
-            //   .from('progress_entries')
-            //   .select('*')
-            //   .eq('student_id', student.id)
-            //   .eq('type', 'hafalan');
-            // const { data: tilawahEntries, error: tilawahError } = await supabase
-            //   .from('progress_entries')
-            //   .select('*')
-            //   .eq('student_id', student.id)
-            //   .eq('type', 'tilawah');
-            // if (hafalanEntries && hafalanEntries.length > 0 && !hafalanError) {
-            //   const { error: upsertHafalanError } = await supabase
-            //     .from('hafalan_progress')
-            //     .upsert(...);
-            // }
-            // if (tilawahEntries && tilawahEntries.length > 0 && !tilawahError) {
-            //   const { error: upsertTilawahError } = await supabase
-            //     .from('tilawah_progress')
-            //     .upsert(...);
-            // }
-            const hafalanEntries: ProgressEntry[] = [];
-            const tilawahEntries: ProgressEntry[] = [];
-            // Optionally, show a warning in the UI if this data is required.
-            // Provide fallback progress values if needed.
+            // Fetch progress entries from the database
+            const { data: progressEntries, error: progressError } = await supabase
+              .from('progress_entries')
+              .select('*')
+              .eq('student_id', student.id)
+              .order('date', { ascending: false });
 
-            // Calculate progress based on entries
-            const hafalanProgress = calculateHafalanProgress(hafalanEntries || []);
-            const tilawahProgress = calculateTilawahProgress(tilawahEntries || []);
-
-            // Update progress in database
-            // Only attempt upsert if entries were successfully fetched and exist
-            if (hafalanEntries && hafalanEntries.length > 0) {
-              // const { error: upsertHafalanError } = await supabase
-              //   .from('hafalan_progress')
-              //   .upsert({
-              //     student_id: student.id,
-              //     percentage: hafalanProgress.percentage,
-              //     last_surah: hafalanProgress.last_surah,
-              //     updated_at: new Date().toISOString()
-              //   });
-              // if (upsertHafalanError) {
-              //   console.error(`Error upserting hafalan progress for student ${student.id} (${student.name}):`, upsertHafalanError);
-              // }
+            if (progressError) {
+              console.error(`Error fetching progress for student ${student.id}:`, progressError);
             }
 
-            if (tilawahEntries && tilawahEntries.length > 0) {
-              // const { error: upsertTilawahError } = await supabase
-              //   .from('tilawah_progress')
-              //   .upsert({
-              //     student_id: student.id,
-              //     percentage: tilawahProgress.percentage,
-              //     jilid: tilawahProgress.jilid,
-              //     updated_at: new Date().toISOString()
-              //   });
-              // if (upsertTilawahError) {
-              //   console.error(`Error upserting tilawah progress for student ${student.id} (${student.name}):`, upsertTilawahError);
-              // }
-            }
+            console.log(`Progress entries for ${student.name}:`, progressEntries);
+
+            // Calculate progress based on actual entries
+            const hafalanEntries = progressEntries?.filter(entry => entry.type === 'hafalan') || [];
+            const tilawahEntries = progressEntries?.filter(entry => entry.type === 'tilawah') || [];
+
+            console.log(`Hafalan entries for ${student.name}:`, hafalanEntries);
+            console.log(`Tilawah entries for ${student.name}:`, tilawahEntries);
+
+            // Calculate progress percentages
+            const hafalanProgress = calculateHafalanProgress(hafalanEntries);
+            const tilawahProgress = calculateTilawahProgress(tilawahEntries);
+
+            console.log(`Student ${student.name}: class=${student.group_name}, teacher=${student.teacher}`);
+            console.log(`Progress - Hafalan: ${hafalanProgress.percentage}%, Tilawah: ${tilawahProgress.percentage}%`);
+            console.log(`Hafalan details:`, hafalanProgress);
+            console.log(`Tilawah details:`, tilawahProgress);
 
             return {
               id: student.id,
               name: student.name,
-              grade: '',
-              group_name: '',
-              teacher: '',
-              photo: null,
+              grade: '', // Not used in current schema
+              group_name: student.group_name || 'Unknown Class',
+              teacher: student.teacher || 'Unknown Teacher',
+              photo: student.photo,
               hafalan_progress: hafalanProgress.percentage > 0 ? {
                 percentage: hafalanProgress.percentage,
                 last_surah: hafalanProgress.last_surah
@@ -178,9 +152,9 @@ const Dashboard = () => {
               id: student.id,
               name: student.name,
               grade: '',
-              group_name: '',
-              teacher: '',
-              photo: null,
+              group_name: 'Unknown Class',
+              teacher: 'Unknown Teacher',
+              photo: student.photo,
               hafalan_progress: null,
               tilawah_progress: null
             };
@@ -188,6 +162,7 @@ const Dashboard = () => {
         })
       );
 
+      console.log('Processed students with progress:', studentsWithProgress);
       setStudents(studentsWithProgress as Student[]); // Explicitly cast to Student[]
       
       // Calculate stats

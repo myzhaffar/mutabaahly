@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -40,6 +40,7 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
 }) => {
   const { profile } = useAuth();
   const isTeacher = profile?.role === 'teacher';
+  const [addProgressOpen, setAddProgressOpen] = useState(false);
 
   // Ensure we have valid progress values
   const hafalanPercentage = progressData?.hafalan_progress?.percentage || 0;
@@ -168,7 +169,16 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-foreground">Progress Overview</h3>
                 {isTeacher && (
-                  <AddProgressDialog open={false} setOpen={() => {}} />
+                  <AddProgressDialog 
+                    open={addProgressOpen} 
+                    setOpen={setAddProgressOpen}
+                    studentId={student.id}
+                    onProgressAdded={() => {
+                      // Refresh progress data
+                      console.log('Progress added for student:', student.id);
+                      onStudentUpdated(); // This should trigger a refetch of progress data
+                    }}
+                  />
                 )}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">

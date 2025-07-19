@@ -79,13 +79,20 @@ export const useStudentDetails = (id: string | undefined) => {
 
       if (!id) return;
       
+      console.log('Fetching progress entries for student:', id);
+      
       const { data: entries, error } = await supabase
         .from('progress_entries')
         .select('*')
         .eq('student_id', id)
         .order('date', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching progress entries:', error);
+        throw error;
+      }
+
+      console.log('Fetched progress entries:', entries);
 
       const hafalan = entries?.filter(entry => entry.type === 'hafalan') || [];
       const tilawah = entries?.filter(entry => entry.type === 'tilawah') || [];
@@ -102,37 +109,12 @@ export const useStudentDetails = (id: string | undefined) => {
         tilawah_progress: tilawahProgress.percentage > 0 ? tilawahProgress : null
       });
 
-      // Only teachers can update progress in database
-      if (profile?.role === 'teacher') {
-        if (hafalan.length > 0 && id) {
-          await supabase
-            .from('hafalan_progress')
-            .upsert({
-              student_id: id,
-              percentage: hafalanProgress.percentage,
-              last_surah: hafalanProgress.last_surah,
-              updated_at: new Date().toISOString()
-            });
-        }
-
-        if (tilawah.length > 0 && id) {
-          await supabase
-            .from('tilawah_progress')
-            .upsert({
-              student_id: id,
-              percentage: tilawahProgress.percentage,
-              jilid: tilawahProgress.jilid,
-              updated_at: new Date().toISOString()
-            });
-        }
-      }
-
     } catch (error) {
       console.error('Error fetching progress entries:', error);
     } finally {
       setLoadingProgress(false);
     }
-  }, [student, id, profile]);
+  }, [student, id]);
 
   const refetchData = () => {
     fetchStudentData();

@@ -55,30 +55,45 @@ const StudentsGrid: React.FC<StudentsGridProps> = ({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {filteredStudents.map((student) => (
-        <StudentCard
-          key={student.id}
-          student={{
-            id: student.id,
-            name: student.name,
-            class: student.group_name,
-            studyGroup: student.teacher,
-            memorization: {
-              progress: student.hafalan_progress?.percentage || 0,
-              status: (student.hafalan_progress?.percentage || 0) === 100 ? 'completed' : 
-                      (student.hafalan_progress?.percentage || 0) > 0 ? 'inProgress' : 'notStarted',
-              currentSurah: student.hafalan_progress?.last_surah || 'Not started'
-            },
-            tilawati: {
-              progress: student.tilawah_progress?.percentage || 0,
-              status: (student.tilawah_progress?.percentage || 0) === 100 ? 'completed' : 
-                      (student.tilawah_progress?.percentage || 0) > 0 ? 'inProgress' : 'notStarted',
-              currentLevel: student.tilawah_progress?.jilid || 'Not started'
-            }
-          }}
-          onViewDetails={onViewDetails}
-        />
-      ))}
+      {filteredStudents.map((student) => {
+        const mappedStudent = {
+          id: student.id,
+          name: student.name,
+          class: student.group_name,
+          studyGroup: student.teacher,
+          memorization: {
+            progress: student.hafalan_progress?.percentage || 0,
+            status: ((student.hafalan_progress?.percentage || 0) === 100 ? 'completed' : 
+                    (student.hafalan_progress?.percentage || 0) > 0 ? 'inProgress' : 'notStarted') as 'completed' | 'inProgress' | 'notStarted',
+            currentSurah: student.hafalan_progress?.last_surah || 'Not started'
+          },
+          tilawati: {
+            progress: student.tilawah_progress?.percentage || 0,
+            status: ((student.tilawah_progress?.percentage || 0) === 100 ? 'completed' : 
+                    (student.tilawah_progress?.percentage || 0) > 0 ? 'inProgress' : 'notStarted') as 'completed' | 'inProgress' | 'notStarted',
+            currentLevel: student.tilawah_progress?.jilid || 'Not started'
+          }
+        };
+
+        console.log(`Mapping student ${student.name}:`, {
+          original: {
+            hafalan_progress: student.hafalan_progress,
+            tilawah_progress: student.tilawah_progress
+          },
+          mapped: {
+            memorization: mappedStudent.memorization,
+            tilawati: mappedStudent.tilawati
+          }
+        });
+
+        return (
+          <StudentCard
+            key={student.id}
+            student={mappedStudent}
+            onViewDetails={onViewDetails}
+          />
+        );
+      })}
     </div>
   );
 };
