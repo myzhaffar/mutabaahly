@@ -14,6 +14,7 @@ import ClassCard from '@/components/dashboard/ClassCard';
 import ParentLayout from '@/components/layouts/ParentLayout';
 import { useToast } from '@/hooks/use-toast';
 import type { ProgressEntry } from '@/types/progress';
+import StudentsGrid from '@/components/dashboard/StudentsGrid';
 
 interface Student {
   id: string;
@@ -92,6 +93,8 @@ const Dashboard = () => {
         return;
       }
 
+      console.log('Raw students data:', studentsData);
+
       // For each student, fetch their progress entries and calculate dynamic progress
       const studentsWithProgress = await Promise.all(
         (studentsData || []).map(async (student) => {
@@ -159,10 +162,10 @@ const Dashboard = () => {
             return {
               id: student.id,
               name: student.name,
-              grade: '',
-              group_name: '',
-              teacher: '',
-              photo: null,
+              grade: '', // Not in database, using empty string
+              group_name: 'No Class', // We'll need to join with classes table later
+              teacher: 'No Teacher', // We'll need to join with profiles table later
+              photo: null, // Not in database, using null
               hafalan_progress: hafalanProgress.percentage > 0 ? {
                 percentage: hafalanProgress.percentage,
                 last_surah: hafalanProgress.last_surah
@@ -178,8 +181,8 @@ const Dashboard = () => {
               id: student.id,
               name: student.name,
               grade: '',
-              group_name: '',
-              teacher: '',
+              group_name: 'Error',
+              teacher: 'Error',
               photo: null,
               hafalan_progress: null,
               tilawah_progress: null
@@ -251,8 +254,8 @@ const Dashboard = () => {
 
   // Group students by class
   const classGroups = students.reduce((acc, student) => {
-    if (!acc[student.group_name]) acc[student.group_name] = [];
-    acc[student.group_name].push(student);
+    if (!acc[student.group_name || 'No Class']) acc[student.group_name || 'No Class'] = [];
+    acc[student.group_name || 'No Class'].push(student);
     return acc;
   }, {} as Record<string, Student[]>);
 
@@ -314,14 +317,24 @@ const Dashboard = () => {
               {/* Removed filtered count for parent role */}
             </div>
             {dataLoading ? <StudentGridSkeleton /> : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {Object.entries(classGroups).map(([className, classStudents]) => {
-                  if (classStudents.length === 0) return null;
-                  return (
-                    <ClassCard key={className} className={className} classStudents={classStudents} />
-                  );
-                })}
-              </div>
+              <StudentsGrid
+                students={students.map(student => ({
+                  ...student,
+                  group_name: student.group_name,
+                  teacher: student.teacher,
+                  hafalan_progress: student.hafalan_progress,
+                  tilawah_progress: student.tilawah_progress,
+                }))}
+                filteredStudents={students.map(student => ({
+                  ...student,
+                  group_name: student.group_name,
+                  teacher: student.teacher,
+                  hafalan_progress: student.hafalan_progress,
+                  tilawah_progress: student.tilawah_progress,
+                }))}
+                onViewDetails={handleStudentAdded}
+                userRole={profile?.role || 'parent'}
+              />
             )}
           </div>
         </div>
