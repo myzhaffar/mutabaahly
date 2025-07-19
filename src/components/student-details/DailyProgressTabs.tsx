@@ -83,7 +83,7 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
             </TabsTrigger>
             <TabsTrigger
               value="tilawah"
-              className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700"
+              className="data-[state=active]:bg-orange-100 data-[state=active]:text-orange-700"
             >
               Tahsin
             </TabsTrigger>

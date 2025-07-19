@@ -48,7 +48,7 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
   const tilawahPercentage = progressData?.tilawah_progress?.percentage || 0;
   const tilawahJilid = progressData?.tilawah_progress?.jilid || 'Not started';
 
-  // Progress color logic (copied from StudentCard)
+  // Progress color logic (same as StudentCard)
   const getProgressColor = (progress: number) => {
     if (progress >= 80) return 'bg-islamic-500';
     if (progress >= 60) return 'bg-blue-500';
@@ -183,7 +183,7 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {/* Hafalan Progress */}
-                <div className="bg-gradient-to-r from-green-100 via-green-50 to-green-200 rounded-xl shadow-sm hover:shadow-md transition-shadow w-full h-full">
+                <div className="bg-green-50 rounded-xl shadow-sm hover:shadow-md transition-shadow w-full h-full">
                   <div className="p-4">
                     <div className="flex items-center mb-3">
                       <Award className="h-6 w-6 text-green-600 mr-2" />
@@ -208,11 +208,11 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
                 </div>
 
                 {/* Tilawati Progress */}
-                <div className="bg-gradient-to-r from-blue-100 via-blue-50 to-blue-200 rounded-xl shadow-sm hover:shadow-md transition-shadow w-full h-full">
+                <div className="bg-orange-50 rounded-xl shadow-sm hover:shadow-md transition-shadow w-full h-full">
                   <div className="p-4">
                     <div className="flex items-center mb-3">
-                      <BookOpen className="h-6 w-6 text-blue-600 mr-2" />
-                      <h3 className="font-semibold text-blue-900">Tahsin Progress</h3>
+                      <BookOpen className="h-6 w-6 text-orange-500 mr-2" />
+                      <h3 className="font-semibold text-orange-700">Tahsin Progress</h3>
                     </div>
                     <div className="space-y-3">
                       <Progress 
