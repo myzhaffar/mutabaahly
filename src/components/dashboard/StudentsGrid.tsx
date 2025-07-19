@@ -61,8 +61,8 @@ const StudentsGrid: React.FC<StudentsGridProps> = ({
           student={{
             id: student.id,
             name: student.name,
-            class: student.group_name || '-',
-            studyGroup: student.teacher || '-',
+            class: student.group_name,
+            studyGroup: student.teacher,
             memorization: {
               progress: student.hafalan_progress?.percentage || 0,
               status: (student.hafalan_progress?.percentage || 0) === 100 ? 'completed' : 
