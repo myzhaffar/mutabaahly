@@ -13,7 +13,7 @@ import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/prog
 import { ChevronLeft, Filter, X } from 'lucide-react';
 import { FIXED_TEACHERS } from '@/utils/rankingDataService';
 import { useToast } from '@/hooks/use-toast';
-import type { ProgressEntry } from '@/types/progress';
+// Removed unused ProgressEntry import
 
 interface ClassStudent {
   id: string;
@@ -162,11 +162,7 @@ const ClassDetail: React.FC = () => {
     return found ? found.id : student.teacher;
   };
 
-  const filteredStudents = students.filter(student =>
-    student.name.toLowerCase().includes(search.toLowerCase()) &&
-    (selectedTeachers.length === 0 || selectedTeachers.includes(getTeacherId(student)))
-  );
-
+  // Removed unused filteredStudents variable
   const hasAnyActiveTeacherFilter = selectedTeachers.length > 0;
   const clearTeacherFilters = () => setSelectedTeachers([]);
 

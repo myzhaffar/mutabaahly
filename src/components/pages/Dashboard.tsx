@@ -13,7 +13,6 @@ import BulkUploadStudentsDialog from '@/components/BulkUploadStudentsDialog';
 import ClassCard from '@/components/dashboard/ClassCard';
 import ParentLayout from '@/components/layouts/ParentLayout';
 import { useToast } from '@/hooks/use-toast';
-import type { ProgressEntry } from '@/types/progress';
 
 interface Student {
   id: string;
