@@ -52,6 +52,15 @@
       "static/chunks/804-6699345473d543c2.js",
       "static/chunks/app/page-923b885c96ebf87d.js"
     ],
+    "/select-role/page": [
+      "static/chunks/webpack-45707eebdd5cd4bc.js",
+      "static/chunks/fd9d1056-0b7055d3d4646368.js",
+      "static/chunks/117-9afcbd9804ccbdcc.js",
+      "static/chunks/main-app-d2fd3b9fca572725.js",
+      "static/chunks/989-460215d3ac45f004.js",
+      "static/chunks/438-5fc938a2f39c49da.js",
+      "static/chunks/app/select-role/page-6ae44d19c80558c3.js"
+    ],
     "/tests/view/page": [
       "static/chunks/webpack-45707eebdd5cd4bc.js",
       "static/chunks/fd9d1056-0b7055d3d4646368.js",
@@ -66,15 +75,6 @@
       "static/chunks/187-ae7d6aca1116a93d.js",
       "static/chunks/804-6699345473d543c2.js",
       "static/chunks/app/tests/view/page-2eb796611192e280.js"
-    ],
-    "/select-role/page": [
-      "static/chunks/webpack-45707eebdd5cd4bc.js",
-      "static/chunks/fd9d1056-0b7055d3d4646368.js",
-      "static/chunks/117-9afcbd9804ccbdcc.js",
-      "static/chunks/main-app-d2fd3b9fca572725.js",
-      "static/chunks/989-460215d3ac45f004.js",
-      "static/chunks/438-5fc938a2f39c49da.js",
-      "static/chunks/app/select-role/page-6ae44d19c80558c3.js"
     ],
     "/class/[className]/page": [
       "static/chunks/webpack-45707eebdd5cd4bc.js",
@@ -107,7 +107,7 @@
       "static/chunks/804-6699345473d543c2.js",
       "static/chunks/873-c767d24f39d2b393.js",
       "static/chunks/887-f84435861ddb9c48.js",
-      "static/chunks/app/dashboard/page-3bb8befea92c179e.js"
+      "static/chunks/app/dashboard/page-5c426e39fb164674.js"
     ],
     "/profile/page": [
       "static/chunks/webpack-45707eebdd5cd4bc.js",
