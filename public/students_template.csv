@@ -1,4 +1,2 @@
-name,group_name,teacher,grade,tahsin_type,tahsin_level_or_ayah,tahfidz_surah,tahfidz_last_ayah
-Ahmad Ali,Class A,Ustaz Ahmad,Grade 1,tilawati,Level 4,Al-Baqarah,25
-Fatima Zahra,Class B,Ustazah Sarah,Grade 2,surah,Al-Fatihah,,
-Ali Yusuf,Class C,Ustazah Lina,Grade 3,,,, 
+name,grade,class,teacher name
+John Doe,5,Makkah,Ust. Ahmad 
