@@ -268,26 +268,56 @@ const ClassDetail: React.FC = () => {
           {teacherFilterOpen && (
             <div className="px-6 pb-6 pt-2">
               <div className="max-h-48 overflow-y-auto flex flex-col gap-2 pr-2">
-                {teacherOptions.map(teacher => (
-                  <div key={teacher.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`teacher-filter-${teacher.id}`}
-                      checked={selectedTeachers.includes(teacher.id)}
-                      onCheckedChange={() => {
-                        setSelectedTeachers(prev => {
-                          const exists = prev.includes(teacher.id);
-                          return exists
-                            ? prev.filter(t => t !== teacher.id)
-                            : [...prev, teacher.id];
-                        });
-                      }}
-                      className="rounded-full"
-                    />
-                    <label htmlFor={`teacher-filter-${teacher.id}`} className="text-sm text-gray-700 cursor-pointer">
-                      {teacher.name}
-                    </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Female Teachers (Ustz.) */}
+                  <div className="space-y-2">
+                    <div className="font-semibold text-emerald-700 text-xs mb-1">Ustz.</div>
+                    {teacherOptions.filter(t => t.name.startsWith('Ustz.')).map(teacher => (
+                      <div key={teacher.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`teacher-filter-${teacher.id}`}
+                          checked={selectedTeachers.includes(teacher.id)}
+                          onCheckedChange={() => {
+                            setSelectedTeachers(prev => {
+                              const exists = prev.includes(teacher.id);
+                              return exists
+                                ? prev.filter(t => t !== teacher.id)
+                                : [...prev, teacher.id];
+                            });
+                          }}
+                          className="rounded-full"
+                        />
+                        <label htmlFor={`teacher-filter-${teacher.id}`} className="text-sm text-gray-700 cursor-pointer">
+                          {teacher.name}
+                        </label>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                  {/* Male Teachers (Ust.) */}
+                  <div className="space-y-2">
+                    <div className="font-semibold text-teal-700 text-xs mb-1">Ust.</div>
+                    {teacherOptions.filter(t => t.name.startsWith('Ust.')).map(teacher => (
+                      <div key={teacher.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`teacher-filter-${teacher.id}`}
+                          checked={selectedTeachers.includes(teacher.id)}
+                          onCheckedChange={() => {
+                            setSelectedTeachers(prev => {
+                              const exists = prev.includes(teacher.id);
+                              return exists
+                                ? prev.filter(t => t !== teacher.id)
+                                : [...prev, teacher.id];
+                            });
+                          }}
+                          className="rounded-full"
+                        />
+                        <label htmlFor={`teacher-filter-${teacher.id}`} className="text-sm text-gray-700 cursor-pointer">
+                          {teacher.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           )}
