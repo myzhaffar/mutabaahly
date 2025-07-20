@@ -89,33 +89,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Fetch user profile
-          setTimeout(async () => {
+          // Fetch user profile immediately
+          await fetchProfile(session.user.id);
+          // Check if profile exists
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+          if (!profileData && !profileError) {
+            // Create profile with role from user metadata
+            await supabase.from('profiles').insert([
+              {
+                id: session.user.id,
+                full_name: session.user.user_metadata.full_name || session.user.user_metadata.name || '',
+                role: session.user.user_metadata.role || undefined, // <-- set role from metadata
+                email: session.user.email || undefined,
+                avatar_url: null,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              },
+            ]);
+            // Refetch profile after creation
             await fetchProfile(session.user.id);
-            // Check if profile exists
-            const { data: profileData, error: profileError } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .single();
-            if (!profileData && !profileError) {
-              // Create profile with role from user metadata
-              await supabase.from('profiles').insert([
-                {
-                  id: session.user.id,
-                  full_name: session.user.user_metadata.full_name || session.user.user_metadata.name || '',
-                  role: session.user.user_metadata.role || undefined, // <-- set role from metadata
-                  email: session.user.email || undefined,
-                  avatar_url: null,
-                  created_at: new Date().toISOString(),
-                  updated_at: new Date().toISOString(),
-                },
-              ]);
-              // Refetch profile after creation
-              await fetchProfile(session.user.id);
-            }
-            setLoading(false);
-          }, 0);
+          }
+          setLoading(false);
         } else {
           setProfile(null);
           setLoading(false);
@@ -166,15 +164,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
-      // Clear local state
+      // Clear local state immediately for instant UI response
       setUser(null);
       setSession(null);
       setProfile(null);
+      setLoading(false);
       
-      // Return success to allow components to handle navigation
+      // Sign out from Supabase in background
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
       return { error: null };
     } catch (error) {
       console.error('Error signing out:', error);
