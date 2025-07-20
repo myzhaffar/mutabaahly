@@ -128,14 +128,6 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
     // Filter out students with no progress
     const validStudents = studentsWithProgress.filter(student => student !== null);
 
-    // Debug: print level values and types for Tilawati students
-    validStudents.forEach(s => {
-      if (s && s.standing === 'tilawati') {
-        // eslint-disable-next-line no-console
-        console.log('[DEBUG] Tilawati student:', s.name, 'level:', s.level, 'type:', typeof s.level);
-      }
-    });
-
     // Sort: All Quran students first (regardless of surah/ayat), then Tilawati students by level/page
     const sortedStudents = validStudents.sort((a, b) => {
       // Quran students first (regardless of surah/ayat)

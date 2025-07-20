@@ -35,7 +35,6 @@ interface ClassStudent {
 const ClassDetail: React.FC = () => {
   const params = useParams();
   const className = decodeURIComponent(params?.className as string);
-  console.log('DEBUG: className param:', className); // Debug log
   const { profile } = useAuth();
   const router = useRouter();
   const [students, setStudents] = useState<ClassStudent[]>([]);
@@ -60,7 +59,6 @@ const ClassDetail: React.FC = () => {
         studentsQuery = studentsQuery.eq('group_name', className);
       }
       const { data: studentsData, error: studentsError } = await studentsQuery;
-      console.log('DEBUG: studentsData:', studentsData, 'studentsError:', studentsError); // Debug log
       if (studentsError || !studentsData) {
         toast({
           title: "Error",
@@ -93,21 +91,13 @@ const ClassDetail: React.FC = () => {
               console.error(`Error fetching progress for student ${student.id}:`, progressError);
             }
 
-            console.log(`Progress entries for ${student.name}:`, progressEntries);
-
             // Calculate progress based on actual entries
             const hafalanEntries = progressEntries?.filter(entry => entry.type === 'hafalan') || [];
             const tilawahEntries = progressEntries?.filter(entry => entry.type === 'tilawah') || [];
 
-            console.log(`Hafalan entries for ${student.name}:`, hafalanEntries);
-            console.log(`Tilawah entries for ${student.name}:`, tilawahEntries);
-
             // Calculate progress percentages
             const hafalanProgress = calculateHafalanProgress(hafalanEntries);
             const tilawahProgress = calculateTilawahProgress(tilawahEntries);
-
-            console.log(`Student ${student.name}: class=${student.group_name}, teacher=${student.teacher}`);
-            console.log(`Progress - Hafalan: ${hafalanProgress.percentage}%, Tilawah: ${tilawahProgress.percentage}%`);
 
             return {
               id: student.id,

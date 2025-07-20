@@ -73,26 +73,17 @@ const Dashboard = () => {
 
   const fetchStudents = useCallback(async () => {
     try {
-      console.log('Fetching students...');
-      console.log('Current profile:', profile);
-      console.log('Profile role:', profile?.role);
-      console.log('Profile ID:', profile?.id);
-      
       let studentsQuery = supabase
         .from('students')
         .select('*');
       
       // If parent, filter by parent_id
       if (profile?.role === 'parent' && profile?.id) {
-        console.log('Filtering by parent_id:', profile.id);
         studentsQuery = studentsQuery.eq('parent_id', profile.id);
-      } else {
-        console.log('Not filtering by parent_id - showing all students');
       }
       
       // TEMPORARY: For testing, show all students to parents and assign unassigned ones
       if (profile?.role === 'parent') {
-        console.log('TEMPORARY: Showing all students to parent for testing');
         studentsQuery = supabase.from('students').select('*');
         
         // Also try to assign unassigned students to this parent
@@ -102,9 +93,6 @@ const Dashboard = () => {
           .is('parent_id', null);
         
         if (unassignedStudents && unassignedStudents.length > 0) {
-          console.log('Found unassigned students:', unassignedStudents);
-          console.log('Assigning them to parent:', profile.id);
-          
           // Assign first few unassigned students to this parent
           const studentsToAssign = unassignedStudents.slice(0, 3); // Limit to 3 students
           for (const student of studentsToAssign) {
@@ -112,7 +100,6 @@ const Dashboard = () => {
               .from('students')
               .update({ parent_id: profile.id })
               .eq('id', student.id);
-            console.log(`Assigned student ${student.name} to parent ${profile.id}`);
           }
         }
       }
@@ -125,18 +112,7 @@ const Dashboard = () => {
           description: "Failed to fetch students. Please try again.",
           variant: "destructive",
         });
-        console.error('Error fetching students:', studentsError);
         return;
-      }
-
-      console.log('Raw students data:', studentsData);
-      
-      // Debug: Check all students to see their parent_id values
-      if (profile?.role === 'parent') {
-        const { data: allStudents } = await supabase
-          .from('students')
-          .select('id, name, parent_id');
-        console.log('All students in database:', allStudents);
       }
 
       // For each student, fetch their progress entries and calculate dynamic progress
@@ -154,23 +130,13 @@ const Dashboard = () => {
               console.error(`Error fetching progress for student ${student.id}:`, progressError);
             }
 
-            console.log(`Progress entries for ${student.name}:`, progressEntries);
-
             // Calculate progress based on actual entries
             const hafalanEntries = progressEntries?.filter(entry => entry.type === 'hafalan') || [];
             const tilawahEntries = progressEntries?.filter(entry => entry.type === 'tilawah') || [];
 
-            console.log(`Hafalan entries for ${student.name}:`, hafalanEntries);
-            console.log(`Tilawah entries for ${student.name}:`, tilawahEntries);
-
             // Calculate progress percentages
             const hafalanProgress = calculateHafalanProgress(hafalanEntries);
             const tilawahProgress = calculateTilawahProgress(tilawahEntries);
-
-            console.log(`Student ${student.name}: class=${student.group_name}, teacher=${student.teacher}`);
-            console.log(`Progress - Hafalan: ${hafalanProgress.percentage}%, Tilawah: ${tilawahProgress.percentage}%`);
-            console.log(`Hafalan details:`, hafalanProgress);
-            console.log(`Tilawah details:`, tilawahProgress);
 
             return {
               id: student.id,
@@ -204,7 +170,6 @@ const Dashboard = () => {
         })
       );
 
-      console.log('Processed students with progress:', studentsWithProgress);
       setStudents(studentsWithProgress as Student[]); // Explicitly cast to Student[]
       
       // Group students by grade and collect unique sub-classes
@@ -221,7 +186,6 @@ const Dashboard = () => {
       }
       setGroupedByGrade(grouped);
       // TODO: Use groupedByGrade in the UI in the next step
-      console.log('Grouped by grade:', grouped);
 
       // Calculate stats
       const totalStudents = studentsWithProgress.length;

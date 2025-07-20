@@ -62,7 +62,6 @@ interface TestFilters {
 
 export const fetchTestsWithFilters = async (filters: TestFilters): Promise<TilawatiTest[]> => {
   try {
-    console.log('Fetching tests with filters:', filters);
     let query = supabase
       .from('tilawati_level_tests')
       .select('*')
@@ -105,7 +104,6 @@ export const fetchTestsWithFilters = async (filters: TestFilters): Promise<Tilaw
       throw error;
     }
 
-    console.log('Fetched tests:', data);
     return data || [];
   } catch (error) {
     console.error('Error in fetchTestsWithFilters:', error);

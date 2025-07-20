@@ -76,7 +76,7 @@ const ClassCard: React.FC<ClassCardProps> = ({ grade, students, classes }) => {
       aria-label={`View grade ${grade}`}
     >
       {/* Head Section: Grade Name */}
-      <div className="px-6 py-5 bg-gradient-to-r from-green-500 to-orange-400 text-white"
+      <div className="px-6 py-5 bg-gradient-to-r from-green-100 to-orange-100 text-emerald-700"
            style={{ borderTopLeftRadius: '1rem', borderTopRightRadius: '1rem' }}>
         <h3 className="text-2xl font-bold mb-1">Grade {grade}</h3>
         <div className="w-12 h-1 bg-white/60 rounded-full" />
