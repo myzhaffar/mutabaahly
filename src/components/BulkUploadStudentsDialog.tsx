@@ -369,29 +369,17 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
   };
 
   const downloadTemplate = () => {
-    // Template with only header and one sample row, no grade column
+    // New template: name, grade, class, teacher name
     const templateData = [
       {
-        name: 'Ahmad Ali',
-        group_name: 'Class A',
-        teacher: 'Ust. Ahmad',
-        tahsin_type: 'tilawati',
-        tahsin_level_or_ayah: 'Level 4',
-        tahfidz_surah: 'Al-Baqarah',
-        tahfidz_last_ayah: '1-30', // Example range
+        name: 'John Doe',
+        grade: '5',
+        class: 'Makkah',
+        'teacher name': 'Ust. Ahmad',
       },
     ];
-
     const worksheet = XLSX.utils.json_to_sheet(templateData, {
-      header: [
-        'name',
-        'group_name',
-        'teacher',
-        'tahsin_type',
-        'tahsin_level_or_ayah',
-        'tahfidz_surah',
-        'tahfidz_last_ayah',
-      ],
+      header: ['name', 'grade', 'class', 'teacher name'],
     });
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Students Template');
