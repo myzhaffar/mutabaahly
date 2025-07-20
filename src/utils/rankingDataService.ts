@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { calculateHafalanProgress, calculateTilawahProgress } from './progressCalculations';
 import { ProgressEntry } from '@/types/progress';
+import { getJuzBySurah, quranSurahs } from './quranData';
 
 export interface StudentRankingData {
   id: string;
@@ -230,9 +231,16 @@ export const fetchHafalanRankingData = async (filters: RankingFilters): Promise<
 
           // Get current surah and verse information
           const currentSurah = calculatedProgress.last_surah;
-          const surahData = getSurahData(currentSurah);
-          const currentJuz = surahData?.juz || null;
           const currentVerse = getCurrentVerse(hafalanEntries || []);
+          
+          // Calculate juz based on surah
+          let currentJuz = null;
+          if (currentSurah) {
+            const surah = quranSurahs.find(s => s.name === currentSurah);
+            if (surah) {
+              currentJuz = getJuzBySurah(surah.number);
+            }
+          }
 
           return {
             id: student.id,

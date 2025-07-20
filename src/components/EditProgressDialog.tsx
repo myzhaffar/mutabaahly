@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Edit } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { quranSurahs } from '@/utils/quranData';
+import { quranSurahs, getSurahsByJuz, getJuzOptions, getJuzBySurah } from '@/utils/quranData';
 import { supabase } from '@/integrations/supabase/client';
 
 interface ProgressEntry {
@@ -41,6 +41,27 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
     ? (/^level\s*\d+$/i.test(entry.surah_or_jilid || '') ? 'tilawati' : 'alquran')
     : '';
   const [tahsinMode, setTahsinMode] = useState<'tilawati' | 'alquran' | ''>(initialTahsinMode);
+
+  // Juz selection for hafalan
+  const [selectedJuz, setSelectedJuz] = useState<number | ''>('');
+
+  // Initialize juz based on current surah
+  React.useEffect(() => {
+    if (entry.type === 'hafalan' && entry.surah_or_jilid) {
+      const surah = quranSurahs.find(s => s.name === entry.surah_or_jilid);
+      if (surah) {
+        setSelectedJuz(getJuzBySurah(surah.number));
+      }
+    }
+  }, [entry]);
+
+  // Get filtered surahs based on selected juz
+  const getFilteredSurahs = () => {
+    if (selectedJuz && typeof selectedJuz === 'number') {
+      return getSurahsByJuz(selectedJuz);
+    }
+    return quranSurahs;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,6 +98,12 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleJuzChange = (juz: string) => {
+    setSelectedJuz(juz === '0' ? '' : parseInt(juz));
+    // Reset surah selection when juz changes
+    setFormData(prev => ({ ...prev, surah_or_jilid: '' }));
   };
 
   return (
@@ -118,6 +145,28 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
               </Select>
             </div>
           )}
+          {/* Juz selection for Hafalan */}
+          {entry.type === 'hafalan' && (
+            <div className="space-y-2">
+              <Label htmlFor="juz">Juz</Label>
+              <Select
+                value={selectedJuz === '' ? '0' : selectedJuz.toString()}
+                onValueChange={handleJuzChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a juz (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">Select Juz</SelectItem>
+                  {getJuzOptions().map((juz) => (
+                    <SelectItem key={juz.value} value={juz.value.toString()}>
+                      {juz.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           {/* Surah/Jilid/Level selection */}
           {entry.type === 'hafalan' && (
             <div className="space-y-2">
@@ -130,7 +179,7 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
                   <SelectValue placeholder="Select a surah" />
                 </SelectTrigger>
                 <SelectContent>
-                  {quranSurahs.map((surah) => (
+                  {getFilteredSurahs().map((surah) => (
                     <SelectItem key={surah.number} value={surah.name}>
                       {surah.name} ({surah.verses} verses)
                     </SelectItem>
@@ -199,7 +248,7 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
               </div>
             </>
           )}
-          {/* Hafalan ayat input (already handled above) */}
+          {/* Hafalan ayat input */}
           {entry.type === 'hafalan' && (
             <div className="space-y-2">
               <Label htmlFor="ayat_or_page">Ayat</Label>
@@ -212,12 +261,12 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
+            <Label htmlFor="notes">Notes (Optional)</Label>
             <Textarea
               id="notes"
               value={formData.notes}
               onChange={(e) => handleInputChange('notes', e.target.value)}
-              placeholder="Additional notes..."
+              placeholder="Add any additional notes..."
               rows={3}
             />
           </div>

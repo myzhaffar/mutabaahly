@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/useAuth';
-import { quranSurahs } from '@/utils/quranData';
+import { quranSurahs, getSurahsByJuz, getJuzOptions } from '@/utils/quranData';
 import { supabase } from '@/integrations/supabase/client';
 
 interface AddProgressDialogProps {
@@ -35,12 +35,21 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({
     notes: ''
   });
   const [tahsinMode, setTahsinMode] = useState<'tilawati' | 'alquran' | ''>('');
+  const [selectedJuz, setSelectedJuz] = useState<number | ''>('');
   const { toast } = useToast();
 
   // Check if user is authorized (teacher)
   if (profile?.role !== 'teacher') {
     return null;
   }
+
+  // Get filtered surahs based on selected juz
+  const getFilteredSurahs = () => {
+    if (selectedJuz && typeof selectedJuz === 'number') {
+      return getSurahsByJuz(selectedJuz);
+    }
+    return quranSurahs;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,6 +124,7 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({
         notes: ''
       });
       setTahsinMode('');
+      setSelectedJuz('');
       
       // Close dialog
       setOpen(false);
@@ -140,6 +150,12 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleJuzChange = (juz: string) => {
+    setSelectedJuz(juz === '0' ? '' : parseInt(juz));
+    // Reset surah selection when juz changes
+    setFormData(prev => ({ ...prev, surah_or_jilid: '' }));
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -161,6 +177,9 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({
             <Select value={formData.type} onValueChange={(value) => {
               handleInputChange('type', value);
               if (value !== 'tilawah') setTahsinMode('');
+              // Reset juz and surah when type changes
+              setSelectedJuz('');
+              setFormData(prev => ({ ...prev, surah_or_jilid: '' }));
             }}>
               <SelectTrigger>
                 <SelectValue placeholder="Select progress type" />
@@ -198,6 +217,29 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({
             />
           </div>
 
+          {/* Juz selection for Hafalan */}
+          {formData.type === 'hafalan' && (
+            <div className="space-y-2">
+              <Label htmlFor="juz">Juz</Label>
+              <Select
+                value={selectedJuz === '' ? '0' : selectedJuz.toString()}
+                onValueChange={handleJuzChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a juz (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">Select Juz</SelectItem>
+                  {getJuzOptions().map((juz) => (
+                    <SelectItem key={juz.value} value={juz.value.toString()}>
+                      {juz.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           {/* Surah/Jilid/Level selection */}
           {formData.type === 'hafalan' && (
             <div className="space-y-2">
@@ -210,7 +252,7 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({
                   <SelectValue placeholder="Select a surah" />
                 </SelectTrigger>
                 <SelectContent>
-                  {quranSurahs.map((surah) => (
+                  {getFilteredSurahs().map((surah) => (
                     <SelectItem key={surah.number} value={surah.name}>
                       {surah.name} ({surah.verses} verses)
                     </SelectItem>
@@ -279,8 +321,7 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({
               </div>
             </>
           )}
-
-          {/* Hafalan ayat input (already handled above) */}
+          {/* Hafalan ayat input */}
           {formData.type === 'hafalan' && (
             <div className="space-y-2">
               <Label htmlFor="ayat_or_page">Ayat</Label>
@@ -292,17 +333,16 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({
               />
             </div>
           )}
-
           <div className="space-y-2">
             <Label htmlFor="notes">Notes (Optional)</Label>
             <Textarea
               id="notes"
               value={formData.notes}
               onChange={(e) => handleInputChange('notes', e.target.value)}
-              placeholder="Additional notes about the progress..."
+              placeholder="Add any additional notes..."
+              rows={3}
             />
           </div>
-
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel

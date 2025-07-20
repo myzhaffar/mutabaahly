@@ -116,6 +116,40 @@ export const quranSurahs = [
   { number: 114, name: "An-Nas", verses: 6 }
 ];
 
+// Juz mapping - each juz contains the surah numbers that belong to it
+export const juzMapping: Record<number, number[]> = {
+  1: [1, 2], // Al-Fatihah, Al-Baqarah (1-141)
+  2: [2], // Al-Baqarah (142-252)
+  3: [2], // Al-Baqarah (253-286), Ali 'Imran (1-92)
+  4: [3], // Ali 'Imran (93-200), An-Nisa (1-23)
+  5: [4], // An-Nisa (24-147)
+  6: [4, 5], // An-Nisa (148-176), Al-Ma'idah (1-81)
+  7: [5], // Al-Ma'idah (82-120), Al-An'am (1-110)
+  8: [6], // Al-An'am (111-165), Al-A'raf (1-87)
+  9: [7], // Al-A'raf (88-206), Al-Anfal (1-40)
+  10: [8, 9], // Al-Anfal (41-75), At-Tawbah (1-92)
+  11: [9, 10], // At-Tawbah (93-129), Yunus (1-109), Hud (1-5)
+  12: [11], // Hud (6-123), Yusuf (1-52)
+  13: [12], // Yusuf (53-111), Ar-Ra'd (1-43), Ibrahim (1-52)
+  14: [15, 16], // Al-Hijr (1-99), An-Nahl (1-128)
+  15: [17, 18], // Al-Isra (1-111), Al-Kahf (1-74)
+  16: [18, 19], // Al-Kahf (75-110), Maryam (1-98), Taha (1-135)
+  17: [21, 22], // Al-Anbya (1-112), Al-Hajj (1-78)
+  18: [23, 24, 25], // Al-Mu'minun (1-118), An-Nur (1-64), Al-Furqan (1-77)
+  19: [26, 27], // Ash-Shu'ara (1-227), An-Naml (1-93)
+  20: [28, 29], // Al-Qasas (1-88), Al-'Ankabut (1-69), Ar-Rum (1-60)
+  21: [31, 32, 33], // Luqman (1-34), As-Sajdah (1-30), Al-Ahzab (1-73)
+  22: [34, 35, 36], // Saba (1-54), Fatir (1-45), Ya-Sin (1-83)
+  23: [37, 38, 39], // As-Saffat (1-182), Sad (1-88), Az-Zumar (1-75)
+  24: [40, 41, 42], // Ghafir (1-85), Fussilat (1-54), Ash-Shuraa (1-53)
+  25: [43, 44, 45], // Az-Zukhruf (1-89), Ad-Dukhan (1-59), Al-Jathiyah (1-37)
+  26: [46, 47, 48], // Al-Ahqaf (1-35), Muhammad (1-38), Al-Fath (1-29)
+  27: [49, 50, 51], // Al-Hujurat (1-18), Qaf (1-45), Adh-Dhariyat (1-60)
+  28: [52, 53, 54], // At-Tur (1-49), An-Najm (1-62), Al-Qamar (1-55)
+  29: [55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77], // All remaining surahs
+  30: [78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114] // Juz 30 surahs
+};
+
 // Total verses in the Quran
 export const TOTAL_QURAN_VERSES = 6236;
 
@@ -144,4 +178,28 @@ export const getSurahByName = (name: string) => {
 
 export const getSurahByNumber = (number: number) => {
   return quranSurahs.find(surah => surah.number === number);
+};
+
+// Get juz by surah number
+export const getJuzBySurah = (surahNumber: number): number => {
+  for (const [juz, surahs] of Object.entries(juzMapping)) {
+    if (surahs.includes(surahNumber)) {
+      return parseInt(juz);
+    }
+  }
+  return 0; // Default if not found
+};
+
+// Get surahs by juz number
+export const getSurahsByJuz = (juzNumber: number) => {
+  const surahNumbers = juzMapping[juzNumber] || [];
+  return quranSurahs.filter(surah => surahNumbers.includes(surah.number));
+};
+
+// Get all juz options for dropdown
+export const getJuzOptions = () => {
+  return Array.from({ length: 30 }, (_, i) => ({
+    value: i + 1,
+    label: `Juz ${i + 1}`
+  }));
 };
