@@ -199,7 +199,7 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
                     <div className="grid grid-cols-2 gap-4">
                       {/* Female Teachers */}
                       <div className="space-y-2">
-                        <div className="font-semibold text-emerald-700 text-sm mb-2">Female</div>
+                        <div className="font-semibold text-emerald-700 text-sm mb-2">Ustadzah</div>
                         {femaleTeachers.map((teacher) => (
                           <button
                             key={teacher.id}
@@ -217,7 +217,7 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
                       
                       {/* Male Teachers */}
                       <div className="space-y-2">
-                        <div className="font-semibold text-teal-700 text-sm mb-2">Male</div>
+                        <div className="font-semibold text-teal-700 text-sm mb-2">Ustadz</div>
                         {maleTeachers.map((teacher) => (
                           <button
                             key={teacher.id}

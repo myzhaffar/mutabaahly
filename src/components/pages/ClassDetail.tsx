@@ -195,7 +195,7 @@ const ClassDetail: React.FC = () => {
         {/* Tabs for grade view */}
         {showTabs && (
           <div className="mb-4">
-            <div className="flex bg-gray-100 rounded-full p-1 overflow-x-auto whitespace-nowrap scrollbar-hide w-full max-w-full">
+            <div className="flex bg-gray-100 rounded-full p-1 overflow-x-auto whitespace-nowrap scrollbar-hide w-full max-w-full sm:bg-transparent sm:rounded-none sm:p-0">
               {tabList.map(tab => (
                 <button
                   key={tab}
