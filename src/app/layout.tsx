@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import AppProviders from '@/components/AppProviders';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: 'Mutabaahly',
@@ -28,6 +29,7 @@ export default function RootLayout({
           </div>
           </ErrorBoundary>
         </AppProviders>
+        <Analytics />
       </body>
     </html>
   );
