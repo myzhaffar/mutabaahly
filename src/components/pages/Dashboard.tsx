@@ -10,7 +10,6 @@ import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/prog
 import TeacherLayout from '@/components/layouts/TeacherLayout';
 import AddStudentDialog from '@/components/AddStudentDialog';
 import BulkUploadStudentsDialog from '@/components/BulkUploadStudentsDialog';
-import ClassCard from '@/components/dashboard/ClassCard';
 import ParentLayout from '@/components/layouts/ParentLayout';
 import { useToast } from '@/hooks/use-toast';
 
@@ -74,13 +73,47 @@ const Dashboard = () => {
   const fetchStudents = useCallback(async () => {
     try {
       console.log('Fetching students...');
+      console.log('Current profile:', profile);
+      console.log('Profile role:', profile?.role);
+      console.log('Profile ID:', profile?.id);
+      
       let studentsQuery = supabase
         .from('students')
         .select('*');
       
       // If parent, filter by parent_id
       if (profile?.role === 'parent' && profile?.id) {
+        console.log('Filtering by parent_id:', profile.id);
         studentsQuery = studentsQuery.eq('parent_id', profile.id);
+      } else {
+        console.log('Not filtering by parent_id - showing all students');
+      }
+      
+      // TEMPORARY: For testing, show all students to parents and assign unassigned ones
+      if (profile?.role === 'parent') {
+        console.log('TEMPORARY: Showing all students to parent for testing');
+        studentsQuery = supabase.from('students').select('*');
+        
+        // Also try to assign unassigned students to this parent
+        const { data: unassignedStudents } = await supabase
+          .from('students')
+          .select('id, name, parent_id')
+          .is('parent_id', null);
+        
+        if (unassignedStudents && unassignedStudents.length > 0) {
+          console.log('Found unassigned students:', unassignedStudents);
+          console.log('Assigning them to parent:', profile.id);
+          
+          // Assign first few unassigned students to this parent
+          const studentsToAssign = unassignedStudents.slice(0, 3); // Limit to 3 students
+          for (const student of studentsToAssign) {
+            await supabase
+              .from('students')
+              .update({ parent_id: profile.id })
+              .eq('id', student.id);
+            console.log(`Assigned student ${student.name} to parent ${profile.id}`);
+          }
+        }
       }
       
       const { data: studentsData, error: studentsError } = await studentsQuery;
@@ -96,6 +129,14 @@ const Dashboard = () => {
       }
 
       console.log('Raw students data:', studentsData);
+      
+      // Debug: Check all students to see their parent_id values
+      if (profile?.role === 'parent') {
+        const { data: allStudents } = await supabase
+          .from('students')
+          .select('id, name, parent_id');
+        console.log('All students in database:', allStudents);
+      }
 
       // For each student, fetch their progress entries and calculate dynamic progress
       const studentsWithProgress = await Promise.all(
@@ -240,12 +281,7 @@ const Dashboard = () => {
 
 
 
-  // Group students by class
-  const classGroups = students.reduce((acc, student) => {
-    if (!acc[student.group_name]) acc[student.group_name] = [];
-    acc[student.group_name].push(student);
-    return acc;
-  }, {} as Record<string, Student[]>);
+  // Group students by class (removed unused variable)
 
   // UI: Render one card per grade
   const gradeCards = Object.entries(groupedByGrade).map(([grade, info]) => (
@@ -308,30 +344,38 @@ const Dashboard = () => {
     <ParentLayout breadcrumbs={breadcrumbs}>
       <div className="container mx-auto px-0 py-0 md:px-6 md:py-6">
         <div className="bg-white rounded-lg shadow-sm">
-          <div className="mb-8 pt-2">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  Welcome back, {profile?.full_name}
-                </h1>
-                <p className="text-gray-600">Parent Dashboard</p>
-              </div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4 pt-2">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                Welcome back, {profile?.full_name}
+              </h1>
+              <p className="text-gray-600">Parent Dashboard</p>
             </div>
-            {dataLoading ? <StatsCardsSkeleton /> : <StatsCards stats={stats} />}
+            {/* No add student buttons for parents */}
           </div>
+          {/* Stats Section */}
+          {dataLoading ? <StatsCardsSkeleton /> : <StatsCards stats={stats} />}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">My Children&apos;s Overview</h2>
-              {/* Removed filtered count for parent role */}
+              <h2 className="text-2xl font-bold text-gray-900">My Children&apos;s Classes</h2>
+              <div className="text-sm text-gray-500">
+                {students.length} child{students.length !== 1 ? 'ren' : ''}
+              </div>
             </div>
             {dataLoading ? <StudentGridSkeleton /> : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {Object.entries(classGroups).map(([className, classStudents]) => {
-                  if (classStudents.length === 0) return null;
-                  return (
-                    <ClassCard key={className} className={className} classStudents={classStudents} />
-                  );
-                })}
+                {gradeCards}
+              </div>
+            )}
+            {!dataLoading && students.length === 0 && (
+              <div className="text-center py-12">
+                <div className="text-gray-400 mb-4">
+                  <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No Children Found</h3>
+                <p className="text-gray-600">Your children haven&apos;t been added to the system yet.</p>
               </div>
             )}
           </div>

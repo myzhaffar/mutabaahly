@@ -182,155 +182,153 @@ const ClassDetail: React.FC = () => {
   ];
 
   const MainContent = (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-2 mb-1 pt-2">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="p-0 m-0 bg-transparent border-none outline-none flex items-center mr-2"
-            aria-label="Back"
-          >
-            <ChevronLeft className="h-6 w-6" />
-          </button>
-          <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-            {className}
-            <span className="inline-flex items-center justify-center px-2 py-0.5 ml-1 text-xs font-semibold leading-none text-white bg-emerald-500 rounded-full">
-              {studentsToShow.length}
-            </span>
-          </h1>
-        </div>
-      </div>
-      {/* Tabs for grade view */}
-      {showTabs && (
-        <div className="mb-4">
-          <div className="flex bg-gray-100 rounded-full p-1 overflow-x-auto whitespace-nowrap scrollbar-hide w-full max-w-full">
-            {tabList.map(tab => (
-              <button
-                key={tab}
-                className={`min-w-max px-4 py-2 rounded-full font-medium transition-all duration-200 focus:outline-none
-                  ${activeTab === tab
-                    ? 'bg-emerald-500 text-white shadow'
-                    : 'bg-transparent text-gray-700 hover:text-emerald-500'}
-                `}
-                onClick={() => setActiveTab(tab)}
-              >
-                {tabLabels[tab]}
-              </button>
-            ))}
+    <div className="container mx-auto px-0 py-0 md:px-6 md:py-6">
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-2 mb-1 pt-2">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="p-0 m-0 bg-transparent border-none outline-none flex items-center mr-2"
+              aria-label="Back"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+            <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+              {className}
+              <span className="inline-flex items-center justify-center px-2 py-0.5 ml-1 text-xs font-semibold leading-none text-white bg-emerald-500 rounded-full">
+                {studentsToShow.length}
+              </span>
+            </h1>
           </div>
         </div>
-      )}
-      {/* Modern Filter Card with Search and Teacher Filter */}
-      <div className="sticky top-14 z-20 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-200 mb-6 px-0 sm:px-0">
-        <div className="px-6 pt-6 pb-2">
-          <Input
-            placeholder="Search students in this class..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-full bg-gray-50 border border-gray-200 rounded-lg focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-base py-2 px-4 shadow-sm"
-          />
-        </div>
-        <div className="border-t border-gray-100 mx-6" />
-        <button
-          type="button"
-          className="w-full flex items-center gap-3 px-6 py-4 focus:outline-none"
-          onClick={() => setTeacherFilterOpen(open => !open)}
-          aria-expanded={teacherFilterOpen}
-        >
-          <div className="p-2 bg-blue-50 rounded-lg">
-            <Filter className="h-4 w-4 text-blue-600" />
-          </div>
-          <div className="flex-1 text-left">
-            <h3 className="font-semibold text-gray-900 text-base sm:text-lg">Teacher Filters</h3>
-            <p className="text-xs sm:text-sm text-gray-500">Select one or more teachers to filter students</p>
-            {hasAnyActiveTeacherFilter && (
-              <div className="flex items-center gap-2 flex-wrap mt-2">
-                {selectedTeachers.map(id => {
-                  const teacher = teacherOptions.find(t => t.id === id);
-                  return (
-                    <span key={id} className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-100 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
-                      {teacher?.name || id}
-                      <button
-                        type="button"
-                        onClick={e => { e.stopPropagation(); setSelectedTeachers(prev => prev.filter(t => t !== id)); }}
-                        className="ml-1 text-xs text-gray-400 hover:text-red-600"
-                        aria-label="Remove teacher filter"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </span>
-                  );
-                })}
+        {/* Tabs for grade view */}
+        {showTabs && (
+          <div className="mb-4">
+            <div className="flex bg-gray-100 rounded-full p-1 overflow-x-auto whitespace-nowrap scrollbar-hide w-full max-w-full">
+              {tabList.map(tab => (
                 <button
-                  type="button"
-                  onClick={e => { e.stopPropagation(); clearTeacherFilters(); }}
-                  className="ml-2 text-xs text-gray-500 hover:text-red-600 underline"
+                  key={tab}
+                  className={`min-w-max px-4 py-2 rounded-full font-medium transition-all duration-200 focus:outline-none
+                    ${activeTab === tab
+                      ? 'bg-emerald-500 text-white shadow'
+                      : 'bg-transparent text-gray-700 hover:text-emerald-500'}
+                  `}
+                  onClick={() => setActiveTab(tab)}
                 >
-                  Clear Filters
+                  {tabLabels[tab]}
                 </button>
-              </div>
-            )}
-          </div>
-          <span className="ml-auto text-xs text-gray-500 font-medium">{teacherFilterOpen ? 'Hide' : 'Show'}</span>
-        </button>
-        {teacherFilterOpen && (
-          <div className="px-6 pb-6 pt-2">
-            <div className="max-h-48 overflow-y-auto flex flex-col gap-2 pr-2">
-              {teacherOptions.map(teacher => (
-                <div key={teacher.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`teacher-filter-${teacher.id}`}
-                    checked={selectedTeachers.includes(teacher.id)}
-                    onCheckedChange={() => {
-                      setSelectedTeachers(prev => {
-                        const exists = prev.includes(teacher.id);
-                        return exists
-                          ? prev.filter(t => t !== teacher.id)
-                          : [...prev, teacher.id];
-                      });
-                    }}
-                    className="rounded-full"
-                  />
-                  <label htmlFor={`teacher-filter-${teacher.id}`} className="text-sm text-gray-700 cursor-pointer">
-                    {teacher.name}
-                  </label>
-                </div>
               ))}
             </div>
           </div>
         )}
+        {/* Modern Filter Card with Search and Teacher Filter */}
+        <div className="sticky top-14 z-20 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-200 mb-6 px-0 sm:px-0">
+          <div className="px-6 pt-6 pb-2">
+            <Input
+              placeholder="Search students in this class..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-base py-2 px-4 shadow-sm"
+            />
+          </div>
+          <div className="border-t border-gray-100 mx-6" />
+          <button
+            type="button"
+            className="w-full flex items-center gap-3 px-6 py-4 focus:outline-none"
+            onClick={() => setTeacherFilterOpen(open => !open)}
+            aria-expanded={teacherFilterOpen}
+          >
+            <div className="p-2 bg-blue-50 rounded-lg">
+              <Filter className="h-4 w-4 text-blue-600" />
+            </div>
+            <div className="flex-1 text-left">
+              <h3 className="font-semibold text-gray-900 text-base sm:text-lg">Teacher Filters</h3>
+              <p className="text-xs sm:text-sm text-gray-500">Select one or more teachers to filter students</p>
+              {hasAnyActiveTeacherFilter && (
+                <div className="flex items-center gap-2 flex-wrap mt-2">
+                  {selectedTeachers.map(id => {
+                    const teacher = teacherOptions.find(t => t.id === id);
+                    return (
+                      <span key={id} className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-100 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
+                        {teacher?.name || id}
+                        <button
+                          type="button"
+                          onClick={e => { e.stopPropagation(); setSelectedTeachers(prev => prev.filter(t => t !== id)); }}
+                          className="ml-1 text-xs text-gray-400 hover:text-red-600"
+                          aria-label="Remove teacher filter"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    );
+                  })}
+                  <button
+                    type="button"
+                    onClick={e => { e.stopPropagation(); clearTeacherFilters(); }}
+                    className="ml-2 text-xs text-gray-500 hover:text-red-600 underline"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              )}
+            </div>
+            <span className="ml-auto text-xs text-gray-500 font-medium">{teacherFilterOpen ? 'Hide' : 'Show'}</span>
+          </button>
+          {teacherFilterOpen && (
+            <div className="px-6 pb-6 pt-2">
+              <div className="max-h-48 overflow-y-auto flex flex-col gap-2 pr-2">
+                {teacherOptions.map(teacher => (
+                  <div key={teacher.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`teacher-filter-${teacher.id}`}
+                      checked={selectedTeachers.includes(teacher.id)}
+                      onCheckedChange={() => {
+                        setSelectedTeachers(prev => {
+                          const exists = prev.includes(teacher.id);
+                          return exists
+                            ? prev.filter(t => t !== teacher.id)
+                            : [...prev, teacher.id];
+                        });
+                      }}
+                      className="rounded-full"
+                    />
+                    <label htmlFor={`teacher-filter-${teacher.id}`} className="text-sm text-gray-700 cursor-pointer">
+                      {teacher.name}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        {loading ? (
+          <div className="text-center py-12 text-gray-500">Loading students...</div>
+        ) : (
+          <StudentsGrid
+            students={studentsToShow.map(student => ({
+              ...student,
+              grade: student.grade || 'Unknown'
+            }))}
+            filteredStudents={studentsToShow.filter(student =>
+              student.name.toLowerCase().includes(search.toLowerCase()) &&
+              (selectedTeachers.length === 0 || selectedTeachers.includes(getTeacherId(student)))
+            ).map(student => ({
+              ...student,
+              grade: student.grade || 'Unknown'
+            }))}
+            onViewDetails={handleViewDetails}
+            userRole={profile?.role || 'parent'}
+          />
+        )}
       </div>
-      {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading students...</div>
-      ) : (
-        <StudentsGrid
-          students={studentsToShow.map(student => ({
-            ...student,
-            grade: student.grade || 'Unknown'
-          }))}
-          filteredStudents={studentsToShow.filter(student =>
-            student.name.toLowerCase().includes(search.toLowerCase()) &&
-            (selectedTeachers.length === 0 || selectedTeachers.includes(getTeacherId(student)))
-          ).map(student => ({
-            ...student,
-            grade: student.grade || 'Unknown'
-          }))}
-          onViewDetails={handleViewDetails}
-          userRole={profile?.role || 'parent'}
-        />
-      )}
     </div>
   );
 
   if (profile?.role === 'parent') {
     return <ParentLayout breadcrumbs={breadcrumbs}>{MainContent}</ParentLayout>;
   }
-  return <TeacherLayout breadcrumbs={breadcrumbs}>
-    <div className="container mx-auto px-0 py-0 md:px-6 md:py-6">
-      {MainContent}
-    </div>
-  </TeacherLayout>;
+  return <TeacherLayout breadcrumbs={breadcrumbs}>{MainContent}</TeacherLayout>;
 };
 
 export default ClassDetail; 
