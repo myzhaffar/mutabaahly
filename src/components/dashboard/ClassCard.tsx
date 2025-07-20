@@ -101,11 +101,7 @@ const ClassCard: React.FC<ClassCardProps> = ({ grade, students, classes }) => {
         {/* Top 3 Performers */}
         <div className="mb-5">
           <div className="flex items-center gap-2">
-            {/* User icon before avatars */}
-            <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" strokeWidth="32" viewBox="0 0 512 512">
-              <circle cx="256" cy="184" r="72" />
-              <path d="M256 304c-70.7 0-128 57.3-128 128h256c0-70.7-57.3-128-128-128z" />
-            </svg>
+            {/* Removed user icon before avatars */}
             <div className="flex -space-x-3">
               {topPerformers.map((student) => (
                 <div

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, BookOpen, Award, TrendingUp } from 'lucide-react';
+import { BookOpen, Award, TrendingUp } from 'lucide-react';
 
 interface StatsCardsProps {
   stats: {
@@ -17,9 +17,7 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
       <Card className="bg-white shadow-sm border-l-4 border-l-blue-500">
         <CardContent className="p-6">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-blue-100 mr-4">
-              <Users className="h-6 w-6 text-blue-600" />
-            </div>
+            {/* Removed icon for student count */}
             <div>
               <p className="text-sm font-medium text-gray-600">Total Students</p>
               <p className="text-2xl font-bold text-gray-900">{stats.totalStudents}</p>
