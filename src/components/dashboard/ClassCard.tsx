@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface Student {
   id: string;
@@ -21,51 +22,139 @@ interface Student {
 }
 
 interface ClassCardProps {
-  className: string;
-  classStudents: Student[];
+  grade: string;
+  students: Student[];
+  classes: string[];
 }
 
-// Utility to generate a color from class name
-function getAccentColor(className: string) {
-  const colors = [
-    'bg-gradient-to-br from-emerald-100 to-emerald-50',
-    'bg-gradient-to-br from-blue-100 to-blue-50',
-    'bg-gradient-to-br from-yellow-100 to-yellow-50',
-    'bg-gradient-to-br from-pink-100 to-pink-50',
-    'bg-gradient-to-br from-purple-100 to-purple-50',
-    'bg-gradient-to-br from-orange-100 to-orange-50',
-  ];
-  let hash = 0;
-  for (let i = 0; i < className.length; i++) {
-    hash = className.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return colors[Math.abs(hash) % colors.length];
+// Utility to generate a color from grade
+function getGradeColor(grade: string) {
+  const gradeColors = {
+    '1': 'from-green-500 to-emerald-500',
+    '2': 'from-blue-500 to-cyan-500', 
+    '3': 'from-purple-500 to-indigo-500',
+    '4': 'from-orange-500 to-red-500',
+    '5': 'from-pink-500 to-rose-500',
+    '6': 'from-teal-500 to-green-500',
+    '7': 'from-indigo-500 to-purple-500',
+    '8': 'from-yellow-500 to-orange-500',
+    '9': 'from-red-500 to-pink-500',
+    '10': 'from-emerald-500 to-teal-500',
+  };
+  
+  const gradeNumber = grade.replace(/\D/g, '');
+  return gradeColors[gradeNumber as keyof typeof gradeColors] || 'from-gray-500 to-gray-600';
 }
 
-const ClassCard: React.FC<ClassCardProps> = ({ className, classStudents }) => {
+// Get top 3 performers based on combined progress
+function getTopPerformers(students: Student[]) {
+  return students
+    .map(student => {
+      const hafalanProgress = student.hafalan_progress?.percentage || 0;
+      const tilawahProgress = student.tilawah_progress?.percentage || 0;
+      const combinedProgress = (hafalanProgress + tilawahProgress) / 2;
+      
+      return {
+        ...student,
+        combinedProgress
+      };
+    })
+    .sort((a, b) => b.combinedProgress - a.combinedProgress)
+    .slice(0, 3);
+}
+
+const ClassCard: React.FC<ClassCardProps> = ({ grade, students, classes }) => {
   const router = useRouter();
-  const accent = getAccentColor(className);
+  const topPerformers = getTopPerformers(students);
+  const gradeColor = getGradeColor(grade);
+  
   return (
     <div
-      className={`relative rounded-2xl shadow-md hover:shadow-xl transition-all duration-200 ${accent}`}
+      className="group relative rounded-2xl shadow-lg hover:shadow-xl hover:shadow-amber-50/50 transition-all duration-300 overflow-hidden"
       tabIndex={0}
-      aria-label={`View class ${className}`}
+      aria-label={`View grade ${grade}`}
     >
-      <div className="p-6 min-h-[170px] flex flex-col justify-between h-full">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg font-bold text-gray-900">{className}</span>
+      {/* Head Section: Grade Name */}
+      <div className="px-6 py-5 bg-gradient-to-r from-green-500 to-orange-400 text-white"
+           style={{ borderTopLeftRadius: '1rem', borderTopRightRadius: '1rem' }}>
+        <h3 className="text-2xl font-bold mb-1">Grade {grade}</h3>
+        <div className="w-12 h-1 bg-white/60 rounded-full" />
+      </div>
+
+      {/* Body Section: Rest of the content */}
+      <div className="relative z-10 p-6 bg-white" style={{ borderBottomLeftRadius: '1rem', borderBottomRightRadius: '1rem' }}>
+        {/* Student Count */}
+        <div className="mb-5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+              {/* Provided user icon for student count */}
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-2.5 3.6-4.5 8-4.5s8 2 8 4.5" />
+              </svg>
+            </div>
+            <span className="text-sm font-medium text-gray-700">{students.length} students</span>
           </div>
-          <div className="text-xs text-gray-400 mb-4">{classStudents.length} students</div>
         </div>
-        <div className="flex justify-end mt-6">
-          <button
-            className="w-full py-2 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm shadow transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2"
-            onClick={() => router.push(`/class/${encodeURIComponent(className)}`)}
-          >
-            View Students in Class
-          </button>
+
+        {/* Top 3 Performers */}
+        <div className="mb-5">
+          <div className="flex items-center gap-2">
+            {/* User icon before avatars */}
+            <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="8" r="4" />
+              <path d="M4 20c0-2.5 3.6-4.5 8-4.5s8 2 8 4.5" />
+            </svg>
+            {topPerformers.map((student, index) => (
+              <div 
+                key={student.id} 
+                className="relative"
+                style={{ 
+                  marginLeft: index > 0 ? '-10px' : '0',
+                  zIndex: topPerformers.length - index 
+                }}
+              >
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center border-3 border-white shadow-md">
+                  {student.photo ? (
+                    <Image
+                      src={student.photo}
+                      alt={student.name}
+                      width={40}
+                      height={40}
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-gray-600 text-sm font-semibold">
+                      {student.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
+
+        {/* Class Tags */}
+        <div className="mb-6">
+          <div className="flex flex-wrap gap-2">
+            {classes.map((cls) => (
+              <span 
+                key={cls} 
+                className={`px-3 py-1.5 text-xs font-medium rounded-full border-2 ${gradeColor.replace('from-', 'from-').replace('to-', 'to-')} bg-opacity-10 text-gray-700 bg-white/80 backdrop-blur-sm`}
+              >
+                {cls}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Action Button */}
+        <button
+          className={`w-full py-3 px-4 rounded-xl bg-gradient-to-r ${gradeColor} hover:shadow-lg hover:scale-[1.02] text-white font-semibold text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50 group-hover:shadow-amber-200/25`}
+          onClick={() => router.push(`/class/${encodeURIComponent(grade)}`)}
+        >
+          View Students
+        </button>
       </div>
     </div>
   );

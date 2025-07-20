@@ -10,6 +10,7 @@ import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/prog
 import TeacherLayout from '@/components/layouts/TeacherLayout';
 import AddStudentDialog from '@/components/AddStudentDialog';
 import BulkUploadStudentsDialog from '@/components/BulkUploadStudentsDialog';
+import ClassCard from '@/components/dashboard/ClassCard';
 import ParentLayout from '@/components/layouts/ParentLayout';
 import { useToast } from '@/hooks/use-toast';
 
@@ -285,24 +286,12 @@ const Dashboard = () => {
 
   // UI: Render one card per grade
   const gradeCards = Object.entries(groupedByGrade).map(([grade, info]) => (
-    <div key={grade} className="bg-white rounded-lg shadow-sm p-6 flex flex-col justify-between">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Grade {grade}</h2>
-        <p className="text-gray-600 mb-2">{info.students.length} students</p>
-        <div className="mb-4">
-          <span className="text-sm text-gray-500">Classes: </span>
-          {info.classes.map(cls => (
-            <span key={cls} className="inline-block bg-gray-100 text-gray-700 rounded-full px-3 py-1 text-xs font-semibold mr-2 mb-2">{cls}</span>
-          ))}
-        </div>
-      </div>
-      <button
-        className="mt-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-        onClick={() => router.push(`/class/${encodeURIComponent(grade)}`)}
-      >
-        View Student Class
-      </button>
-    </div>
+    <ClassCard
+      key={grade}
+      grade={grade}
+      students={info.students}
+      classes={info.classes}
+    />
   ));
 
   if (profile?.role === 'teacher') {
