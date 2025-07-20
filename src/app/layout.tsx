@@ -3,6 +3,7 @@ import './globals.css';
 import AppProviders from '@/components/AppProviders';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata: Metadata = {
   title: 'Mutabaahly',
@@ -30,6 +31,7 @@ export default function RootLayout({
           </ErrorBoundary>
         </AppProviders>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
