@@ -133,17 +133,17 @@ const Profile: React.FC = () => {
               </CardHeader>
               <CardContent className="space-y-6 p-6">
                 <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                  <User className="h-5 w-5 text-teal-500" />
-                  <div>
+                  <User className="h-5 w-5 text-teal-500 flex-shrink-0" />
+                  <div className="min-w-0">
                     <p className="text-sm text-gray-500">Full Name</p>
-                    <p className="font-medium text-gray-900">{profile?.full_name || 'Not set'}</p>
+                    <p className="font-medium text-gray-900 truncate max-w-[180px] sm:max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl">{profile?.full_name || 'Not set'}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                  <Mail className="h-5 w-5 text-teal-500" />
-                  <div>
+                  <Mail className="h-5 w-5 text-teal-500 flex-shrink-0" />
+                  <div className="min-w-0">
                     <p className="text-sm text-gray-500">Email</p>
-                    <p className="font-medium text-gray-900">{user?.email || 'Not set'}</p>
+                    <p className="font-medium text-gray-900 truncate max-w-[180px] sm:max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl">{user?.email || 'Not set'}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
