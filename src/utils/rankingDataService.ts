@@ -269,25 +269,9 @@ export const fetchHafalanRankingData = async (filters: RankingFilters): Promise<
         student.verse > 0
       )
       .sort((a, b) => {
-      // If both students are in Juz 30, rank by Surah (An-Naba highest to An-Nas lowest)
-      if (a.juz === 30 && b.juz === 30) {
-        const surahRankA = getJuz30SurahRank(a.surah);
-        const surahRankB = getJuz30SurahRank(b.surah);
-        
-        if (surahRankA !== surahRankB) {
-          return surahRankA - surahRankB; // Lower number = higher rank (An-Naba=1, An-Nas=37)
-        }
-        // If same Surah, rank by verse (higher verse = higher rank)
-        return b.verse - a.verse;
-      }
-      
-      // If only one student is in Juz 30, Juz 30 student gets higher rank
-      if (a.juz === 30) return -1; // a is higher
-      if (b.juz === 30) return 1;  // b is higher
-      
-      // For Juz 1-29, rank by Juz (higher Juz = higher rank)
+      // First, rank by Juz (lower Juz = higher rank, so Juz 1 > Juz 30)
       if (a.juz !== null && b.juz !== null && a.juz !== b.juz) {
-        return b.juz - a.juz;
+        return a.juz - b.juz; // Lower juz number = higher rank
       }
       
       // If one has Juz and other doesn't, the one with Juz ranks higher
@@ -299,7 +283,7 @@ export const fetchHafalanRankingData = async (filters: RankingFilters): Promise<
       const surahRankB = getSurahRank(b.surah);
       
       if (surahRankA !== surahRankB) {
-        return surahRankB - surahRankA; // Higher Surah number = higher rank
+        return surahRankA - surahRankB; // Lower surah number = higher rank
       }
       
       // If same Surah, rank by verse (higher verse = higher rank)
@@ -321,53 +305,6 @@ const getTilawatiLevelNumber = (jilid: string | null): number | undefined => {
   // Extract level number from jilid (e.g., "Jilid 1" -> 1, "Level 2" -> 2, "2" -> 2)
   const match = jilid.match(/(?:Jilid|Level)\s*(\d+)/i) || jilid.match(/(\d+)/);
   return match ? parseInt(match[1]) : undefined;
-};
-
-// Get Juz 30 Surah rank (An-Naba = 1, An-Nas = 37)
-const getJuz30SurahRank = (surahName: string | null): number => {
-  if (!surahName) return 999; // Default low rank
-  
-  const juz30SurahRanks: Record<string, number> = {
-    'An-Naba': 1,
-    'An-Nazi\'at': 2,
-    'Abasa': 3,
-    'At-Takwir': 4,
-    'Al-Infitar': 5,
-    'Al-Mutaffifin': 6,
-    'Al-Inshiqaq': 7,
-    'Al-Buruj': 8,
-    'At-Tariq': 9,
-    'Al-A\'la': 10,
-    'Al-Ghashiyah': 11,
-    'Al-Fajr': 12,
-    'Al-Balad': 13,
-    'Ash-Shams': 14,
-    'Al-Layl': 15,
-    'Ad-Duha': 16,
-    'Ash-Sharh': 17,
-    'At-Tin': 18,
-    'Al-Alaq': 19,
-    'Al-Qadr': 20,
-    'Al-Bayyinah': 21,
-    'Az-Zalzalah': 22,
-    'Al-Adiyat': 23,
-    'Al-Qari\'ah': 24,
-    'At-Takathur': 25,
-    'Al-Asr': 26,
-    'Al-Humazah': 27,
-    'Al-Fil': 28,
-    'Quraish': 29,
-    'Al-Ma\'un': 30,
-    'Al-Kawthar': 31,
-    'Al-Kafirun': 32,
-    'An-Nasr': 33,
-    'Al-Masad': 34,
-    'Al-Ikhlas': 35,
-    'Al-Falaq': 36,
-    'An-Nas': 37
-  };
-  
-  return juz30SurahRanks[surahName] || 999;
 };
 
 // Get general Surah rank (Surah number)
@@ -492,55 +429,6 @@ const getSurahRank = (surahName: string | null): number => {
   };
   
   return surahNumbers[surahName] || 0;
-};
-
-const getSurahData = (surahName: string | null) => {
-  if (!surahName) return null;
-  
-  // For now, we only identify Juz 30 Surahs since we don't have Juz data for others yet
-  const juz30Surahs = [
-    'An-Naba',
-    'An-Nazi\'at',
-    'Abasa',
-    'At-Takwir',
-    'Al-Infitar',
-    'Al-Mutaffifin',
-    'Al-Inshiqaq',
-    'Al-Buruj',
-    'At-Tariq',
-    'Al-A\'la',
-    'Al-Ghashiyah',
-    'Al-Fajr',
-    'Al-Balad',
-    'Ash-Shams',
-    'Al-Layl',
-    'Ad-Duha',
-    'Ash-Sharh',
-    'At-Tin',
-    'Al-Alaq',
-    'Al-Qadr',
-    'Al-Bayyinah',
-    'Az-Zalzalah',
-    'Al-Adiyat',
-    'Al-Qari\'ah',
-    'At-Takathur',
-    'Al-Asr',
-    'Al-Humazah',
-    'Al-Fil',
-    'Quraish',
-    'Al-Ma\'un',
-    'Al-Kawthar',
-    'Al-Kafirun',
-    'An-Nasr',
-    'Al-Masad',
-    'Al-Ikhlas',
-    'Al-Falaq',
-    'An-Nas'
-  ];
-  
-  return {
-    juz: juz30Surahs.includes(surahName) ? 30 : null
-  };
 };
 
 const getCurrentVerse = (entries: ProgressEntry[]): number => {
