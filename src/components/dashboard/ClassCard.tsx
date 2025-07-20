@@ -87,13 +87,7 @@ const ClassCard: React.FC<ClassCardProps> = ({ grade, students, classes }) => {
         {/* Student Count */}
         <div className="mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
-              {/* Exact user icon from uploaded image for student count */}
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <circle cx="12" cy="8" r="4" />
-                <path d="M4 20c0-2.5 3.6-4.5 8-4.5s8 2 8 4.5" />
-              </svg>
-            </div>
+            {/* Removed student count icon */}
             <span className="text-sm font-medium text-gray-700">{students.length} students</span>
           </div>
         </div>
@@ -145,7 +139,7 @@ const ClassCard: React.FC<ClassCardProps> = ({ grade, students, classes }) => {
 
         {/* Action Button */}
         <Button
-          className="w-full mt-2"
+          className="w-full mt-2 bg-gradient-to-r from-emerald-500 to-teal-400 hover:opacity-90 text-white"
           onClick={() => router.push(`/class/${encodeURIComponent(grade)}`)}
         >
           View Students
