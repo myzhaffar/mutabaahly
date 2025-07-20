@@ -225,7 +225,9 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
                         {student.standing === 'quran' ? (
                           <span className="text-sm text-green-700 font-semibold">{student.surah}</span>
                         ) : (
-                          <Badge variant="outline" className="border-blue-200 text-blue-700">Level {student.level}</Badge>
+                          <Badge variant="outline" className="border-blue-200 text-blue-700">
+                            {student.level ? `Level ${student.level}` : '—'}
+                          </Badge>
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

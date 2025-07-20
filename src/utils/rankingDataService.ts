@@ -10,7 +10,7 @@ export interface StudentRankingData {
   teacherId: string;
   grade: string;
   // Tilawati specific
-  level?: number;
+  level?: number | undefined;
   page?: number;
   // Hafalan specific
   juz: number | null;
@@ -97,6 +97,7 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
             // Otherwise, treat as Tilawati (either jilid or surah is a number)
             const levelNumber = getTilawatiLevelNumber(calculatedProgress.jilid || calculatedProgress.surah);
             const currentPage = calculatedProgress.total_pages || calculatedProgress.ayat || 0;
+            
             return {
               id: student.id,
               name: student.name,
@@ -306,12 +307,12 @@ export const fetchHafalanRankingData = async (filters: RankingFilters): Promise<
 };
 
 // Helper functions
-const getTilawatiLevelNumber = (jilid: string | null): number => {
-  if (!jilid) return 1;
+const getTilawatiLevelNumber = (jilid: string | null): number | undefined => {
+  if (!jilid) return undefined;
   
   // Extract level number from jilid (e.g., "Jilid 1" -> 1, "Level 2" -> 2, "2" -> 2)
   const match = jilid.match(/(?:Jilid|Level)\s*(\d+)/i) || jilid.match(/(\d+)/);
-  return match ? parseInt(match[1]) : 1;
+  return match ? parseInt(match[1]) : undefined;
 };
 
 // Get Juz 30 Surah rank (An-Naba = 1, An-Nas = 37)
