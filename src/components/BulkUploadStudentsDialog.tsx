@@ -17,12 +17,9 @@ interface BulkUploadStudentsDialogProps {
 
 interface StudentData {
   name: string;
-  group_name: string;
-  teacher: string;
-  tahsin_type?: string;
-  tahsin_level_or_ayah?: string;
-  tahfidz_surah?: string;
-  tahfidz_last_ayah?: string;
+  grade: string;
+  class: string;
+  'teacher name': string;
 }
 
 interface ValidationError {
@@ -56,7 +53,6 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
     
     data.forEach((student, index) => {
       const rowNumber = startRow + index;
-      
       // Validate name
       if (!student.name || student.name.trim().length === 0) {
         errors.push({
@@ -71,31 +67,37 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
           message: 'Student name must be at least 2 characters long'
         });
       }
-      
-      // Validate group_name
-      if (!student.group_name || student.group_name.trim().length === 0) {
+      // Validate grade
+      if (!student.grade || student.grade.trim().length === 0) {
         errors.push({
           row: rowNumber,
-          field: 'group_name',
-          message: 'Group/Class is required'
+          field: 'grade',
+          message: 'Grade is required'
         });
       }
-      
-      // Validate teacher
-      if (!student.teacher || student.teacher.trim().length === 0) {
+      // Validate class
+      if (!student.class || student.class.trim().length === 0) {
         errors.push({
           row: rowNumber,
-          field: 'teacher',
-          message: 'Teacher is required'
+          field: 'class',
+          message: 'Class is required'
+        });
+      }
+      // Validate teacher name
+      if (!student['teacher name'] || student['teacher name'].trim().length === 0) {
+        errors.push({
+          row: rowNumber,
+          field: 'teacher name',
+          message: 'Teacher name is required'
         });
       } else {
         // Check if teacher exists in FIXED_TEACHERS
-        const teacherExists = FIXED_TEACHERS.some(t => t.name === student.teacher.trim());
+        const teacherExists = FIXED_TEACHERS.some(t => t.name === student['teacher name'].trim());
         if (!teacherExists) {
           errors.push({
             row: rowNumber,
-            field: 'teacher',
-            message: `Teacher "${student.teacher}" not found in the system`
+            field: 'teacher name',
+            message: `Teacher "${student['teacher name']}" not found in the system`
           });
         }
       }
@@ -115,7 +117,7 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
         const result = Papa.parse(text, {
           header: true,
           skipEmptyLines: true,
-          transformHeader: (header) => header.trim().toLowerCase().replace(/\s+/g, '_')
+          transformHeader: (header) => header.trim().toLowerCase()
         });
 
         if (result.errors.length > 0) {
@@ -136,7 +138,7 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
         }
 
         // Convert to StudentData format
-        const headers = (jsonData[0] as string[]).map(h => h?.toString().toLowerCase().replace(/\s+/g, '_'));
+        const headers = (jsonData[0] as string[]).map(h => h?.toString().toLowerCase());
         data = (jsonData.slice(1) as string[][]).map(row => {
           const student: Record<string, string> = {};
           headers.forEach((header, index) => {
@@ -146,12 +148,9 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
           });
           return {
             name: student.name || '',
-            group_name: student.group_name || '',
-            teacher: student.teacher || '',
-            tahsin_type: student.tahsin_type,
-            tahsin_level_or_ayah: student.tahsin_level_or_ayah,
-            tahfidz_surah: student.tahfidz_surah,
-            tahfidz_last_ayah: student.tahfidz_last_ayah,
+            grade: student.grade || '',
+            class: student.class || '',
+            'teacher name': student['teacher name'] || '',
           } as StudentData;
         });
       } else {
@@ -159,13 +158,13 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
       }
 
       // Mitigation: Strictly validate headers
-      const allowedHeaders = ['name', 'group_name', 'teacher', 'tahsin_type', 'tahsin_level_or_ayah', 'tahfidz_surah', 'tahfidz_last_ayah'];
+      const allowedHeaders = ['name', 'grade', 'class', 'teacher name'];
       const headers = Object.keys(data[0] || {});
       const hasAllHeaders = allowedHeaders.every(h => headers.includes(h));
       if (!hasAllHeaders) {
         toast({
           title: "Error",
-          description: "File is missing required columns (name, group_name, teacher, tahsin_type, tahsin_level_or_ayah, tahfidz_surah, tahfidz_last_ayah).",
+          description: "File is missing required columns (name, grade, class, teacher name).",
           variant: "destructive",
         });
         return;
@@ -190,12 +189,9 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
       // Mitigation: Sanitize all string fields
       data = data.map(row => ({
         name: (row.name || '').toString().trim(),
-        group_name: (row.group_name || '').toString().trim(),
-        teacher: (row.teacher || '').toString().trim(),
-        tahsin_type: (row.tahsin_type || '').toString().trim(),
-        tahsin_level_or_ayah: (row.tahsin_level_or_ayah || '').toString().trim(),
-        tahfidz_surah: (row.tahfidz_surah || '').toString().trim(),
-        tahfidz_last_ayah: (row.tahfidz_last_ayah || '').toString().trim(),
+        grade: (row.grade || '').toString().trim(),
+        class: (row.class || '').toString().trim(),
+        'teacher name': (row['teacher name'] || '').toString().trim(),
       }));
 
       // Validate the data
@@ -268,15 +264,11 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
       // Prepare two arrays: one for student insert, one for progress
       const validStudents = previewData.map(student => ({
         name: student.name.trim(),
-        group_name: student.group_name.trim(),
-        teacher: student.teacher.trim(),
+        grade: student.grade.trim(),
+        group_name: student.class.trim(),
+        teacher: student['teacher name'].trim(),
       }));
-      const progressInfo = previewData.map(student => ({
-        tahsin_type: student.tahsin_type?.trim() || '',
-        tahsin_level_or_ayah: student.tahsin_level_or_ayah?.trim() || '',
-        tahfidz_surah: student.tahfidz_surah?.trim() || '',
-        tahfidz_last_ayah: student.tahfidz_last_ayah?.trim() || '',
-      }));
+      // No progressInfo handling needed for new template
 
       // Insert students in batches
       const batchSize = 10;
@@ -285,7 +277,6 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
 
       for (let i = 0; i < validStudents.length; i += batchSize) {
         const batch = validStudents.slice(i, i + batchSize);
-        const batchProgress = progressInfo.slice(i, i + batchSize);
         // Insert students and get their ids
         const { data: inserted, error } = await supabase
           .from('students')
@@ -297,41 +288,7 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
           failedCount += batch.length;
         } else {
           successCount += batch.length;
-          // For each inserted student, insert progress_entries if needed
-          for (let j = 0; j < inserted.length; j++) {
-            const studentProgress = batchProgress[j];
-            // const newStudent = inserted[j]; // Disabled: unused when progress_entries is not saved
-            if (studentProgress.tahsin_type && studentProgress.tahsin_level_or_ayah) {
-              // TODO: Disabled because 'progress_entries' table does not exist in production DB.
-              // await supabase.from('progress_entries').insert([
-              //   {
-              //     student_id: newStudent.id,
-              //     type: 'tilawah',
-              //     // ...other fields
-              //   }
-              // ]);
-              toast({
-                title: 'Not Implemented',
-                description: 'Progress entry saving is temporarily disabled. Please contact admin.',
-                variant: 'destructive',
-              });
-            }
-            if (studentProgress.tahfidz_surah && studentProgress.tahfidz_last_ayah) {
-              // TODO: Disabled because 'progress_entries' table does not exist in production DB.
-              // await supabase.from('progress_entries').insert([
-              //   {
-              //     student_id: newStudent.id,
-              //     type: 'hafalan',
-              //     // ...other fields
-              //   }
-              // ]);
-              toast({
-                title: 'Not Implemented',
-                description: 'Progress entry saving is temporarily disabled. Please contact admin.',
-                variant: 'destructive',
-              });
-            }
-          }
+          // No progressInfo handling needed for new template
         }
 
         setUploadProgress(prev => ({
@@ -506,16 +463,18 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
                 <span className="font-medium">Preview ({previewData.length} students)</span>
               </div>
               <div className="max-h-32 overflow-y-auto">
-                <div className="grid grid-cols-3 gap-2 text-xs font-medium text-gray-600 border-b pb-1">
+                <div className="grid grid-cols-4 gap-2 text-xs font-medium text-gray-600 border-b pb-1">
                   <div>Name</div>
-                  <div>Group</div>
-                  <div>Teacher</div>
+                  <div>Grade</div>
+                  <div>Class</div>
+                  <div>Teacher Name</div>
                 </div>
                 {previewData.slice(0, 5).map((student, index) => (
-                  <div key={index} className="grid grid-cols-3 gap-2 text-xs border-b py-1">
+                  <div key={index} className="grid grid-cols-4 gap-2 text-xs border-b py-1">
                     <div>{student.name}</div>
-                    <div>{student.group_name}</div>
-                    <div>{student.teacher}</div>
+                    <div>{student.grade}</div>
+                    <div>{student.class}</div>
+                    <div>{student['teacher name']}</div>
                   </div>
                 ))}
                 {previewData.length > 5 && (
