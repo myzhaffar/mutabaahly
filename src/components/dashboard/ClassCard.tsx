@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 
 interface Student {
   id: string;
@@ -87,7 +88,7 @@ const ClassCard: React.FC<ClassCardProps> = ({ grade, students, classes }) => {
         <div className="mb-5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
-              {/* Provided user icon for student count */}
+              {/* Exact user icon from uploaded image for student count */}
               <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <circle cx="12" cy="8" r="4" />
                 <path d="M4 20c0-2.5 3.6-4.5 8-4.5s8 2 8 4.5" />
@@ -101,36 +102,34 @@ const ClassCard: React.FC<ClassCardProps> = ({ grade, students, classes }) => {
         <div className="mb-5">
           <div className="flex items-center gap-2">
             {/* User icon before avatars */}
-            <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 20c0-2.5 3.6-4.5 8-4.5s8 2 8 4.5" />
+            <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" strokeWidth="32" viewBox="0 0 512 512">
+              <circle cx="256" cy="184" r="72" />
+              <path d="M256 304c-70.7 0-128 57.3-128 128h256c0-70.7-57.3-128-128-128z" />
             </svg>
-            {topPerformers.map((student, index) => (
-              <div 
-                key={student.id} 
-                className="relative"
-                style={{ 
-                  marginLeft: index > 0 ? '-10px' : '0',
-                  zIndex: topPerformers.length - index 
-                }}
-              >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center border-3 border-white shadow-md">
-                  {student.photo ? (
-                    <Image
-                      src={student.photo}
-                      alt={student.name}
-                      width={40}
-                      height={40}
-                      className="w-full h-full rounded-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-gray-600 text-sm font-semibold">
-                      {student.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
-                    </span>
-                  )}
+            <div className="flex -space-x-3">
+              {topPerformers.map((student) => (
+                <div
+                  key={student.id}
+                  className="relative"
+                >
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center border-2 border-white shadow-md overflow-hidden">
+                    {student.photo ? (
+                      <Image
+                        src={student.photo}
+                        alt={student.name}
+                        width={40}
+                        height={40}
+                        className="w-full h-full rounded-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-gray-600 text-sm font-semibold">
+                        {student.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
@@ -149,12 +148,12 @@ const ClassCard: React.FC<ClassCardProps> = ({ grade, students, classes }) => {
         </div>
 
         {/* Action Button */}
-        <button
-          className={`w-full py-3 px-4 rounded-xl bg-gradient-to-r ${gradeColor} hover:shadow-lg hover:scale-[1.02] text-white font-semibold text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50 group-hover:shadow-amber-200/25`}
+        <Button
+          className="w-full mt-2"
           onClick={() => router.push(`/class/${encodeURIComponent(grade)}`)}
         >
           View Students
-        </button>
+        </Button>
       </div>
     </div>
   );
