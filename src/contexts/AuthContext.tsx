@@ -112,6 +112,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             ]);
             // Refetch profile after creation
             await fetchProfile(session.user.id);
+          } else {
+            // If profile exists but role is null, and user metadata has a role, upsert it
+            if (profileData && (!profileData.role || profileData.role === null) && session.user.user_metadata.role) {
+              await supabase.from('profiles').update({
+                role: session.user.user_metadata.role
+              }).eq('id', session.user.id);
+              // Refetch profile after update
+              await fetchProfile(session.user.id);
+            }
           }
           setLoading(false);
         } else {
