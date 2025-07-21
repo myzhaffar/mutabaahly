@@ -34,20 +34,20 @@ const Index = () => {
 
   const testimonials = [
     {
-      name: "Ustadz Ahmad Rahman",
-      role: "Al-Quran Teacher at SDIT Al-Hikmah",
+      name: "Teacher",
+      role: "Al-Quran Teacher",
       text: "This platform really helps us monitor students&apos; memorization progress in real-time. Parents can also see their children&apos;s development.",
       rating: 5
     },
     {
-      name: "Siti Nurhaliza",
-      role: "Parent of Grade 5 Student",
+      name: "Parent",
+      role: "Parent",
       text: "My child is more motivated to memorize the Quran because they can see the attractive progress charts. Thank you!",
       rating: 5
     },
     {
       name: "Dr. Muhammad Yusuf",
-      role: "SDIT Principal",
+      role: "Principal",
       text: "A very comprehensive monitoring system. It makes it easier to evaluate tahfidz and tilawati programs at our school.",
       rating: 5
     }
