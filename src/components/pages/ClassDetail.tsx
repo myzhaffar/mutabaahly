@@ -297,25 +297,25 @@ const ClassDetail: React.FC = () => {
                   <div className="space-y-2">
                     <div className="font-semibold text-teal-700 text-xs mb-1">Ust.</div>
                     {teacherOptions.filter(t => t.name.startsWith('Ust.')).map(teacher => (
-                      <div key={teacher.id} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`teacher-filter-${teacher.id}`}
-                          checked={selectedTeachers.includes(teacher.id)}
-                          onCheckedChange={() => {
-                            setSelectedTeachers(prev => {
-                              const exists = prev.includes(teacher.id);
-                              return exists
-                                ? prev.filter(t => t !== teacher.id)
-                                : [...prev, teacher.id];
-                            });
-                          }}
-                          className="rounded-full"
-                        />
-                        <label htmlFor={`teacher-filter-${teacher.id}`} className="text-sm text-gray-700 cursor-pointer">
-                          {teacher.name}
-                        </label>
-                      </div>
-                    ))}
+                  <div key={teacher.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`teacher-filter-${teacher.id}`}
+                      checked={selectedTeachers.includes(teacher.id)}
+                      onCheckedChange={() => {
+                        setSelectedTeachers(prev => {
+                          const exists = prev.includes(teacher.id);
+                          return exists
+                            ? prev.filter(t => t !== teacher.id)
+                            : [...prev, teacher.id];
+                        });
+                      }}
+                      className="rounded-full"
+                    />
+                    <label htmlFor={`teacher-filter-${teacher.id}`} className="text-sm text-gray-700 cursor-pointer">
+                      {teacher.name}
+                    </label>
+                  </div>
+                ))}
                   </div>
                 </div>
               </div>

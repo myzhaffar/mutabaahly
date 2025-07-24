@@ -160,9 +160,9 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
                 <SelectValue placeholder="Select grade" />
               </SelectTrigger>
               <SelectContent>
-                {[1,2,3,4,5,6].map(g => (
+              {[1,2,3,4,5,6].map(g => (
                   <SelectItem key={g} value={g.toString()}>{g}</SelectItem>
-                ))}
+              ))}
               </SelectContent>
             </Select>
           </div>

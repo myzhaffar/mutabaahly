@@ -71,7 +71,7 @@ const ClassCard: React.FC<ClassCardProps> = ({ grade, students, classes }) => {
   
   return (
     <div
-      className="group relative rounded-2xl shadow-lg hover:shadow-xl hover:shadow-amber-50/50 transition-all duration-300 overflow-hidden"
+      className="group relative rounded-2xl shadow-lg hover:shadow-xl hover:shadow-amber-50/50 transition-all duration-300 overflow-hidden h-full flex flex-col"
       tabIndex={0}
       aria-label={`View grade ${grade}`}
     >
@@ -83,7 +83,7 @@ const ClassCard: React.FC<ClassCardProps> = ({ grade, students, classes }) => {
       </div>
 
       {/* Body Section: Rest of the content */}
-      <div className="relative z-10 p-6 bg-white" style={{ borderBottomLeftRadius: '1rem', borderBottomRightRadius: '1rem' }}>
+      <div className="relative z-10 p-6 bg-white flex flex-col h-full" style={{ borderBottomLeftRadius: '1rem', borderBottomRightRadius: '1rem' }}>
         {/* Student Count */}
         <div className="mb-5">
           <div className="flex items-center gap-3">
@@ -128,7 +128,7 @@ const ClassCard: React.FC<ClassCardProps> = ({ grade, students, classes }) => {
         </div>
 
         {/* Class Tags */}
-        <div className="mb-6">
+        <div className="mb-6 min-h-[48px]">
           <div className="flex flex-wrap gap-2">
             {classes.map((cls) => (
               <span 
@@ -142,12 +142,14 @@ const ClassCard: React.FC<ClassCardProps> = ({ grade, students, classes }) => {
         </div>
 
         {/* Action Button */}
-        <Button
-          className="w-full mt-2 bg-gradient-to-r from-emerald-500 to-teal-400 hover:opacity-90 text-white"
-          onClick={() => router.push(`/class/${encodeURIComponent(grade)}`)}
-        >
-          View Students
-        </Button>
+        <div className="mt-auto">
+          <Button
+            className="w-full bg-gradient-to-r from-emerald-500 to-teal-400 hover:opacity-90 text-white"
+            onClick={() => router.push(`/class/${encodeURIComponent(grade)}`)}
+          >
+            View Students
+          </Button>
+        </div>
       </div>
     </div>
   );
