@@ -75,17 +75,6 @@ const StudentsGrid: React.FC<StudentsGridProps> = ({
           }
         };
 
-        console.log(`Mapping student ${student.name}:`, {
-          original: {
-            hafalan_progress: student.hafalan_progress,
-            tilawah_progress: student.tilawah_progress
-          },
-          mapped: {
-            memorization: mappedStudent.memorization,
-            tilawati: mappedStudent.tilawati
-          }
-        });
-
         return (
           <StudentCard
             key={student.id}

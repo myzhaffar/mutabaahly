@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/useAuth';
 
 import StatsCards from '@/components/dashboard/StatsCards';
@@ -13,6 +13,23 @@ import BulkUploadStudentsDialog from '@/components/BulkUploadStudentsDialog';
 import ClassCard from '@/components/dashboard/ClassCard';
 import ParentLayout from '@/components/layouts/ParentLayout';
 import { useToast } from '@/hooks/use-toast';
+
+// Skeleton components
+const StatsCardsSkeleton = () => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+    {[...Array(4)].map((_, i) => (
+      <div key={i} className="bg-gray-100 animate-pulse h-32 rounded-xl"></div>
+    ))}
+  </div>
+);
+
+const StudentGridSkeleton = () => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {[...Array(8)].map((_, i) => (
+      <div key={i} className="bg-gray-100 animate-pulse h-64 rounded-2xl"></div>
+    ))}
+  </div>
+);
 
 interface Student {
   id: string;
@@ -35,23 +52,6 @@ interface FilterState {
   classes: string[];
 }
 
-// Simple skeleton components
-const StatsCardsSkeleton = () => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
-    {Array.from({ length: 4 }).map((_, i) => (
-      <div key={i} className="bg-gray-100 rounded-lg h-24 animate-pulse" />
-    ))}
-  </div>
-);
-
-const StudentGridSkeleton = () => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-    {Array.from({ length: 4 }).map((_, i) => (
-      <div key={i} className="bg-gray-100 rounded-lg h-40 animate-pulse" />
-    ))}
-  </div>
-);
-
 const Dashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
   const { toast } = useToast();
@@ -70,8 +70,9 @@ const Dashboard = () => {
     completedStudents: 0
   });
   const [groupedByGrade, setGroupedByGrade] = useState<Record<string, { students: Student[]; classes: string[] }>>({});
-
-  const fetchStudents = useCallback(async () => {
+  
+  // Separate data fetching into smaller, parallel functions
+  const fetchStudentsBase = useCallback(async () => {
     try {
       let studentsQuery = supabase
         .from('students')
@@ -82,28 +83,6 @@ const Dashboard = () => {
         studentsQuery = studentsQuery.eq('parent_id', profile.id);
       }
       
-      // TEMPORARY: For testing, show all students to parents and assign unassigned ones
-      if (profile?.role === 'parent') {
-        studentsQuery = supabase.from('students').select('*');
-        
-        // Also try to assign unassigned students to this parent
-        const { data: unassignedStudents } = await supabase
-          .from('students')
-          .select('id, name, parent_id')
-          .is('parent_id', null);
-        
-        if (unassignedStudents && unassignedStudents.length > 0) {
-          // Assign first few unassigned students to this parent
-          const studentsToAssign = unassignedStudents.slice(0, 3); // Limit to 3 students
-          for (const student of studentsToAssign) {
-            await supabase
-              .from('students')
-              .update({ parent_id: profile.id })
-              .eq('id', student.id);
-          }
-        }
-      }
-      
       const { data: studentsData, error: studentsError } = await studentsQuery;
 
       if (studentsError) {
@@ -112,27 +91,59 @@ const Dashboard = () => {
           description: "Failed to fetch students. Please try again.",
           variant: "destructive",
         });
+        return null;
+      }
+      
+      return studentsData;
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while fetching students.",
+        variant: "destructive",
+      });
+      return null;
+    }
+  }, [toast, profile]);
+
+  const fetchProgressEntries = useCallback(async (studentId: string) => {
+    try {
+      const { data: progressEntries, error: progressError } = await supabase
+        .from('progress_entries')
+        .select('*')
+        .eq('student_id', studentId)
+        .order('date', { ascending: false });
+
+      if (progressError) {
+        return [];
+      }
+      
+      return progressEntries || [];
+    } catch (error) {
+      return [];
+    }
+  }, []);
+
+  const fetchStudents = useCallback(async () => {
+    setDataLoading(true);
+    
+    try {
+      // Step 1: Get all students data
+      const studentsData = await fetchStudentsBase();
+      if (!studentsData) {
+        setDataLoading(false);
         return;
       }
-
-      // For each student, fetch their progress entries and calculate dynamic progress
+      
+      // Step 2: Fetch progress entries for all students in parallel
       const studentsWithProgress = await Promise.all(
-        (studentsData || []).map(async (student) => {
+        studentsData.map(async (student) => {
           try {
             // Fetch progress entries from the database
-            const { data: progressEntries, error: progressError } = await supabase
-              .from('progress_entries')
-              .select('*')
-              .eq('student_id', student.id)
-              .order('date', { ascending: false });
-
-            if (progressError) {
-              console.error(`Error fetching progress for student ${student.id}:`, progressError);
-            }
+            const progressEntries = await fetchProgressEntries(student.id);
 
             // Calculate progress based on actual entries
-            const hafalanEntries = progressEntries?.filter(entry => entry.type === 'hafalan') || [];
-            const tilawahEntries = progressEntries?.filter(entry => entry.type === 'tilawah') || [];
+            const hafalanEntries = progressEntries.filter(entry => entry.type === 'hafalan');
+            const tilawahEntries = progressEntries.filter(entry => entry.type === 'tilawah');
 
             // Calculate progress percentages
             const hafalanProgress = calculateHafalanProgress(hafalanEntries);
@@ -155,7 +166,6 @@ const Dashboard = () => {
               } : null
             };
           } catch (error) {
-            console.error(`Failed to process or update progress for student ${student.id} (${student.name}):`, error);
             return {
               id: student.id,
               name: student.name,
@@ -170,7 +180,7 @@ const Dashboard = () => {
         })
       );
 
-      setStudents(studentsWithProgress as Student[]); // Explicitly cast to Student[]
+      setStudents(studentsWithProgress as Student[]);
       
       // Group students by grade and collect unique sub-classes
       const grouped: Record<string, { students: Student[]; classes: string[] }> = {};
@@ -185,12 +195,11 @@ const Dashboard = () => {
         }
       }
       setGroupedByGrade(grouped);
-      // TODO: Use groupedByGrade in the UI in the next step
 
       // Calculate stats
       const totalStudents = studentsWithProgress.length;
-      const avgHafalan = studentsWithProgress.reduce((sum, s) => sum + (s.hafalan_progress?.percentage || 0), 0) / totalStudents;
-      const avgTilawah = studentsWithProgress.reduce((sum, s) => sum + (s.tilawah_progress?.percentage || 0), 0) / totalStudents;
+      const avgHafalan = studentsWithProgress.reduce((sum, s) => sum + (s.hafalan_progress?.percentage || 0), 0) / (totalStudents || 1);
+      const avgTilawah = studentsWithProgress.reduce((sum, s) => sum + (s.tilawah_progress?.percentage || 0), 0) / (totalStudents || 1);
       const completed = studentsWithProgress.filter(s => 
         (s.hafalan_progress?.percentage || 0) === 100 && 
         (s.tilawah_progress?.percentage || 0) === 100
@@ -209,11 +218,10 @@ const Dashboard = () => {
         description: "An unexpected error occurred while fetching students.",
         variant: "destructive",
       });
-      console.error('Error in fetchStudents:', error);
     } finally {
       setDataLoading(false);
     }
-  }, [toast, profile]);
+  }, [fetchStudentsBase, fetchProgressEntries, toast]);
 
   useEffect(() => {
     if (user && profile) {
@@ -223,40 +231,21 @@ const Dashboard = () => {
     }
   }, [user, profile, authLoading, router, fetchStudents]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-
-  }, [students, searchTerm, filters]);
-
-
-
-  // const handleSearchChange = (search: string) => { // This function is removed as per the edit hint
-  //   setSearchTerm(search);
-  // };
-
-  // const handleFiltersChange = (newFilters: FilterState) => { // This function is removed as per the edit hint
-  //   setFilters(newFilters);
-  // };
-
-
-
   const handleStudentAdded = () => {
     fetchStudents();
   };
 
-
-
-  // Group students by class (removed unused variable)
-
-  // UI: Render one card per grade
-  const gradeCards = Object.entries(groupedByGrade).map(([grade, info]) => (
-    <ClassCard
-      key={grade}
-      grade={grade}
-      students={info.students}
-      classes={info.classes}
-    />
-  ));
+  // Use useMemo for grade cards to prevent unnecessary re-renders
+  const gradeCards = useMemo(() => {
+    return Object.entries(groupedByGrade).map(([grade, info]) => (
+      <ClassCard
+        key={grade}
+        grade={grade}
+        students={info.students}
+        classes={info.classes}
+      />
+    ));
+  }, [groupedByGrade]);
 
   if (profile?.role === 'teacher') {
     const breadcrumbs = [{ label: 'Dashboard' }];

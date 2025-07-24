@@ -79,8 +79,6 @@ export const useStudentDetails = (id: string | undefined) => {
 
       if (!id) return;
       
-      console.log('Fetching progress entries for student:', id);
-      
       const { data: entries, error } = await supabase
         .from('progress_entries')
         .select('*')
@@ -88,11 +86,8 @@ export const useStudentDetails = (id: string | undefined) => {
         .order('date', { ascending: false });
 
       if (error) {
-        console.error('Error fetching progress entries:', error);
         throw error;
       }
-
-      console.log('Fetched progress entries:', entries);
 
       const hafalan = entries?.filter(entry => entry.type === 'hafalan') || [];
       const tilawah = entries?.filter(entry => entry.type === 'tilawah') || [];
@@ -110,7 +105,7 @@ export const useStudentDetails = (id: string | undefined) => {
       });
 
     } catch (error) {
-      console.error('Error fetching progress entries:', error);
+      // Silent error handling
     } finally {
       setLoadingProgress(false);
     }

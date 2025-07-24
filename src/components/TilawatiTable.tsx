@@ -45,10 +45,7 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
         
         const data = await fetchTilawatiRankingData(rankingFilters);
         setAllStudents(data);
-        console.log('[TilawatiTable] allStudents:', data);
-        console.log('[TilawatiTable] filters:', filters);
       } catch (err) {
-        console.error('Error fetching Tilawati ranking data:', err);
         setError('Failed to load ranking data');
         toast({
           title: "Error",
