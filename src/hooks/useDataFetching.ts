@@ -1,10 +1,11 @@
 import useSWR from 'swr';
 import { supabase } from '@/integrations/supabase/client';
 import { useState } from 'react';
-import { PostgrestFilterBuilder } from '@supabase/postgrest-js';
 
-// Generic fetcher function for Supabase queries
-const fetcher = async (key: string, query: PostgrestFilterBuilder<any, any, any>) => {
+// TODO: Improve typing for PostgrestFilterBuilder in the future
+// The complex typing from Supabase requires database-specific type definitions
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const fetcher = async (key: string, query: any) => {
   const { data, error } = await query;
   if (error) throw error;
   return data;
