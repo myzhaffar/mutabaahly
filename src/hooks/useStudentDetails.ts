@@ -79,15 +79,11 @@ export const useStudentDetails = (id: string | undefined) => {
 
       if (!id) return;
       
-      const { data: entries, error } = await supabase
+      const { data: entries } = await supabase
         .from('progress_entries')
         .select('*')
         .eq('student_id', id)
         .order('date', { ascending: false });
-
-      if (error) {
-        throw error;
-      }
 
       const hafalan = entries?.filter(entry => entry.type === 'hafalan') || [];
       const tilawah = entries?.filter(entry => entry.type === 'tilawah') || [];
@@ -104,7 +100,7 @@ export const useStudentDetails = (id: string | undefined) => {
         tilawah_progress: tilawahProgress.percentage > 0 ? tilawahProgress : null
       });
 
-    } catch (error) {
+    } catch {
       // Silent error handling
     } finally {
       setLoadingProgress(false);

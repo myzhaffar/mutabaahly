@@ -48,10 +48,6 @@ interface Student {
   } | null;
 }
 
-interface FilterState {
-  classes: string[];
-}
-
 const Dashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
   const { toast } = useToast();
@@ -59,10 +55,11 @@ const Dashboard = () => {
   const router = useRouter();
   const [students, setStudents] = useState<Student[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
-  const [searchTerm] = useState('');
-  const [filters] = useState<FilterState>({
-    classes: []
-  });
+  // Remove unused state variables and their types
+  // const [searchTerm] = useState('');
+  // const [filters] = useState({
+  //   classes: []
+  // });
   const [stats, setStats] = useState({
     totalStudents: 0,
     avgHafalanProgress: 0,
@@ -83,9 +80,9 @@ const Dashboard = () => {
         studentsQuery = studentsQuery.eq('parent_id', profile.id);
       }
       
-      const { data: studentsData, error: studentsError } = await studentsQuery;
+      const { data: studentsData, error: queryError } = await studentsQuery;
 
-      if (studentsError) {
+      if (queryError) {
         toast({
           title: "Error",
           description: "Failed to fetch students. Please try again.",
@@ -95,7 +92,7 @@ const Dashboard = () => {
       }
       
       return studentsData;
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "An unexpected error occurred while fetching students.",
@@ -107,18 +104,18 @@ const Dashboard = () => {
 
   const fetchProgressEntries = useCallback(async (studentId: string) => {
     try {
-      const { data: progressEntries, error: progressError } = await supabase
+      const { data: progressEntries, error: queryError } = await supabase
         .from('progress_entries')
         .select('*')
         .eq('student_id', studentId)
         .order('date', { ascending: false });
 
-      if (progressError) {
+      if (queryError) {
         return [];
       }
       
       return progressEntries || [];
-    } catch (error) {
+    } catch {
       return [];
     }
   }, []);
@@ -165,7 +162,7 @@ const Dashboard = () => {
                 jilid: tilawahProgress.jilid
               } : null
             };
-          } catch (error) {
+          } catch {
             return {
               id: student.id,
               name: student.name,
@@ -212,7 +209,7 @@ const Dashboard = () => {
         completedStudents: completed
       });
 
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "An unexpected error occurred while fetching students.",

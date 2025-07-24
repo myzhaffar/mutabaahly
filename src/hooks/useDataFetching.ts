@@ -5,7 +5,7 @@ import { useState } from 'react';
 // TODO: Improve typing for PostgrestFilterBuilder in the future
 // The complex typing from Supabase requires database-specific type definitions
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const fetcher = async (key: string, query: any) => {
+const fetcher = async (_key: string, query: any) => {
   const { data, error } = await query;
   if (error) throw error;
   return data;
@@ -30,7 +30,7 @@ export const useStudents = (profileId?: string, role?: string) => {
   };
   
   // Use SWR for data fetching with caching and revalidation
-  const { data, error, isValidating, mutate } = useSWR(
+  const { data, error, mutate } = useSWR(
     profileId ? queryKey : null,
     () => fetcher(queryKey.join('_'), getQuery()),
     {
