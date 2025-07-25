@@ -25,13 +25,17 @@ interface StudentsGridProps {
   filteredStudents: Student[];
   onViewDetails: (studentId: string) => void;
   userRole: string;
+  selectedStudentIds?: string[];
+  onToggleStudent?: (id: string, checked: boolean) => void;
 }
 
 const StudentsGrid: React.FC<StudentsGridProps> = ({ 
   students, 
   filteredStudents, 
   onViewDetails, 
-  userRole 
+  userRole,
+  selectedStudentIds = [],
+  onToggleStudent
 }) => {
   if (filteredStudents.length === 0) {
     return (
@@ -76,11 +80,26 @@ const StudentsGrid: React.FC<StudentsGridProps> = ({
         };
 
         return (
-          <StudentCard
-            key={student.id}
-            student={mappedStudent}
-            onViewDetails={onViewDetails}
-          />
+          <div key={student.id} className="flex items-start gap-3">
+            {onToggleStudent && (
+              <label className="inline-flex items-center cursor-pointer mt-4 relative">
+                <input
+                  type="checkbox"
+                  checked={selectedStudentIds.includes(student.id)}
+                  onChange={e => onToggleStudent(student.id, e.target.checked)}
+                  className="peer appearance-none w-6 h-6 border-2 border-emerald-400 rounded-full bg-white checked:bg-emerald-500 checked:border-emerald-500 transition-colors duration-200 focus:ring-2 focus:ring-emerald-400"
+                  aria-label={selectedStudentIds.includes(student.id) ? 'Deselect student' : 'Select student'}
+                />
+                <span className="pointer-events-none absolute w-6 h-6 rounded-full border-2 border-emerald-400 peer-checked:bg-emerald-500 peer-checked:border-emerald-500 top-0 left-0"></span>
+              </label>
+            )}
+            <div className="flex-1">
+              <StudentCard
+                student={mappedStudent}
+                onViewDetails={onViewDetails}
+              />
+            </div>
+          </div>
         );
       })}
     </div>

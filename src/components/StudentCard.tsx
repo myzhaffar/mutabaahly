@@ -26,9 +26,11 @@ interface StudentCardProps {
     };
   };
   onViewDetails: (studentId: string) => void;
+  selected?: boolean;
+  onSelect?: (checked: boolean) => void;
 }
 
-const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => {
+const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails, selected = false, onSelect }) => {
 
   const getStatusVariant = (status: string) => {
     switch (status) {
@@ -64,7 +66,17 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails }) => 
   };
 
   return (
-    <Card className="bg-white hover:shadow-xl transition-all duration-300 border-0 shadow-md rounded-xl overflow-hidden">
+    <Card className="bg-white hover:shadow-xl transition-all duration-300 border-0 shadow-md rounded-xl overflow-hidden relative">
+      {/* Selection Checkbox */}
+      {onSelect && (
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={e => onSelect(e.target.checked)}
+          className="absolute top-3 left-3 z-10 w-5 h-5 accent-emerald-500 rounded focus:ring-2 focus:ring-emerald-400"
+          aria-label={selected ? 'Deselect student' : 'Select student'}
+        />
+      )}
       <CardHeader className="p-4 sm:p-6 pb-4 bg-gradient-to-r from-islamic-50 to-accent-50">
         <div className="flex flex-col sm:flex-row items-center sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 text-center sm:text-left">
           <Avatar className="h-16 w-16 border-3 border-white shadow-lg mx-auto sm:mx-0">

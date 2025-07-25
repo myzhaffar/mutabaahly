@@ -1,18 +1,24 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
 import ParentLayout from '@/components/layouts/ParentLayout';
 import { useAuth } from '@/contexts/useAuth';
 import StudentsGrid from '@/components/dashboard/StudentsGrid';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
-import { ChevronLeft, Filter, X } from 'lucide-react';
-import { FIXED_TEACHERS } from '@/utils/rankingDataService';
+import { ChevronLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 // Removed unused ProgressEntry import
 
 interface ClassStudent {
@@ -40,12 +46,113 @@ const ClassDetail: React.FC = () => {
   const [students, setStudents] = useState<ClassStudent[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [selectedTeachers, setSelectedTeachers] = useState<string[]>([]);
-  const [teacherFilterOpen, setTeacherFilterOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   // Removed allStudents state
   const [subClasses, setSubClasses] = useState<string[]>([]);
+  const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
+  const selectAllRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const [massEditOpen, setMassEditOpen] = useState(false);
+  const [massEditData, setMassEditData] = useState<Record<string, { name: string; grade: string; group_name: string; teacher: string }>>({});
+  const prevMassEditOpen = useRef(false);
+  const [saving, setSaving] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showBulkEdit, setShowBulkEdit] = useState(false);
+
+
+  const handleMassEditChange = (studentId: string, field: string, value: string) => {
+    setMassEditData(prev => ({
+      ...prev,
+      [studentId]: {
+        ...prev[studentId],
+        [field]: value
+      }
+    }));
+  };
+
+  const handleSaveAll = async () => {
+    setSaving(true);
+    try {
+      const updates = Object.entries(massEditData).map(([studentId, data]) => ({
+        id: studentId,
+        ...data
+      }));
+
+      const { error } = await supabase
+        .from('students')
+        .upsert(updates, { onConflict: 'id' });
+
+      if (error) {
+        toast({
+          title: 'Failed to update students',
+          description: error.message,
+          variant: 'destructive',
+        });
+        setSaving(false);
+        return;
+      }
+
+      // Close modal, clear selection, and refresh students list
+      setMassEditOpen(false);
+      setSelectedStudentIds([]);
+      toast({
+        title: 'Students updated',
+        description: 'All selected students have been updated.',
+        variant: 'default',
+      });
+      // Refresh students list
+      // If you use SWR, call mutate here. Otherwise, re-fetch students:
+      // await fetchStudents();
+      // For now, trigger a soft reload by updating state
+      setLoading(true);
+      // Optionally, you can re-run the fetchStudents logic here
+      // setTimeout(() => setLoading(false), 500); // Remove this if you re-fetch
+    } catch (error) {
+      toast({
+        title: 'Unexpected error',
+        description: (error as Error).message,
+        variant: 'destructive',
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleMassDelete = async () => {
+    setDeleting(true);
+    try {
+      const { error } = await supabase
+        .from('students')
+        .delete()
+        .in('id', selectedStudentIds);
+      if (error) {
+        toast({
+          title: 'Failed to delete students',
+          description: error.message,
+          variant: 'destructive',
+        });
+        setDeleting(false);
+        return;
+      }
+      setDeleteDialogOpen(false);
+      setSelectedStudentIds([]);
+      toast({
+        title: 'Students deleted',
+        description: 'Selected students have been deleted.',
+        variant: 'default',
+      });
+      setLoading(true);
+    } catch (error) {
+      toast({
+        title: 'Unexpected error',
+        description: (error as Error).message,
+        variant: 'destructive',
+      });
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -140,7 +247,61 @@ const ClassDetail: React.FC = () => {
   };
 
   // Use fixed teacher list for filter
-  const teacherOptions = FIXED_TEACHERS;
+  const teacherOptions = [
+    { id: 'ustz.a', name: 'Ustz. A' },
+    { id: 'ustz.b', name: 'Ustz. B' },
+    { id: 'ustz.c', name: 'Ustz. C' },
+    { id: 'ustz.d', name: 'Ustz. D' },
+    { id: 'ustz.e', name: 'Ustz. E' },
+    { id: 'ustz.f', name: 'Ustz. F' },
+    { id: 'ustz.g', name: 'Ustz. G' },
+    { id: 'ustz.h', name: 'Ustz. H' },
+    { id: 'ustz.i', name: 'Ustz. I' },
+    { id: 'ustz.j', name: 'Ustz. J' },
+    { id: 'ustz.k', name: 'Ustz. K' },
+    { id: 'ustz.l', name: 'Ustz. L' },
+    { id: 'ustz.m', name: 'Ustz. M' },
+    { id: 'ustz.n', name: 'Ustz. N' },
+    { id: 'ustz.o', name: 'Ustz. O' },
+    { id: 'ustz.p', name: 'Ustz. P' },
+    { id: 'ustz.q', name: 'Ustz. Q' },
+    { id: 'ustz.r', name: 'Ustz. R' },
+    { id: 'ustz.s', name: 'Ustz. S' },
+    { id: 'ustz.t', name: 'Ustz. T' },
+    { id: 'ustz.u', name: 'Ustz. U' },
+    { id: 'ustz.v', name: 'Ustz. V' },
+    { id: 'ustz.w', name: 'Ustz. W' },
+    { id: 'ustz.x', name: 'Ustz. X' },
+    { id: 'ustz.y', name: 'Ustz. Y' },
+    { id: 'ustz.z', name: 'Ustz. Z' },
+    { id: 'ust.', name: 'Ust.' },
+    { id: 'ust.a', name: 'Ust. A' },
+    { id: 'ust.b', name: 'Ust. B' },
+    { id: 'ust.c', name: 'Ust. C' },
+    { id: 'ust.d', name: 'Ust. D' },
+    { id: 'ust.e', name: 'Ust. E' },
+    { id: 'ust.f', name: 'Ust. F' },
+    { id: 'ust.g', name: 'Ust. G' },
+    { id: 'ust.h', name: 'Ust. H' },
+    { id: 'ust.i', name: 'Ust. I' },
+    { id: 'ust.j', name: 'Ust. J' },
+    { id: 'ust.k', name: 'Ust. K' },
+    { id: 'ust.l', name: 'Ust. L' },
+    { id: 'ust.m', name: 'Ust. M' },
+    { id: 'ust.n', name: 'Ust. N' },
+    { id: 'ust.o', name: 'Ust. O' },
+    { id: 'ust.p', name: 'Ust. P' },
+    { id: 'ust.q', name: 'Ust. Q' },
+    { id: 'ust.r', name: 'Ust. R' },
+    { id: 'ust.s', name: 'Ust. S' },
+    { id: 'ust.t', name: 'Ust. T' },
+    { id: 'ust.u', name: 'Ust. U' },
+    { id: 'ust.v', name: 'Ust. V' },
+    { id: 'ust.w', name: 'Ust. W' },
+    { id: 'ust.x', name: 'Ust. X' },
+    { id: 'ust.y', name: 'Ust. Y' },
+    { id: 'ust.z', name: 'Ust. Z' },
+  ];
 
   // Map student.teacher to ID if needed (for legacy data)
   const getTeacherId = (student: ClassStudent) => {
@@ -152,8 +313,15 @@ const ClassDetail: React.FC = () => {
   };
 
   // Removed unused filteredStudents variable
-  const hasAnyActiveTeacherFilter = selectedTeachers.length > 0;
-  const clearTeacherFilters = () => setSelectedTeachers([]);
+  const hasAnyActiveTeacherFilter = false; // No teacher filter implemented
+  const clearTeacherFilters = () => {};
+
+  // Selection handler for mass actions
+  const handleToggleStudent = (id: string, checked: boolean) => {
+    setSelectedStudentIds(prev =>
+      checked ? [...prev, id] : prev.filter(sid => sid !== id)
+    );
+  };
 
   // Tabs logic
   const showTabs = !isNaN(Number(className));
@@ -164,6 +332,49 @@ const ClassDetail: React.FC = () => {
   const studentsToShow = showTabs && activeTab !== 'all'
     ? students.filter(s => s.group_name === activeTab)
     : students;
+
+  // Compute filtered students for selection (move here after studentsToShow is defined)
+  const filteredStudents = studentsToShow.filter(student =>
+    student.name.toLowerCase().includes(search.toLowerCase()) &&
+    true // No teacher filter implemented
+  );
+  const filteredIds = filteredStudents.map(s => s.id);
+  const allSelected = filteredIds.length > 0 && filteredIds.every(id => selectedStudentIds.includes(id));
+  const someSelected = filteredIds.some(id => selectedStudentIds.includes(id)) && !allSelected;
+
+  // Set indeterminate state
+  useEffect(() => {
+    if (selectAllRef.current) {
+      selectAllRef.current.indeterminate = someSelected;
+    }
+  }, [someSelected]);
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedStudentIds(prev => Array.from(new Set([...prev, ...filteredIds])));
+    } else {
+      setSelectedStudentIds(prev => prev.filter(id => !filteredIds.includes(id)));
+    }
+  };
+
+  // Initialize mass edit data when modal opens
+  useEffect(() => {
+    if (massEditOpen && !prevMassEditOpen.current) {
+      const initialData: Record<string, { name: string; grade: string; group_name: string; teacher: string }> = {};
+      filteredStudents
+        .filter(s => selectedStudentIds.includes(s.id))
+        .forEach(student => {
+          initialData[student.id] = {
+            name: student.name || '',
+            grade: student.grade || '',
+            group_name: student.group_name || '',
+            teacher: student.teacher || ''
+          };
+        });
+      setMassEditData(initialData);
+    }
+    prevMassEditOpen.current = massEditOpen;
+  }, [massEditOpen, selectedStudentIds, filteredStudents]);
 
   const breadcrumbs = [
     { label: 'Dashboard', href: '/dashboard' },
@@ -214,7 +425,7 @@ const ClassDetail: React.FC = () => {
         {/* Modern Filter Card with Search and Teacher Filter */}
         <div className="sticky top-14 z-20 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-200 mb-6 px-0 sm:px-0">
           <div className="px-6 pt-6 pb-2">
-            <Input
+            <input
               placeholder="Search students in this class..."
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -225,33 +436,18 @@ const ClassDetail: React.FC = () => {
           <button
             type="button"
             className="w-full flex items-center gap-3 px-6 py-4 focus:outline-none"
-            onClick={() => setTeacherFilterOpen(open => !open)}
-            aria-expanded={teacherFilterOpen}
+            onClick={() => {}}
+            aria-expanded={false}
           >
             <div className="p-2 bg-blue-50 rounded-lg">
-              <Filter className="h-4 w-4 text-blue-600" />
+              {/* Filter icon removed */}
             </div>
             <div className="flex-1 text-left">
               <h3 className="font-semibold text-gray-900 text-base sm:text-lg">Teacher Filters</h3>
               <p className="text-xs sm:text-sm text-gray-500">Select one or more teachers to filter students</p>
               {hasAnyActiveTeacherFilter && (
                 <div className="flex items-center gap-2 flex-wrap mt-2">
-                  {selectedTeachers.map(id => {
-                    const teacher = teacherOptions.find(t => t.id === id);
-                    return (
-                      <span key={id} className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-100 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
-                        {teacher?.name || id}
-                        <button
-                          type="button"
-                          onClick={e => { e.stopPropagation(); setSelectedTeachers(prev => prev.filter(t => t !== id)); }}
-                          className="ml-1 text-xs text-gray-400 hover:text-red-600"
-                          aria-label="Remove teacher filter"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </span>
-                    );
-                  })}
+                  {/* Teacher filter options removed */}
                   <button
                     type="button"
                     onClick={e => { e.stopPropagation(); clearTeacherFilters(); }}
@@ -262,82 +458,176 @@ const ClassDetail: React.FC = () => {
                 </div>
               )}
             </div>
-            <span className="ml-auto text-xs text-gray-500 font-medium">{teacherFilterOpen ? 'Hide' : 'Show'}</span>
+            <span className="ml-auto text-xs text-gray-500 font-medium">Show</span>
           </button>
-          {teacherFilterOpen && (
-            <div className="px-6 pb-6 pt-2">
-              <div className="max-h-48 overflow-y-auto flex flex-col gap-2 pr-2">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Female Teachers (Ustz.) */}
-                  <div className="space-y-2">
-                    <div className="font-semibold text-emerald-700 text-xs mb-1">Ustz.</div>
-                    {teacherOptions.filter(t => t.name.startsWith('Ustz.')).map(teacher => (
-                      <div key={teacher.id} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`teacher-filter-${teacher.id}`}
-                          checked={selectedTeachers.includes(teacher.id)}
-                          onCheckedChange={() => {
-                            setSelectedTeachers(prev => {
-                              const exists = prev.includes(teacher.id);
-                              return exists
-                                ? prev.filter(t => t !== teacher.id)
-                                : [...prev, teacher.id];
-                            });
-                          }}
-                          className="rounded-full"
+          {/* Teacher filter options removed */}
+        </div>
+        {profile?.role !== 'parent' && (
+          <>
+            {/* Bulk Edit Toggle Button */}
+            <div className="flex items-center justify-between mb-2">
+              <button
+                className="px-4 py-2 rounded-full font-semibold text-white bg-gradient-to-r from-emerald-500 to-green-400 hover:from-emerald-600 hover:to-green-500 shadow-sm transition text-[14px]"
+                onClick={() => {
+                  setShowBulkEdit(v => {
+                    if (v) setSelectedStudentIds([]); // If turning off, clear selection
+                    return !v;
+                  });
+                }}
+              >
+                {showBulkEdit ? 'Cancel Bulk Edit' : 'Bulk Edit'}
+              </button>
+            </div>
+            {/* Bulk Actions Bar */}
+            {showBulkEdit && selectedStudentIds.length > 0 && (
+              <div className="flex items-center gap-2 my-2">
+                <span className="text-sm text-gray-700 font-medium">{selectedStudentIds.length} selected</span>
+                <button
+                  className="px-3 py-1 rounded-full font-semibold text-white bg-gradient-to-r from-emerald-500 to-green-400 hover:from-emerald-600 hover:to-green-500 shadow-sm transition text-[14px]"
+                  style={{ fontSize: 14 }}
+                  onClick={() => setMassEditOpen(true)}
+                >
+                  Edit Selected
+                </button>
+                <button
+                  className="px-3 py-1 rounded-full font-semibold text-white bg-red-500 hover:bg-red-600 shadow-sm transition text-[14px]"
+                  style={{ fontSize: 14 }}
+                  onClick={() => setDeleteDialogOpen(true)}
+                >
+                  Delete Selected
+                </button>
+              </div>
+            )}
+          </>
+        )}
+        {profile?.role !== 'parent' && (
+          <div className="flex items-center gap-4 mb-2">
+            <label className="inline-flex items-center cursor-pointer">
+              <input
+                ref={selectAllRef}
+                type="checkbox"
+                checked={allSelected}
+                onChange={e => handleSelectAll(e.target.checked)}
+                className="appearance-none w-6 h-6 border-2 border-emerald-400 rounded-full bg-white checked:bg-emerald-500 checked:border-emerald-500 transition-colors duration-200 focus:ring-2 focus:ring-emerald-400"
+                aria-label={allSelected ? 'Deselect all students' : 'Select all students'}
+              />
+              <span className="ml-2 text-sm font-medium text-gray-700">Select All</span>
+            </label>
+          </div>
+        )}
+        {/* Mass Edit Modal */}
+        <Dialog open={massEditOpen} onOpenChange={setMassEditOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Selected Students</DialogTitle>
+              <p className="text-sm text-gray-500 mt-1">Edit the details for each selected student below.</p>
+            </DialogHeader>
+            <div className="max-h-[60vh] overflow-y-auto space-y-6 pr-2">
+              {filteredStudents.filter(s => selectedStudentIds.includes(s.id)).map(student => (
+                <div key={student.id} className="p-4 border rounded-lg bg-gray-50 flex flex-col gap-3">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={student.photo || '/avatars/placeholder.png'} alt={student.name} />
+                      <AvatarFallback>{student.name.split(' ').map(n => n[0]).join('').substring(0, 2)}</AvatarFallback>
+                    </Avatar>
+                    <span className="font-semibold text-gray-800">{student.name}</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Name</label>
+                                              <input
+                          className="border rounded px-2 py-1 w-full"
+                          value={massEditData[student.id]?.name || ''}
+                          placeholder="Name"
+                          onChange={(e) => handleMassEditChange(student.id, 'name', e.target.value)}
                         />
-                        <label htmlFor={`teacher-filter-${teacher.id}`} className="text-sm text-gray-700 cursor-pointer">
-                          {teacher.name}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                  {/* Male Teachers (Ust.) */}
-                  <div className="space-y-2">
-                    <div className="font-semibold text-teal-700 text-xs mb-1">Ust.</div>
-                    {teacherOptions.filter(t => t.name.startsWith('Ust.')).map(teacher => (
-                  <div key={teacher.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`teacher-filter-${teacher.id}`}
-                      checked={selectedTeachers.includes(teacher.id)}
-                      onCheckedChange={() => {
-                        setSelectedTeachers(prev => {
-                          const exists = prev.includes(teacher.id);
-                          return exists
-                            ? prev.filter(t => t !== teacher.id)
-                            : [...prev, teacher.id];
-                        });
-                      }}
-                      className="rounded-full"
-                    />
-                    <label htmlFor={`teacher-filter-${teacher.id}`} className="text-sm text-gray-700 cursor-pointer">
-                      {teacher.name}
-                    </label>
-                  </div>
-                ))}
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Grade</label>
+                                              <input
+                          className="border rounded px-2 py-1 w-full"
+                          value={massEditData[student.id]?.grade || ''}
+                          placeholder="Grade"
+                          onChange={(e) => handleMassEditChange(student.id, 'grade', e.target.value)}
+                        />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Class</label>
+                                              <input
+                          className="border rounded px-2 py-1 w-full"
+                          value={massEditData[student.id]?.group_name || ''}
+                          placeholder="Class"
+                          onChange={(e) => handleMassEditChange(student.id, 'group_name', e.target.value)}
+                        />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Teacher</label>
+                                              <input
+                          className="border rounded px-2 py-1 w-full"
+                          value={massEditData[student.id]?.teacher || ''}
+                          placeholder="Teacher"
+                          onChange={(e) => handleMassEditChange(student.id, 'teacher', e.target.value)}
+                        />
+                    </div>
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
-          )}
-        </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <button className="px-4 py-2 rounded-full bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition">Cancel</button>
+              </DialogClose>
+              <button className="px-4 py-2 rounded-full bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition" onClick={handleSaveAll} disabled={saving}>
+                {saving ? 'Saving...' : 'Save All'}
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        {/* Mass Delete Confirmation Dialog */}
+        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Selected Students</DialogTitle>
+              <p className="text-sm text-gray-500 mt-1">Are you sure you want to delete the following students? This action cannot be undone.</p>
+            </DialogHeader>
+            <div className="max-h-[40vh] overflow-y-auto space-y-2 pr-2">
+              {filteredStudents.filter(s => selectedStudentIds.includes(s.id)).map(student => (
+                <div key={student.id} className="flex items-center gap-3 p-2 border rounded bg-gray-50">
+                  <Avatar className="h-7 w-7">
+                    <AvatarImage src={student.photo || '/avatars/placeholder.png'} alt={student.name} />
+                    <AvatarFallback>{student.name.split(' ').map(n => n[0]).join('').substring(0, 2)}</AvatarFallback>
+                  </Avatar>
+                  <span className="font-medium text-gray-800">{student.name}</span>
+                  <span className="text-xs text-gray-500 ml-2">{student.grade} {student.group_name}</span>
+                </div>
+              ))}
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <button className="px-4 py-2 rounded-full bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition" disabled={deleting}>Cancel</button>
+              </DialogClose>
+              <button className="px-4 py-2 rounded-full bg-red-500 text-white font-semibold hover:bg-red-600 transition" onClick={handleMassDelete} disabled={deleting}>
+                {deleting ? 'Deleting...' : 'Delete All'}
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         {loading ? (
           <div className="text-center py-12 text-gray-500">Loading students...</div>
         ) : (
           <StudentsGrid
-            students={studentsToShow.map(student => ({
+            students={filteredStudents.map(student => ({
               ...student,
-              grade: student.grade || 'Unknown'
+              grade: student.grade || ''
             }))}
-            filteredStudents={studentsToShow.filter(student =>
-              student.name.toLowerCase().includes(search.toLowerCase()) &&
-              (selectedTeachers.length === 0 || selectedTeachers.includes(getTeacherId(student)))
-            ).map(student => ({
+            filteredStudents={filteredStudents.map(student => ({
               ...student,
-              grade: student.grade || 'Unknown'
+              grade: student.grade || ''
             }))}
             onViewDetails={handleViewDetails}
             userRole={profile?.role || 'parent'}
+            selectedStudentIds={profile?.role !== 'parent' && showBulkEdit ? selectedStudentIds : []}
+            onToggleStudent={profile?.role !== 'parent' && showBulkEdit ? handleToggleStudent : undefined}
           />
         )}
       </div>
