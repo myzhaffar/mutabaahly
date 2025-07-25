@@ -19,6 +19,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { FIXED_TEACHERS } from '@/utils/rankingDataService';
 // Removed unused ProgressEntry import
 
 interface ClassStudent {
@@ -59,6 +60,8 @@ const ClassDetail: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showBulkEdit, setShowBulkEdit] = useState(false);
+  const [teacherFilterOpen, setTeacherFilterOpen] = useState(false);
+  const [selectedTeachers, setSelectedTeachers] = useState<string[]>([]);
 
 
   const handleMassEditChange = (studentId: string, field: string, value: string) => {
@@ -248,7 +251,7 @@ const ClassDetail: React.FC = () => {
 
   // Use fixed teacher list for filter
   const hasAnyActiveTeacherFilter = false; // No teacher filter implemented
-  const clearTeacherFilters = () => {};
+  const clearTeacherFilters = () => setSelectedTeachers([]);
 
   // Selection handler for mass actions
   const handleToggleStudent = (id: string, checked: boolean) => {
@@ -338,26 +341,26 @@ const ClassDetail: React.FC = () => {
         </div>
         {/* Tabs for grade view */}
         {showTabs && (
-          <div className="mb-4">
-            <div className="flex bg-gray-100 rounded-full p-1 overflow-x-auto whitespace-nowrap scrollbar-hide w-full max-w-full sm:bg-transparent sm:rounded-none sm:p-0">
-              {tabList.map(tab => (
-                <button
-                  key={tab}
-                  className={`min-w-max px-4 py-2 rounded-full font-medium transition-all duration-200 focus:outline-none
-                    ${activeTab === tab
-                      ? 'bg-emerald-500 text-white shadow'
-                      : 'bg-transparent text-gray-700 hover:text-emerald-500'}
-                  `}
-                  onClick={() => setActiveTab(tab)}
-                >
-                  {tabLabels[tab]}
-                </button>
-              ))}
-            </div>
+          <div className="flex gap-3 mb-4 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pr-4">
+            {tabList.map((tab, idx) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setActiveTab(tab)}
+                className={`flex items-center justify-center min-w-max px-4 py-2 rounded-full font-semibold transition-all duration-150 text-sm mx-0
+                  ${activeTab === tab
+                    ? 'bg-emerald-500 text-white shadow'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}
+                  ${idx === tabList.length - 1 ? 'mr-2' : ''}
+                `}
+              >
+                {tabLabels[tab] || tab}
+              </button>
+            ))}
           </div>
         )}
-        {/* Modern Filter Card with Search and Teacher Filter */}
-        <div className="sticky top-14 z-20 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-200 mb-6 px-0 sm:px-0">
+        {/* Collapsible Teacher Filters */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden w-full">
           <div className="px-6 pt-6 pb-2">
             <input
               placeholder="Search students in this class..."
@@ -365,26 +368,39 @@ const ClassDetail: React.FC = () => {
               onChange={e => setSearch(e.target.value)}
               className="w-full bg-gray-50 border border-gray-200 rounded-lg focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-base py-2 px-4 shadow-sm"
             />
+            {/* Selected teacher filter badges */}
+            {selectedTeachers.length > 0 && (
+              <div className="flex items-center gap-2 flex-wrap mt-2">
+                <span className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-green-50 text-green-700 text-xs sm:text-sm rounded-full border border-green-200">
+                  Teachers: {selectedTeachers.join(', ')}
+                </span>
+                <button
+                  type="button"
+                  onClick={clearTeacherFilters}
+                  className="ml-2 text-xs text-gray-500 hover:text-red-600 underline"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            )}
           </div>
           <div className="border-t border-gray-100 mx-6" />
           <button
-            type="button"
             className="w-full flex items-center gap-3 px-6 py-4 focus:outline-none"
-            onClick={() => {}}
-            aria-expanded={false}
+            onClick={() => setTeacherFilterOpen(open => !open)}
+            aria-expanded={teacherFilterOpen}
           >
             <div className="p-2 bg-blue-50 rounded-lg">
-              {/* Filter icon removed */}
+              {/* Optionally add a filter icon here */}
             </div>
             <div className="flex-1 text-left">
               <h3 className="font-semibold text-gray-900 text-base sm:text-lg">Teacher Filters</h3>
               <p className="text-xs sm:text-sm text-gray-500">Select one or more teachers to filter students</p>
               {hasAnyActiveTeacherFilter && (
                 <div className="flex items-center gap-2 flex-wrap mt-2">
-                  {/* Teacher filter options removed */}
                   <button
                     type="button"
-                    onClick={e => { e.stopPropagation(); clearTeacherFilters(); }}
+                    onClick={clearTeacherFilters}
                     className="ml-2 text-xs text-gray-500 hover:text-red-600 underline"
                   >
                     Clear Filters
@@ -392,16 +408,63 @@ const ClassDetail: React.FC = () => {
                 </div>
               )}
             </div>
-            <span className="ml-auto text-xs text-gray-500 font-medium">Show</span>
+            <span className="ml-auto text-xs text-gray-500">{teacherFilterOpen ? 'Hide' : 'Show'}</span>
           </button>
-          {/* Teacher filter options removed */}
+          {teacherFilterOpen && (
+            <div className="p-4">
+              <div className="grid grid-cols-2 gap-4">
+                {/* Ustz. (female) teachers */}
+                <div>
+                  <div className="font-semibold text-emerald-700 text-xs mb-1">Ustz.</div>
+                  {FIXED_TEACHERS.filter(t => t.name.startsWith('Ustz.')).map(teacher => (
+                    <label key={teacher.id} className="flex items-center gap-2 mb-1 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selectedTeachers.includes(teacher.name)}
+                        onChange={() => {
+                          setSelectedTeachers(prev =>
+                            prev.includes(teacher.name)
+                              ? prev.filter(t => t !== teacher.name)
+                              : [...prev, teacher.name]
+                          );
+                        }}
+                        className="rounded-full border-emerald-400"
+                      />
+                      <span className="text-sm text-gray-700">{teacher.name}</span>
+                    </label>
+                  ))}
+                </div>
+                {/* Ust. (male) teachers */}
+                <div>
+                  <div className="font-semibold text-teal-700 text-xs mb-1">Ust.</div>
+                  {FIXED_TEACHERS.filter(t => t.name.startsWith('Ust.')).map(teacher => (
+                    <label key={teacher.id} className="flex items-center gap-2 mb-1 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selectedTeachers.includes(teacher.name)}
+                        onChange={() => {
+                          setSelectedTeachers(prev =>
+                            prev.includes(teacher.name)
+                              ? prev.filter(t => t !== teacher.name)
+                              : [...prev, teacher.name]
+                          );
+                        }}
+                        className="rounded-full border-emerald-400"
+                      />
+                      <span className="text-sm text-gray-700">{teacher.name}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         {profile?.role !== 'parent' && (
           <>
             {/* Bulk Edit Toggle Button */}
             <div className="flex items-center justify-between mb-2">
               <button
-                className="px-4 py-2 rounded-full font-semibold text-white bg-gradient-to-r from-emerald-500 to-green-400 hover:from-emerald-600 hover:to-green-500 shadow-sm transition text-[14px]"
+                className="px-4 py-2 rounded-md font-semibold bg-gray-100 text-gray-800 hover:bg-gray-200 transition text-[14px]"
                 onClick={() => {
                   setShowBulkEdit(v => {
                     if (v) setSelectedStudentIds([]); // If turning off, clear selection
@@ -432,22 +495,30 @@ const ClassDetail: React.FC = () => {
                 </button>
               </div>
             )}
+            {/* Select All Checkbox */}
+            {showBulkEdit && (
+              <div className="flex items-center gap-4 mb-2">
+                <label className="inline-flex items-center cursor-pointer relative">
+                  <input
+                    ref={selectAllRef}
+                    type="checkbox"
+                    checked={allSelected}
+                    onChange={e => handleSelectAll(e.target.checked)}
+                    className="peer appearance-none w-6 h-6 border-2 border-gray-400 rounded-full bg-white checked:bg-emerald-500 checked:border-emerald-500 transition-colors duration-200 focus:ring-2 focus:ring-emerald-400"
+                    aria-label={allSelected ? 'Deselect all students' : 'Select all students'}
+                  />
+                  <span className="pointer-events-none absolute w-6 h-6 rounded-full border-2 border-gray-400 peer-checked:bg-emerald-500 peer-checked:border-emerald-500 top-0 left-0 flex items-center justify-center">
+                    {allSelected && (
+                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </span>
+                  <span className="ml-2 text-sm font-medium text-gray-700">Select All</span>
+                </label>
+              </div>
+            )}
           </>
-        )}
-        {profile?.role !== 'parent' && (
-          <div className="flex items-center gap-4 mb-2">
-            <label className="inline-flex items-center cursor-pointer">
-              <input
-                ref={selectAllRef}
-                type="checkbox"
-                checked={allSelected}
-                onChange={e => handleSelectAll(e.target.checked)}
-                className="appearance-none w-6 h-6 border-2 border-emerald-400 rounded-full bg-white checked:bg-emerald-500 checked:border-emerald-500 transition-colors duration-200 focus:ring-2 focus:ring-emerald-400"
-                aria-label={allSelected ? 'Deselect all students' : 'Select all students'}
-              />
-              <span className="ml-2 text-sm font-medium text-gray-700">Select All</span>
-            </label>
-          </div>
         )}
         {/* Mass Edit Modal */}
         <Dialog open={massEditOpen} onOpenChange={setMassEditOpen}>
@@ -560,7 +631,7 @@ const ClassDetail: React.FC = () => {
             }))}
             onViewDetails={handleViewDetails}
             userRole={profile?.role || 'parent'}
-            selectedStudentIds={profile?.role !== 'parent' && showBulkEdit ? selectedStudentIds : []}
+            selectedStudentIds={profile?.role !== 'parent' && showBulkEdit ? selectedStudentIds : undefined}
             onToggleStudent={profile?.role !== 'parent' && showBulkEdit ? handleToggleStudent : undefined}
           />
         )}
