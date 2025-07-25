@@ -34,20 +34,20 @@ const EditTestDialog: React.FC<EditTestDialogProps> = ({ test, onTestUpdated }) 
     setLoading(true);
 
     try {
-      const { error } = await supabase
+      const { data } = await supabase
         .from('tilawati_level_tests')
         .update(formData)
         .eq('id', test.id);
 
-      if (error) throw error;
+      if (data) {
+        toast({
+          title: "Success",
+          description: "Test updated successfully!",
+        });
 
-      toast({
-        title: "Success",
-        description: "Test updated successfully!",
-      });
-
-      setOpen(false);
-      onTestUpdated();
+        setOpen(false);
+        onTestUpdated();
+      }
     } catch (error) {
       toast({
         title: "Error",

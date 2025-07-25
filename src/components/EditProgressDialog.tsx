@@ -72,18 +72,21 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
         ...formData,
         updated_at: new Date().toISOString(),
       };
-      const { error } = await supabase
+      const { data } = await supabase
         .from('progress_entries')
         .update(updatePayload)
         .eq('id', entry.id);
-      if (error) throw error;
-      toast({
-        title: "Success",
-        description: "Progress updated successfully!",
-      });
-      setOpen(false);
-      onProgressUpdated();
-      if (entry.type === 'tilawah' && setActiveTab) setActiveTab('tilawah');
+      if (data) {
+        toast({
+          title: "Success",
+          description: "Progress updated successfully!",
+        });
+        setOpen(false);
+        onProgressUpdated();
+        if (entry.type === 'tilawah' && setActiveTab) setActiveTab('tilawah');
+      } else {
+        throw new Error("Failed to update progress.");
+      }
     } catch (error) {
       toast({
         title: "Error",

@@ -69,12 +69,12 @@ const DeleteStudentDialog: React.FC<DeleteStudentDialogProps> = ({
       //   .eq('student_id', studentId);
 
       // Finally delete the student
-      const { error } = await supabase
+      const { data } = await supabase
         .from('students')
         .delete()
         .eq('id', studentId);
 
-      if (error) throw error;
+      if (data) throw new Error("Failed to delete student. Please try again.");
 
       toast({
         title: "Success",

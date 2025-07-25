@@ -51,19 +51,15 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
       }
     }
 
-    const { data: students, error } = await query;
+    const { data } = await query;
 
-    if (error) {
-      return [];
-    }
-
-    if (!students || students.length === 0) {
+    if (!data || data.length === 0) {
       return [];
     }
 
     // Fetch progress data for each student
     const studentsWithProgress = await Promise.all(
-      students.map(async (student) => {
+      data.map(async (student) => {
         try {
           // Fetch progress entries for tilawah (tahsin)
           const { data: tilawahEntries } = await supabase
@@ -187,19 +183,15 @@ export const fetchHafalanRankingData = async (filters: RankingFilters): Promise<
       }
     }
 
-    const { data: students, error } = await query;
+    const { data } = await query;
 
-    if (error) {
-      return [];
-    }
-
-    if (!students || students.length === 0) {
+    if (!data || data.length === 0) {
       return [];
     }
 
     // Fetch progress data for each student
     const studentsWithProgress = await Promise.all(
-      students.map(async (student) => {
+      data.map(async (student) => {
         try {
           // Fetch progress entries first
           const { data: hafalanEntries, error: entriesError } = await supabase
@@ -452,17 +444,17 @@ const getCurrentVerse = (entries: ProgressEntry[]): number => {
 // Fetch teachers for filter dropdown
 export const fetchTeachers = async (): Promise<{ id: string; name: string }[]> => {
   try {
-    const { data: teachers, error } = await supabase
+    const { data } = await supabase
       .from('profiles')
       .select('id, full_name')
       .eq('role', 'teacher')
       .order('full_name');
 
-    if (error) {
+    if (!data) {
       return [];
     }
 
-    return teachers?.map(teacher => ({
+    return data?.map(teacher => ({
       id: teacher.id,
       name: teacher.full_name
     })) || [];
@@ -474,17 +466,17 @@ export const fetchTeachers = async (): Promise<{ id: string; name: string }[]> =
 // Fetch grades for filter dropdown
 export const fetchGrades = async (): Promise<{ id: string; name: string }[]> => {
   try {
-    const { data: grades, error } = await supabase
+    const { data } = await supabase
       .from('students')
       .select('group_name')
       .not('group_name', 'is', null);
 
-    if (error) {
+    if (!data) {
       return [];
     }
 
     // Get unique grades
-    const uniqueGrades = [...new Set(grades?.map(g => g.group_name).filter(Boolean))];
+    const uniqueGrades = [...new Set(data?.map(g => g.group_name).filter(Boolean))];
     
     return uniqueGrades.map(grade => ({
       id: grade,

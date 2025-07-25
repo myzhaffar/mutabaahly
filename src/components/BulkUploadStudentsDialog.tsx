@@ -277,12 +277,12 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
       for (let i = 0; i < validStudents.length; i += batchSize) {
         const batch = validStudents.slice(i, i + batchSize);
         // Insert students and get their ids
-        const { data: inserted, error } = await supabase
+        const { data } = await supabase
           .from('students')
           .insert(batch)
           .select();
 
-        if (error || !inserted) {
+        if (!data) {
           failedCount += batch.length;
         } else {
           successCount += batch.length;
