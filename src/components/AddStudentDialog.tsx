@@ -53,7 +53,6 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
 
       return data.publicUrl;
     } catch (error) {
-      console.error('Error uploading image:', error);
       return null;
     }
   };
@@ -104,7 +103,6 @@ const AddStudentDialog: React.FC<AddStudentDialogProps> = ({ onStudentAdded }) =
       setOpen(false);
       onStudentAdded();
     } catch (error) {
-      console.error('Error adding student:', error);
       toast({
         title: "Error",
         description: "Failed to add student. Please try again.",

@@ -47,7 +47,6 @@ const ClassDetail: React.FC = () => {
   const [subClasses, setSubClasses] = useState<string[]>([]);
   const { toast } = useToast();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const fetchStudents = async () => {
       setLoading(true);

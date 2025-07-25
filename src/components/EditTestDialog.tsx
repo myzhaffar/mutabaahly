@@ -49,7 +49,6 @@ const EditTestDialog: React.FC<EditTestDialogProps> = ({ test, onTestUpdated }) 
       setOpen(false);
       onTestUpdated();
     } catch (error) {
-      console.error('Error updating test:', error);
       toast({
         title: "Error",
         description: "Failed to update test. Please try again.",

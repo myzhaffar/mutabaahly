@@ -76,15 +76,6 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({
         return;
       }
 
-      console.log('Saving progress entry:', {
-        student_id: studentId,
-        type: formData.type,
-        date: formData.date,
-        surah_or_jilid: formData.surah_or_jilid || null,
-        ayat_or_page: formData.ayat_or_page || null,
-        notes: formData.notes || null
-      });
-
       const { data, error } = await supabase
         .from('progress_entries')
         .insert([{ 
@@ -98,7 +89,6 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({
         .select();
 
       if (error) {
-        console.error('Error saving progress entry:', error);
         toast({
           title: 'Error',
           description: 'Failed to add progress entry. Please try again.',
@@ -106,8 +96,6 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({
         });
         return;
       }
-
-      console.log('Progress entry saved successfully:', data);
       
       // Show success message
       toast({
@@ -135,7 +123,6 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({
       }
       
     } catch (error) {
-      console.error('Error adding progress:', error);
       toast({
         title: "Error",
         description: "Failed to add progress entry. Please try again.",

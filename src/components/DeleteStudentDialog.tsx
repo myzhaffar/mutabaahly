@@ -83,7 +83,6 @@ const DeleteStudentDialog: React.FC<DeleteStudentDialogProps> = ({
 
       onStudentDeleted();
     } catch (error) {
-      console.error('Error deleting student:', error);
       toast({
         title: "Error",
         description: "Failed to delete student. Please try again.",

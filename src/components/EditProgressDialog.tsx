@@ -85,7 +85,6 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
       onProgressUpdated();
       if (entry.type === 'tilawah' && setActiveTab) setActiveTab('tilawah');
     } catch (error) {
-      console.error('Error updating progress:', error);
       toast({
         title: "Error",
         description: "Failed to update progress. Please try again.",

@@ -54,7 +54,6 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
     const { data: students, error } = await query;
 
     if (error) {
-      console.error('Error fetching students for Tahsin ranking:', error);
       return [];
     }
 
@@ -119,7 +118,6 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
             return null;
           }
         } catch (error) {
-          console.error(`Error processing student ${student.id}:`, error);
           return null;
         }
       })
@@ -155,7 +153,6 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
     return sortedStudents;
 
   } catch (error) {
-    console.error('Error in fetchTilawatiRankingData:', error);
     return [];
   }
 };
@@ -193,7 +190,6 @@ export const fetchHafalanRankingData = async (filters: RankingFilters): Promise<
     const { data: students, error } = await query;
 
     if (error) {
-      console.error('Error fetching students for Hafalan ranking:', error);
       return [];
     }
 
@@ -214,7 +210,6 @@ export const fetchHafalanRankingData = async (filters: RankingFilters): Promise<
             .order('date', { ascending: false });
 
           if (entriesError) {
-            console.error(`Error fetching hafalan entries for student ${student.id}:`, entriesError);
             return null;
           }
 
@@ -247,7 +242,6 @@ export const fetchHafalanRankingData = async (filters: RankingFilters): Promise<
             progress: calculatedProgress.percentage
           };
         } catch (error) {
-          console.error(`Error processing student ${student.id}:`, error);
           return null;
         }
       })
@@ -285,7 +279,6 @@ export const fetchHafalanRankingData = async (filters: RankingFilters): Promise<
     return sortedStudents;
 
   } catch (error) {
-    console.error('Error in fetchHafalanRankingData:', error);
     return [];
   }
 };
@@ -466,7 +459,6 @@ export const fetchTeachers = async (): Promise<{ id: string; name: string }[]> =
       .order('full_name');
 
     if (error) {
-      console.error('Error fetching teachers:', error);
       return [];
     }
 
@@ -475,7 +467,6 @@ export const fetchTeachers = async (): Promise<{ id: string; name: string }[]> =
       name: teacher.full_name
     })) || [];
   } catch (error) {
-    console.error('Error in fetchTeachers:', error);
     return [];
   }
 };
@@ -489,7 +480,6 @@ export const fetchGrades = async (): Promise<{ id: string; name: string }[]> => 
       .not('group_name', 'is', null);
 
     if (error) {
-      console.error('Error fetching grades:', error);
       return [];
     }
 
@@ -501,7 +491,6 @@ export const fetchGrades = async (): Promise<{ id: string; name: string }[]> => 
       name: grade
     }));
   } catch (error) {
-    console.error('Error in fetchGrades:', error);
     return [];
   }
 };

@@ -45,7 +45,6 @@ const Auth = () => {
   }, [quotes.length]);
 
   useEffect(() => {
-    console.log('user:', user, 'profile:', profile, 'role:', profile?.role);
     if (user && profile && profile.role !== 'teacher' && profile.role !== 'parent') {
       router.push('/select-role');
     } else if (user && profile && (profile.role === 'teacher' || profile.role === 'parent')) {

@@ -55,7 +55,6 @@ const ParentTestView: React.FC = () => {
       const { data, error } = await query;
 
       if (error) {
-        console.error('Error fetching tests:', error);
         throw error;
       }
 

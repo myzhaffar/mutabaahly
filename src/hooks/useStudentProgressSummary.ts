@@ -1,0 +1,252 @@
+import useSWR from 'swr';
+import { useState, useMemo } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+
+// Define a type for the student data we'll work with
+export interface StudentData {
+  id: string;
+  name: string;
+  grade: string | null;
+  group_name: string | null;
+  teacher: string | null;
+  photo: string | null;
+  parent_id: string | null;
+  hafalan_progress?: {
+    percentage: number;
+    last_surah: string | null;
+  } | null;
+  tilawah_progress?: {
+    percentage: number;
+    jilid: string | null;
+  } | null;
+}
+
+// Define the props for our hook
+interface UseStudentProgressSummaryProps {
+  parentId?: string;
+  teacherId?: string;
+  grade?: string;
+  groupName?: string;
+  studentId?: string;
+  fetchAllStudents?: boolean; // New prop to fetch all students
+}
+
+// Type for the processed student data with calculated progress
+export interface ProcessedStudent {
+  id: string;
+  name: string;
+  grade: string;
+  group_name: string;
+  teacher: string;
+  photo: string | null;
+  parent_id: string | null; // Added to support filtering
+  hafalan_progress: {
+    percentage: number;
+    last_surah: string | null;
+  } | null;
+  tilawah_progress: {
+    percentage: number;
+    jilid: string | null;
+  } | null;
+}
+
+// Type for the grouped data structure
+export interface GroupedData {
+  students: ProcessedStudent[];
+  classes: string[];
+}
+
+// Type for the summary statistics
+export interface SummaryStats {
+  totalStudents: number;
+  avgHafalanProgress: number;
+  avgTilawahProgress: number;
+  completedStudents: number;
+}
+
+// Format grade value to ensure consistency
+function formatGrade(grade: string | null): string {
+  if (!grade) return 'Unknown';
+  
+  // If grade already includes the word "Grade" (like "Grade 6"), extract just the number
+  if (grade.toLowerCase().includes('grade')) {
+    return grade.replace(/[^\d]/g, '');
+  }
+  
+  // If grade is just a number or other format, return it as is
+  return grade;
+}
+
+// The main hook
+export const useStudentProgressSummary = ({
+  parentId,
+  teacherId,
+  grade,
+  groupName,
+  studentId,
+  fetchAllStudents = false,
+}: UseStudentProgressSummaryProps = {}) => {
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  
+  // Create a query key that includes all filters
+  const queryKey = ['studentProgressSummary', fetchAllStudents, parentId, teacherId, grade, groupName, studentId];
+  
+  // Fetcher function for Supabase queries
+  const fetcher = async () => {
+    // Always fetch all students first
+    let query = supabase.from('students').select('*');
+    
+    // Only apply filters to the database query if we're not fetching all students
+    if (!fetchAllStudents) {
+      if (parentId) {
+        query = query.eq('parent_id', parentId);
+      }
+      
+      if (teacherId) {
+        query = query.eq('teacher', teacherId);
+      }
+      
+      if (grade) {
+        query = query.eq('grade', grade);
+      }
+      
+      if (groupName) {
+        query = query.eq('group_name', groupName);
+      }
+      
+      if (studentId) {
+        query = query.eq('id', studentId);
+      }
+    }
+    
+    const { data, error } = await query;
+    if (error) throw error;
+    
+    // Now fetch progress entries for each student
+    const studentsWithProgress = await Promise.all((data || []).map(async (student) => {
+      // Fetch progress entries
+      const { data: progressEntries } = await supabase
+        .from('progress_entries')
+        .select('*')
+        .eq('student_id', student.id);
+      
+      // Calculate hafalan progress
+      const hafalanEntries = progressEntries?.filter(entry => entry.type === 'hafalan') || [];
+      const hafalanPercentage = hafalanEntries.length > 0 
+        ? Math.min(100, Math.round((hafalanEntries.length * 100) / 114))
+        : 0;
+      const lastSurah = hafalanEntries.length > 0
+        ? hafalanEntries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]?.surah_or_jilid
+        : null;
+      
+      // Calculate tilawah progress
+      const tilawahEntries = progressEntries?.filter(entry => entry.type === 'tilawah') || [];
+      const tilawahPercentage = tilawahEntries.length > 0
+        ? Math.min(100, Math.round((tilawahEntries.length * 100) / 6))
+        : 0;
+      const lastJilid = tilawahEntries.length > 0
+        ? tilawahEntries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]?.surah_or_jilid
+        : null;
+      
+      // Ensure we have all required fields with proper fallbacks
+      // Format grade to ensure consistency
+      return {
+        id: student.id,
+        name: student.name || '',
+        grade: formatGrade(student.grade),
+        group_name: student.group_name || '',
+        teacher: student.teacher || '',
+        photo: student.photo,
+        parent_id: student.parent_id, // Keep parent_id for filtering
+        hafalan_progress: hafalanEntries.length > 0 ? {
+          percentage: hafalanPercentage,
+          last_surah: lastSurah
+        } : null,
+        tilawah_progress: tilawahEntries.length > 0 ? {
+          percentage: tilawahPercentage,
+          jilid: lastJilid
+        } : null
+      } as ProcessedStudent;
+    }));
+    
+    return studentsWithProgress;
+  };
+  
+  // Use SWR for data fetching with caching and revalidation
+  const { data: allStudentsData, error, mutate } = useSWR<ProcessedStudent[]>(
+    queryKey,
+    fetcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 60000, // 1 minute
+    }
+  );
+  
+  // Filter data on the client side if we fetched all students
+  const data = useMemo(() => {
+    if (!allStudentsData || !fetchAllStudents) return allStudentsData;
+    
+    return allStudentsData.filter(student => {
+      // Apply filters
+      if (parentId && student.parent_id !== parentId) return false;
+      if (grade && student.grade !== grade) return false;
+      if (groupName && student.group_name !== groupName) return false;
+      if (studentId && student.id !== studentId) return false;
+      return true;
+    });
+  }, [allStudentsData, fetchAllStudents, parentId, grade, groupName, studentId]);
+  
+  // Custom refresh function
+  const refresh = async () => {
+    setIsRefreshing(true);
+    await mutate();
+    setIsRefreshing(false);
+  };
+  
+  // Calculate summary statistics
+  const summaryStats: SummaryStats = {
+    totalStudents: data?.length || 0,
+    avgHafalanProgress: data?.length 
+      ? Math.round(data.reduce((sum, student) => sum + (student.hafalan_progress?.percentage || 0), 0) / data.length) 
+      : 0,
+    avgTilawahProgress: data?.length 
+      ? Math.round(data.reduce((sum, student) => sum + (student.tilawah_progress?.percentage || 0), 0) / data.length) 
+      : 0,
+    completedStudents: data?.filter(s => 
+      (s.hafalan_progress?.percentage || 0) === 100 && 
+      (s.tilawah_progress?.percentage || 0) === 100
+    ).length || 0
+  };
+  
+  // Group students by grade
+  const groupedByGrade: Record<string, GroupedData> = {};
+  
+  if (data && data.length > 0) {
+    for (const student of data) {
+      const studentGrade = student.grade || 'Unknown';
+      
+      if (!groupedByGrade[studentGrade]) {
+        groupedByGrade[studentGrade] = { students: [], classes: [] };
+      }
+      
+      groupedByGrade[studentGrade].students.push(student);
+      
+      if (student.group_name && !groupedByGrade[studentGrade].classes.includes(student.group_name)) {
+        groupedByGrade[studentGrade].classes.push(student.group_name);
+      }
+    }
+  }
+  
+  return {
+    studentProgressData: data || [],
+    summaryStats,
+    groupedByGrade,
+    isLoading: !error && !data,
+    isRefreshing,
+    isError: !!error,
+    error,
+    refresh,
+  };
+}; 

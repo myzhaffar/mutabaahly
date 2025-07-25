@@ -64,21 +64,38 @@ function getTopPerformers(students: Student[]) {
     .slice(0, 3);
 }
 
+// Format grade display to ensure consistency
+function formatGrade(grade: string): string {
+  // If grade is just a number (like "6"), return it as is
+  if (/^\d+$/.test(grade)) {
+    return grade;
+  }
+  
+  // If grade already includes the word "Grade" (like "Grade 6"), extract just the number
+  if (grade.toLowerCase().includes('grade')) {
+    return grade.replace(/[^\d]/g, '');
+  }
+  
+  // Otherwise, return the grade as is
+  return grade;
+}
+
 const ClassCard: React.FC<ClassCardProps> = ({ grade, students, classes }) => {
   const router = useRouter();
   const topPerformers = getTopPerformers(students);
-  const gradeColor = getGradeColor(grade);
+  const formattedGrade = formatGrade(grade);
+  const gradeColor = getGradeColor(formattedGrade);
   
   return (
     <div
       className="group relative rounded-2xl shadow-lg hover:shadow-xl hover:shadow-amber-50/50 transition-all duration-300 overflow-hidden h-full flex flex-col"
       tabIndex={0}
-      aria-label={`View grade ${grade}`}
+      aria-label={`View grade ${formattedGrade}`}
     >
       {/* Head Section: Grade Name */}
       <div className="px-6 py-5 bg-gradient-to-r from-green-100 to-orange-100 text-emerald-700"
            style={{ borderTopLeftRadius: '1rem', borderTopRightRadius: '1rem' }}>
-        <h3 className="text-2xl font-bold mb-1">Grade {grade}</h3>
+        <h3 className="text-2xl font-bold mb-1">Grade {formattedGrade}</h3>
         <div className="w-12 h-1 bg-white/60 rounded-full" />
       </div>
 
@@ -145,7 +162,7 @@ const ClassCard: React.FC<ClassCardProps> = ({ grade, students, classes }) => {
         <div className="mt-auto">
           <Button
             className="w-full bg-gradient-to-r from-emerald-500 to-teal-400 hover:opacity-90 text-white"
-            onClick={() => router.push(`/class/${encodeURIComponent(grade)}`)}
+            onClick={() => router.push(`/class/${encodeURIComponent(formattedGrade)}`)}
           >
             View Students
           </Button>

@@ -212,7 +212,6 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
         });
       }
     } catch (error) {
-      console.error('Error processing file:', error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to process file",
@@ -284,7 +283,6 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
           .select();
 
         if (error || !inserted) {
-          console.error('Error inserting batch:', error);
           failedCount += batch.length;
         } else {
           successCount += batch.length;
@@ -314,7 +312,6 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
         });
       }
     } catch (error) {
-      console.error('Error uploading students:', error);
       toast({
         title: "Error",
         description: "Failed to upload students. Please try again.",
