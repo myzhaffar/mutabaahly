@@ -77,13 +77,13 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
         .update(updatePayload)
         .eq('id', entry.id);
       if (data) {
-        toast({
-          title: "Success",
-          description: "Progress updated successfully!",
-        });
-        setOpen(false);
-        onProgressUpdated();
-        if (entry.type === 'tilawah' && setActiveTab) setActiveTab('tilawah');
+      toast({
+        title: "Success",
+        description: "Progress updated successfully!",
+      });
+      setOpen(false);
+      onProgressUpdated();
+      if (entry.type === 'tilawah' && setActiveTab) setActiveTab('tilawah');
       } else {
         throw new Error("Failed to update progress.");
       }

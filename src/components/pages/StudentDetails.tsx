@@ -29,7 +29,7 @@ const StudentDetails = () => {
   } = useStudentDetails(id);
 
   const handleStudentDeleted = () => {
-    router.push('/dashboard');
+    router.push('/students');
   };
 
   let breadcrumbs: { label: string; href?: string }[] = [];
@@ -40,8 +40,6 @@ const StudentDetails = () => {
       { label: student.name }
     ];
   }
-
-  const [activeTab, setActiveTab] = React.useState('hafalan');
 
   const MainContent = (
     <div className="container mx-auto px-0 py-0 md:px-6 md:py-6">
@@ -130,9 +128,7 @@ const StudentDetails = () => {
         hafalanEntries={hafalanEntries}
         tilawahEntries={tilawahEntries}
         onProgressUpdated={refetchData}
-        studentId={student.id}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={() => {}}
       />
           )}
     </>

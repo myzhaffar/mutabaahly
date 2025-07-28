@@ -2,6 +2,7 @@
 import React from 'react';
 import { BookOpen, User, Clock, Calendar } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from 'react-i18next';
 
 interface TestStats {
   total: number;
@@ -15,11 +16,13 @@ interface TestStatsCardsProps {
 }
 
 const TestStatsCards: React.FC<TestStatsCardsProps> = ({ stats }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-xs lg:text-sm font-medium">Total Tes</CardTitle>
+          <CardTitle className="text-xs lg:text-sm font-medium">{t('cards.statsCard.totalTests')}</CardTitle>
           <BookOpen className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
@@ -29,7 +32,7 @@ const TestStatsCards: React.FC<TestStatsCardsProps> = ({ stats }) => {
       
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-xs lg:text-sm font-medium">Lulus</CardTitle>
+          <CardTitle className="text-xs lg:text-sm font-medium">{t('cards.statsCard.passed')}</CardTitle>
           <User className="h-4 w-4 text-green-600" />
         </CardHeader>
         <CardContent>
@@ -39,7 +42,7 @@ const TestStatsCards: React.FC<TestStatsCardsProps> = ({ stats }) => {
       
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-xs lg:text-sm font-medium">Terjadwal</CardTitle>
+          <CardTitle className="text-xs lg:text-sm font-medium">{t('cards.statsCard.scheduled')}</CardTitle>
           <Clock className="h-4 w-4 text-blue-600" />
         </CardHeader>
         <CardContent>
@@ -49,7 +52,7 @@ const TestStatsCards: React.FC<TestStatsCardsProps> = ({ stats }) => {
       
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-xs lg:text-sm font-medium">Belum Lulus</CardTitle>
+          <CardTitle className="text-xs lg:text-sm font-medium">{t('cards.statsCard.failed')}</CardTitle>
           <Calendar className="h-4 w-4 text-red-600" />
         </CardHeader>
         <CardContent>

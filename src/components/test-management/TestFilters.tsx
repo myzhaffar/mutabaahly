@@ -1,164 +1,175 @@
 import React, { useState } from 'react';
-import { Filter } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { TilawatiJilid, TestStatus } from '@/types/tilawati';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
-export type StatusOption = TestStatus | 'scheduled' | 'passed' | 'failed';
-export type JilidOption = TilawatiJilid | 'Level 1' | 'Level 2' | 'Level 3' | 'Level 4' | 'Level 5' | 'Level 6';
+import { Filter, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-interface TestFiltersProps {
-  searchTerm?: string;
-  status?: StatusOption[];
-  jilidLevel?: JilidOption[];
-  date?: string;
-  onFilterChange: (key: string, value: string[] | string | undefined) => void;
-  showDateFilter?: boolean;
+export interface StatusOption {
+  value: string;
+  label: string;
 }
 
-const STATUS_OPTIONS: { value: StatusOption; label: string }[] = [
+export interface JilidOption {
+  value: string;
+  label: string;
+}
+
+const STATUS_OPTIONS: StatusOption[] = [
   { value: 'scheduled', label: 'Scheduled' },
   { value: 'passed', label: 'Passed' },
   { value: 'failed', label: 'Failed' },
+  { value: 'pending_retake', label: 'Pending Retake' },
+  { value: 'cancelled', label: 'Cancelled' }
 ];
-const JILID_OPTIONS: { value: JilidOption; label: string }[] = [
-  { value: 'Level 1', label: 'Level 1' },
-  { value: 'Level 2', label: 'Level 2' },
-  { value: 'Level 3', label: 'Level 3' },
-  { value: 'Level 4', label: 'Level 4' },
-  { value: 'Level 5', label: 'Level 5' },
-  { value: 'Level 6', label: 'Level 6' },
+
+const JILID_OPTIONS: JilidOption[] = [
+  { value: 'Jilid 1', label: 'Jilid 1' },
+  { value: 'Jilid 2', label: 'Jilid 2' },
+  { value: 'Jilid 3', label: 'Jilid 3' },
+  { value: 'Jilid 4', label: 'Jilid 4' },
+  { value: 'Jilid 5', label: 'Jilid 5' },
+  { value: 'Jilid 6', label: 'Jilid 6' }
 ];
+
+interface TestFiltersProps {
+  searchTerm?: string;
+  status: string[];
+  jilidLevel: string[];
+  onFilterChange: (key: string, value: string[] | string | undefined) => void;
+}
 
 const TestFilters: React.FC<TestFiltersProps> = ({
-  searchTerm = '',
-  status = [],
-  jilidLevel = [],
-  date,
-  onFilterChange,
-  showDateFilter = false,
+  status,
+  jilidLevel,
+  onFilterChange
 }) => {
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const { t } = useTranslation();
+
+  const hasActiveFilters = status.length > 0 || jilidLevel.length > 0;
 
   const clearFilters = () => {
-    onFilterChange('searchTerm', '');
     onFilterChange('status', []);
     onFilterChange('jilidLevel', []);
-    if (showDateFilter) {
-      onFilterChange('date', undefined);
-    }
   };
 
-  const hasActiveFilters = (status && status.length > 0) || (jilidLevel && jilidLevel.length > 0) || date;
-
   return (
-    <div className="sticky top-14 z-20 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-200 mb-6 px-0 sm:px-0">
-      <div className="px-6 pt-6 pb-2">
-          <Input
-            placeholder="Search students by name..."
-            value={searchTerm}
-            onChange={(e) => onFilterChange('searchTerm', e.target.value)}
-          className="w-full bg-gray-50 border border-gray-200 rounded-lg focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-base py-2 px-4 shadow-sm"
-          />
-        </div>
-      <div className="border-t border-gray-100 mx-6" />
+    <Card className="mb-6">
+      <CardHeader>
         <button
-        className="w-full flex items-center gap-3 px-6 py-4 focus:outline-none"
-          onClick={() => setFiltersOpen((open) => !open)}
-          aria-expanded={filtersOpen}
+          type="button"
+          onClick={() => setFiltersOpen(!filtersOpen)}
+          className="flex items-center justify-between w-full text-left"
         >
-        <div className="p-2 bg-blue-50 rounded-lg">
-          <Filter className="h-4 w-4 text-blue-600" />
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-gray-100 rounded-lg">
+              <Filter className="h-4 w-4 text-gray-600" />
+            </div>
+            <div className="flex-1 text-left">
+              <h3 className="font-semibold text-gray-900 text-base sm:text-lg">{t('filters.title')}</h3>
+              <p className="text-xs sm:text-sm text-gray-500">{t('filters.description')}</p>
+              {/* Show selected filter badges under description, even when collapsed */}
+              {hasActiveFilters && (
+                <div className="flex items-center gap-2 flex-wrap mt-2">
+                  {status.length > 0 && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-50 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
+                      {t('filters.status')}: {status.map(s => STATUS_OPTIONS.find(opt => opt.value === s)?.label || s).join(', ')}
+                    </span>
+                  )}
+                  {jilidLevel.length > 0 && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-50 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
+                      {t('filters.level')}: {jilidLevel.map(j => JILID_OPTIONS.find(opt => opt.value === j)?.label || j).join(', ')}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={clearFilters}
+                    className="ml-2 text-xs text-gray-500 hover:text-red-600 underline"
+                  >
+                    {t('filters.clearFilters')}
+                  </button>
+                </div>
+              )}
+            </div>
+            <span className="ml-auto text-xs text-gray-500">{filtersOpen ? t('filters.hide') : t('filters.show')}</span>
           </div>
-          <div className="flex-1 text-left">
-            <h3 className="font-semibold text-gray-900 text-base sm:text-lg">Filters</h3>
-            <p className="text-xs sm:text-sm text-gray-500">Refine your search results</p>
-            {/* Show selected filter badges under description, even when collapsed */}
+        </button>
+      </CardHeader>
+
+      {filtersOpen && (
+        <CardContent className="pt-0">
+          <div className="space-y-4">
+            {/* Status Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('filters.status')}</label>
+              <div className="flex flex-wrap gap-2">
+                {STATUS_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => {
+                      const newStatus = status.includes(option.value)
+                        ? status.filter(s => s !== option.value)
+                        : [...status, option.value];
+                      onFilterChange('status', newStatus);
+                    }}
+                    className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                      status.includes(option.value)
+                        ? 'bg-blue-100 text-blue-700 border-blue-300'
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Level Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('filters.level')}</label>
+              <div className="flex flex-wrap gap-2">
+                {JILID_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => {
+                      const newLevel = jilidLevel.includes(option.value)
+                        ? jilidLevel.filter(l => l !== option.value)
+                        : [...jilidLevel, option.value];
+                      onFilterChange('jilidLevel', newLevel);
+                    }}
+                    className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                      jilidLevel.includes(option.value)
+                        ? 'bg-green-100 text-green-700 border-green-300'
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Clear Filters Button */}
             {hasActiveFilters && (
-              <div className="flex items-center gap-2 flex-wrap mt-2">
-                {status.length > 0 && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-50 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
-                    Status: {status.map(s => STATUS_OPTIONS.find(opt => opt.value === s)?.label || s).join(', ')}
-                  </span>
-                )}
-                {jilidLevel.length > 0 && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 bg-blue-50 text-blue-700 text-xs sm:text-sm rounded-full border border-blue-200">
-                    Level: {jilidLevel.map(j => JILID_OPTIONS.find(opt => opt.value === j)?.label || j).join(', ')}
-                  </span>
-                )}
-                <button
-                  type="button"
+              <div className="pt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={clearFilters}
-                  className="ml-2 text-xs text-gray-500 hover:text-red-600 underline"
+                  className="text-red-600 border-red-300 hover:bg-red-50"
                 >
-                  Clear Filters
-                </button>
+                  <X className="h-4 w-4 mr-2" />
+                  {t('filters.clearFilters')}
+                </Button>
               </div>
             )}
           </div>
-          <span className="ml-auto text-xs text-gray-500">{filtersOpen ? 'Hide' : 'Show'}</span>
-        </button>
-      {filtersOpen && (
-        <div className="p-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-            {/* Status Multi-Select */}
-            <div className="space-y-2 sm:space-y-3">
-              <label className="text-xs sm:text-sm font-medium text-gray-700 flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                Status
-              </label>
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {STATUS_OPTIONS.map(opt => (
-                  <div key={opt.value} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`status-filter-${opt.value}`}
-                      checked={status.includes(opt.value)}
-                      onCheckedChange={() => {
-                        const newStatus = status.includes(opt.value)
-                          ? status.filter(s => s !== opt.value)
-                          : [...status, opt.value];
-                        onFilterChange('status', newStatus);
-                      }}
-                      className="rounded-full"
-                    />
-                    <label htmlFor={`status-filter-${opt.value}`} className="text-sm text-gray-700 cursor-pointer">
-                      {opt.label}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-            {/* Jilid Multi-Select */}
-            <div className="space-y-2 sm:space-y-3">
-              <label className="text-xs sm:text-sm font-medium text-gray-700 flex items-center gap-2">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                Level
-              </label>
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {JILID_OPTIONS.map(opt => (
-                  <div key={opt.value} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`jilid-filter-${opt.value}`}
-                      checked={jilidLevel.includes(opt.value)}
-                      onCheckedChange={() => {
-                        const newJilid = jilidLevel.includes(opt.value)
-                          ? jilidLevel.filter(j => j !== opt.value)
-                          : [...jilidLevel, opt.value];
-                        onFilterChange('jilidLevel', newJilid);
-                      }}
-                      className="rounded-full"
-                    />
-                    <label htmlFor={`jilid-filter-${opt.value}`} className="text-sm text-gray-700 cursor-pointer">
-                      {opt.label}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
+        </CardContent>
       )}
-    </div>
+    </Card>
   );
 };
 

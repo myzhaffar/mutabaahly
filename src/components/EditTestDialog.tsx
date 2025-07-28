@@ -40,13 +40,13 @@ const EditTestDialog: React.FC<EditTestDialogProps> = ({ test, onTestUpdated }) 
         .eq('id', test.id);
 
       if (data) {
-        toast({
-          title: "Success",
-          description: "Test updated successfully!",
-        });
+      toast({
+        title: "Success",
+        description: "Test updated successfully!",
+      });
 
-        setOpen(false);
-        onTestUpdated();
+      setOpen(false);
+      onTestUpdated();
       }
     } catch (error) {
       toast({

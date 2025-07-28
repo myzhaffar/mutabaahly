@@ -343,20 +343,20 @@ const ClassDetail: React.FC = () => {
         {showTabs && (
           <div className="flex gap-3 mb-4 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pr-4">
             {tabList.map((tab, idx) => (
-              <button
-                key={tab}
+                <button
+                  key={tab}
                 type="button"
                 onClick={() => setActiveTab(tab)}
                 className={`flex items-center justify-center min-w-max px-4 py-2 rounded-full font-semibold transition-all duration-150 text-sm mx-0
-                  ${activeTab === tab
-                    ? 'bg-emerald-500 text-white shadow'
+                    ${activeTab === tab
+                      ? 'bg-emerald-500 text-white shadow'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}
                   ${idx === tabList.length - 1 ? 'mr-2' : ''}
-                `}
-              >
+                  `}
+                >
                 {tabLabels[tab] || tab}
-              </button>
-            ))}
+                </button>
+              ))}
           </div>
         )}
         {/* Collapsible Teacher Filters */}
@@ -427,13 +427,13 @@ const ClassDetail: React.FC = () => {
                               ? prev.filter(t => t !== teacher.name)
                               : [...prev, teacher.name]
                           );
-                        }}
+                      }}
                         className="rounded-full border-emerald-400"
                       />
                       <span className="text-sm text-gray-700">{teacher.name}</span>
                     </label>
                   ))}
-                </div>
+                  </div>
                 {/* Ust. (male) teachers */}
                 <div>
                   <div className="font-semibold text-teal-700 text-xs mb-1">Ust.</div>

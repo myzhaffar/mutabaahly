@@ -13,6 +13,29 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LogOut, User } from "lucide-react";
+import { useTranslation } from 'react-i18next';
+import '@/i18n';
+
+const LanguageSwitcher = () => {
+  const { i18n } = useTranslation();
+  return (
+    <div className="flex gap-2 items-center">
+      <button
+        onClick={() => i18n.changeLanguage('en')}
+        className={i18n.language === 'en' ? 'font-bold underline' : 'text-gray-600'}
+      >
+        EN
+      </button>
+      <span>|</span>
+      <button
+        onClick={() => i18n.changeLanguage('id')}
+        className={i18n.language === 'id' ? 'font-bold underline' : 'text-gray-600'}
+      >
+        ID
+      </button>
+    </div>
+  );
+};
 
 export default function Navbar() {
   const { user, profile, signOut } = useAuth();
@@ -63,6 +86,8 @@ export default function Navbar() {
               <Button>Sign In</Button>
             </Link>
           )}
+          <LanguageSwitcher />
+          <div>TEST</div>
         </div>
       </div>
     </nav>

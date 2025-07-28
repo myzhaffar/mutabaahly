@@ -4,6 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 interface Student {
   id: string;
@@ -82,6 +83,7 @@ function formatGrade(grade: string): string {
 
 const ClassCard: React.FC<ClassCardProps> = ({ grade, students, classes }) => {
   const router = useRouter();
+  const { t } = useTranslation();
   const topPerformers = getTopPerformers(students);
   const formattedGrade = formatGrade(grade);
   const gradeColor = getGradeColor(formattedGrade);
@@ -107,7 +109,7 @@ const ClassCard: React.FC<ClassCardProps> = ({ grade, students, classes }) => {
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" className="text-gray-400 fill-current">
               <path d="m22.004,4.498c.001-.865-.525-1.61-1.34-1.898L14.199.319c-1.388-.491-2.916-.492-4.303-.006L3.353,2.603c-.818.286-1.346,1.03-1.346,1.896,0,.867.529,1.611,1.347,1.896l2.646.923v1.682c0,3.309,2.691,6,6,6s6-2.691,6-6v-1.682l2-.698v4.379c0,.552.448,1,1,1s1-.448,1-1v-6.477c0-.009.004-.016.004-.025Zm-6.004,4.502c0,2.206-1.794,4-4,4s-4-1.794-4-4v-.984l1.861.649c.689.24,1.414.361,2.138.361s1.448-.121,2.137-.361l1.864-.65v.984Zm-2.522-2.223c-.953.333-2.004.333-2.957,0l-6.507-2.287,6.544-2.29h0c.478-.167.979-.251,1.482-.251.506,0,1.012.085,1.494.255l6.465,2.298-6.521,2.274Zm6.478,15.926c.164.527-.131,1.088-.658,1.252-.099.031-.199.045-.297.045-.426,0-.821-.275-.955-.704-.787-2.53-3.272-4.297-6.045-4.297s-5.258,1.767-6.045,4.297c-.164.528-.728.821-1.252.658-.527-.164-.822-.725-.658-1.252,1.044-3.358,4.315-5.703,7.955-5.703s6.911,2.345,7.955,5.703Z"/>
             </svg>
-            <span className="text-sm font-medium text-gray-700">{students.length} students</span>
+            <span className="text-sm font-medium text-gray-700">{students.length} {t('cards.classCard.students')}</span>
           </div>
         </div>
 
@@ -164,7 +166,7 @@ const ClassCard: React.FC<ClassCardProps> = ({ grade, students, classes }) => {
             className="w-full bg-gradient-to-r from-emerald-500 to-teal-400 hover:opacity-90 text-white"
             onClick={() => router.push(`/class/${encodeURIComponent(formattedGrade)}`)}
           >
-            View Students
+            {t('cards.classCard.viewStudents')}
           </Button>
         </div>
       </div>

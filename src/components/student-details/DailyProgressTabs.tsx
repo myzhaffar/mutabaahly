@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ProgressEntriesTable from './ProgressEntriesTable';
 import { Button } from '@/components/ui/button';
+import ProgressEntriesTable from './ProgressEntriesTable';
 import ExportProgressDialog from './ExportProgressDialog';
-import { supabase } from '@/integrations/supabase/client';
+import { useTranslation } from 'react-i18next';
 
 interface ProgressEntry {
   id: string;
@@ -19,51 +19,35 @@ interface DailyProgressTabsProps {
   hafalanEntries: ProgressEntry[];
   tilawahEntries: ProgressEntry[];
   onProgressUpdated: () => void;
-  studentId: string;
-  activeTab?: string;
-  onTabChange?: (tab: string) => void;
+  onTabChange: (tab: string) => void;
 }
 
 const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
   hafalanEntries,
   tilawahEntries,
   onProgressUpdated,
-  studentId,
-  activeTab,
   onTabChange
 }) => {
-  const [exportOpen, setExportOpen] = React.useState(false);
-  const [tab, setTab] = React.useState(activeTab || 'hafalan');
-
-  React.useEffect(() => {
-    if (activeTab && activeTab !== tab) setTab(activeTab);
-  }, [activeTab, tab]);
+  const [tab, setTab] = useState('hafalan');
+  const [exportOpen, setExportOpen] = useState(false);
+  const { t } = useTranslation();
 
   const handleTabChange = (value: string) => {
     setTab(value);
-    if (onTabChange) onTabChange(value);
+    onTabChange(value);
   };
 
-  const handleDuplicate = async (entry: ProgressEntry) => {
-    if (!studentId) return;
-    const newEntry = {
-      student_id: studentId,
-      date: new Date().toISOString().split('T')[0],
-      type: entry.type,
-      surah_or_jilid: entry.surah_or_jilid,
-      ayat_or_page: entry.ayat_or_page,
-      notes: entry.notes,
-    };
-    const { error } = await supabase.from('progress_entries').insert([newEntry]);
-    if (!error) onProgressUpdated();
+  const handleDuplicate = (entry: ProgressEntry) => {
+    // Handle duplicate functionality
+    console.log('Duplicate entry:', entry);
   };
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Daily Progress Records</CardTitle>
+        <CardTitle>{t('tabs.dailyProgress')}</CardTitle>
         <Button variant="outline" onClick={() => setExportOpen(true)}>
-          Export
+          {t('tabs.export')}
         </Button>
         <ExportProgressDialog
           open={exportOpen}
@@ -79,13 +63,13 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
               value="hafalan"
               className="data-[state=active]:bg-green-100 data-[state=active]:text-green-700"
             >
-              Tahfidz
+              {t('tabs.tahfidz')}
             </TabsTrigger>
             <TabsTrigger
               value="tilawah"
               className="data-[state=active]:bg-orange-100 data-[state=active]:text-orange-700"
             >
-              Tahsin
+              {t('tabs.tahsin')}
             </TabsTrigger>
           </TabsList>
           

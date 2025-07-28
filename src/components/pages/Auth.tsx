@@ -9,10 +9,12 @@ import { useAuth } from '@/contexts/useAuth';
 import { useRouter } from 'next/navigation';
 
 import { useToast } from '@/hooks/use-toast';
-import { Home, Mail, Lock, Eye, User } from 'lucide-react';
+import { Home, Eye } from 'lucide-react';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import Image from 'next/image';
+import { useTranslation } from 'react-i18next';
+import '@/i18n';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -27,15 +29,11 @@ const Auth = () => {
 
   const { toast } = useToast();
   const router = useRouter();
+  const { t } = useTranslation();
 
   const allowedRoles = ['teacher', 'parent'];
 
-  const quotes = [
-    "Stay connect with Al Qur'an",
-    "The best among you are those who learn the Qur'an and teach it.",
-    "Let the Qur'an be your companion every day.",
-    "Knowledge is light, and the Qur'an is its source."
-  ];
+  const quotes = t('auth.quotes', { returnObjects: true }) as string[];
   const [quoteIndex, setQuoteIndex] = useState(0);
   useEffect(() => {
     const interval = setInterval(() => {
@@ -131,82 +129,76 @@ const Auth = () => {
               onClick={handleGoogleLogin}
             >
               <Image src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width={20} height={20} className="h-5 w-5" />
-              Continue with Google
+              {t('auth.continueWithGoogle')}
             </button>
             <div className="flex items-center my-6">
               <div className="flex-1 h-px bg-gray-200" />
-              <span className="mx-3 text-gray-400 text-sm">Or continue with email</span>
+              <span className="mx-3 text-gray-400 text-sm">{t('auth.orContinueWithEmail')}</span>
               <div className="flex-1 h-px bg-gray-200" />
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               { !isLogin && (
-                <div>
-                  <Label htmlFor="fullName">Full Name</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">{t('auth.fullName')}</Label>
                   <Input
                     id="fullName"
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    required
-                    placeholder="Enter your full name"
+                    placeholder={t('auth.fullName')}
+                    required={!isLogin}
+                    className="w-full"
                   />
                 </div>
               )}
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <div className="relative mt-1">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><Mail className="h-5 w-5" /></span>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    placeholder="Enter your email"
-                    className="pl-10"
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">{t('auth.email')}</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={t('auth.email')}
+                  required
+                  className="w-full"
+                />
               </div>
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <div className="relative mt-1">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><Lock className="h-5 w-5" /></span>
+              <div className="space-y-2">
+                <Label htmlFor="password">{t('auth.password')}</Label>
+                <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    placeholder={t('auth.password')}
                     required
-                    placeholder="Enter your password"
-                    className="pl-10 pr-10"
+                    className="w-full pr-10"
                   />
                   <button
                     type="button"
-                    tabIndex={-1}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    onClick={() => setShowPassword((v) => !v)}
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   >
-                    <Eye className="h-5 w-5" />
+                    <Eye className="h-4 w-4 text-gray-400" />
                   </button>
                 </div>
               </div>
               { !isLogin && (
-                <div>
-                  <Label htmlFor="role">Role</Label>
-                  <div className="relative mt-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><User className="h-5 w-5" /></span>
-                    <Select value={role} onValueChange={v => {
-                      if (allowedRoles.includes(v)) setRole(v);
-                    }}>
-                      <SelectTrigger className="pl-10">
-                        <SelectValue placeholder="Select role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="teacher">Teacher/Mentor</SelectItem>
-                        <SelectItem value="parent">Parent</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="role">{t('auth.role')}</Label>
+                  <Select value={role} onValueChange={setRole}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('auth.selectRole')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {allowedRoles.map((roleOption) => (
+                        <SelectItem key={roleOption} value={roleOption}>
+                          {roleOption === 'teacher' ? t('auth.teacher') : t('auth.parent')}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               )}
               <Button 
@@ -215,7 +207,7 @@ const Auth = () => {
                   ${isLogin ? 'bg-gradient-to-r from-emerald-500 to-teal-400 hover:opacity-90' : 'bg-gradient-to-r from-orange-400 to-orange-600 hover:opacity-90'}`}
                 disabled={loading}
               >
-                {loading ? 'Please wait...' : (isLogin ? (<><span>Sign In</span></>) : (<><span>Sign Up</span></>))}
+                {loading ? t('auth.pleaseWait') : (isLogin ? (<><span>{t('auth.signIn')}</span></>) : (<><span>{t('auth.signUp')}</span></>))}
               </Button>
             </form>
             <div className="mt-4 text-center">
@@ -225,8 +217,8 @@ const Auth = () => {
                 className="text-blue-600 hover:underline text-sm font-medium"
               >
                 {isLogin 
-                  ? "Don't have an account? Sign up" 
-                  : "Already have an account? Sign in"}
+                  ? t('auth.dontHaveAccount')
+                  : t('auth.alreadyHaveAccount')}
               </button>
             </div>
             <div className="mt-8">
@@ -236,7 +228,7 @@ const Auth = () => {
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-gray-700 border-gray-300"
                 onClick={() => router.push('/')}
               >
-                <Home className="h-5 w-5 mr-1" /> Back to Home
+                <Home className="h-5 w-5 mr-1" /> {t('auth.backToHome')}
               </Button>
             </div>
           </CardContent>

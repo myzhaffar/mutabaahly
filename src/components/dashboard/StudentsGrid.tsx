@@ -100,10 +100,10 @@ const StudentsGrid: React.FC<StudentsGridProps> = ({
               </label>
             )}
             <div className="flex-1">
-              <StudentCard
-                student={mappedStudent}
-                onViewDetails={onViewDetails}
-              />
+          <StudentCard
+            student={mappedStudent}
+            onViewDetails={onViewDetails}
+          />
             </div>
           </div>
         );

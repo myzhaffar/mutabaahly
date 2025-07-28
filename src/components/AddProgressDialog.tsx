@@ -88,7 +88,7 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({
       await supabase
         .from('progress_entries')
         .insert([progressData]);
-
+      
       // Show success message
       toast({
         title: 'Progress Added',

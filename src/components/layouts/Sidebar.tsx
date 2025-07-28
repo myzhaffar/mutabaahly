@@ -17,6 +17,8 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
+import '@/i18n';
 
 export function Sidebar({ className }: { className?: string }) {
   const { profile, signOut } = useAuth();
@@ -27,6 +29,27 @@ export function Sidebar({ className }: { className?: string }) {
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
+  };
+
+  const LanguageSwitcher = () => {
+    const { i18n } = useTranslation();
+    return (
+      <div className="flex gap-2 items-center mt-2 mb-4">
+        <button
+          onClick={() => i18n.changeLanguage('en')}
+          className={i18n.language === 'en' ? 'font-bold underline' : 'text-gray-600'}
+        >
+          EN
+        </button>
+        <span>|</span>
+        <button
+          onClick={() => i18n.changeLanguage('id')}
+          className={i18n.language === 'id' ? 'font-bold underline' : 'text-gray-600'}
+        >
+          ID
+        </button>
+      </div>
+    );
   };
 
   const menuItems = [
@@ -59,6 +82,7 @@ export function Sidebar({ className }: { className?: string }) {
 
   return (
     <>
+      <div>SIDEBAR TEST</div>
       <Button
         variant="ghost"
         size="icon"
@@ -76,10 +100,12 @@ export function Sidebar({ className }: { className?: string }) {
         )}
       >
         <div className="flex h-full flex-col">
-          <div className="flex h-16 items-center border-b px-6">
-            <Link href="/" className="font-bold text-xl">
+          <div className="flex flex-col border-b px-6 pt-4 pb-2">
+            <Link href="/" className="font-bold text-xl mb-2">
               Mutabaahly
             </Link>
+            <div>LANGSWITCH TEST</div>
+            <LanguageSwitcher />
           </div>
           <div className="flex-1 overflow-auto py-4">
             <div className="px-4 space-y-4">

@@ -17,9 +17,12 @@ import {
   Heart 
 } from 'lucide-react';
 import PublicHeader from '@/components/layouts/PublicHeader';
+import { useTranslation } from 'react-i18next';
+import '@/i18n';
 
 const Index = () => {
   const { user, loading } = useAuth();
+  const { t } = useTranslation();
 
   const router = useRouter();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
@@ -118,14 +121,14 @@ const Index = () => {
               
               <h1 className="text-6xl font-bold text-gray-900 mb-6 leading-tight">
                 <span className="bg-gradient-to-r from-green-400 to-teal-500 bg-clip-text text-transparent">
-                  Mutabaahly
+                  {t('home.title')}
                 </span>
-                <span className="block text-4xl text-gray-700 mt-2">Al-Quran Progress Monitoring</span>
+                <span className="block text-4xl text-gray-700 mt-2">{t('home.subtitle')}</span>
               </h1>
               
               <p className="text-xl text-gray-600 mb-10 leading-relaxed max-w-3xl mx-auto">
-                Integrated platform for monitoring Al-Quran memorization progress and Tilawati reading learning for SDIT students. 
-                <span className="block mt-2 font-medium bg-gradient-to-r from-green-400 to-teal-500 bg-clip-text text-transparent">Easy, Accurate, and Reliable ✨</span>
+                {t('home.description')}
+                <span className="block mt-2 font-medium bg-gradient-to-r from-green-400 to-teal-500 bg-clip-text text-transparent">{t('home.tagline')}</span>
               </p>
               
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
@@ -135,7 +138,7 @@ const Index = () => {
                   disabled={isLoading}
                   className="bg-gradient-to-r from-green-400 to-teal-500 hover:opacity-90 text-white px-10 py-6 text-lg rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-105 group disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isLoading ? 'Processing...' : 'Get Started'}
+                  {isLoading ? t('home.processing') : t('home.getStarted')}
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
                 <Button
@@ -145,7 +148,7 @@ const Index = () => {
                   className="border-2 border-green-400 text-teal-500 hover:bg-gradient-to-r from-green-400 to-teal-500 hover:text-white px-10 py-6 text-lg rounded-2xl transition-all duration-300 hover:shadow-lg"
                 >
                   <BookOpen className="mr-2 h-5 w-5" />
-                  Learn More
+                  {t('home.learnMore')}
                 </Button>
               </div>
 
@@ -153,7 +156,7 @@ const Index = () => {
               <div className="mt-12 flex flex-wrap justify-center items-center gap-8 text-sm text-gray-500">
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-teal-600" />
-                  <span>500+ Active Students</span>
+                  <span>{t('home.activeStudents')}</span>
                 </div>
               </div>
             </div>
@@ -264,10 +267,10 @@ const Index = () => {
           {/* Testimonials Section */}
           <div id="testimonials" className="mb-20">
             <h2 className="text-4xl font-bold text-center text-gray-900 mb-4">
-              What They Say?
+              {t('home.testimonials.title')}
             </h2>
             <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-              Listen to the experiences of teachers and parents who have felt the benefits of our platform
+              {t('home.testimonials.subtitle')}
             </p>
             
             <div className="max-w-4xl mx-auto">
@@ -316,10 +319,10 @@ const Index = () => {
           <div id="cta" className="text-center bg-gradient-to-r from-emerald-500/10 via-white/80 to-blue-500/10 backdrop-blur-lg rounded-3xl p-16 shadow-2xl border border-white/20 max-w-5xl mx-auto mb-16">
             <div className="max-w-3xl mx-auto">
               <h2 className="text-4xl font-bold text-gray-900 mb-6">
-                Ready to Start Your Digital Journey?
+                {t('home.cta.title')}
               </h2>
               <p className="text-xl text-gray-600 mb-10 leading-relaxed">
-                Join hundreds of teachers and parents who have experienced the convenience of monitoring Al-Quran progress with our modern platform.
+                {t('home.cta.description')}
               </p>
               
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
@@ -329,7 +332,7 @@ const Index = () => {
                   disabled={isLoading}
                   className="bg-gradient-to-r from-emerald-500 to-teal-400 hover:opacity-90 text-white px-12 py-6 text-xl rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-105 group disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isLoading ? 'Processing...' : 'Register Now'}
+                  {isLoading ? t('home.processing') : t('home.registerNow')}
                   <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
@@ -337,15 +340,15 @@ const Index = () => {
               <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-gray-500">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-emerald-600" />
-                  <span>Integrated Platform</span>
+                  <span>{t('home.cta.features.integrated')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-emerald-600" />
-                  <span>Real-time Dashboard</span>
+                  <span>{t('home.cta.features.realtime')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-emerald-600" />
-                  <span>Complete Reports</span>
+                  <span>{t('home.cta.features.reports')}</span>
                 </div>
               </div>
             </div>
