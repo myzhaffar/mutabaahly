@@ -1,25 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import ParentLayout from '@/components/layouts/ParentLayout';
 import TestFilters from '@/components/test-management/TestFilters';
 import ParentTestTable from '@/components/test-management/ParentTestTable';
 import { useAuth } from '@/contexts/useAuth';
 import { ChevronLeft } from 'lucide-react';
-import type { TestStatus, TilawatiJilid, TilawatiTest } from '@/types/tilawati';
+import type { TilawatiTest } from '@/types/tilawati';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 
-interface Filters {
-  searchQuery?: string;
-  status?: TestStatus[];
-  level?: TilawatiJilid[];
-}
-
 const ParentTestView: React.FC = () => {
   const { profile } = useAuth();
-  const [filters, setFilters] = useState<Filters>({});
   const router = useRouter();
 
   const breadcrumbs = [
@@ -29,9 +22,9 @@ const ParentTestView: React.FC = () => {
 
   // Fetch children's tests
   const { data: tests, isLoading } = useQuery({
-    queryKey: ['parent-tests', filters],
+    queryKey: ['parent-tests'],
     queryFn: async () => {
-      let query = supabase
+      const { data, error } = await supabase
         .from('tilawati_level_tests')
         .select(`
           *,
@@ -40,19 +33,6 @@ const ParentTestView: React.FC = () => {
           )
         `)
         .order('date', { ascending: false });
-
-      // Apply filters
-      if (filters.status && filters.status.length > 0) {
-        query = query.in('status', filters.status);
-      }
-      if (filters.level && filters.level.length > 0) {
-        query = query.in('tilawati_level', filters.level);
-      }
-      if (filters.searchQuery) {
-        query = query.ilike('class_name', `%${filters.searchQuery}%`);
-      }
-
-      const { data, error } = await query;
 
       if (error) {
         throw error;
@@ -129,17 +109,7 @@ Notes: ${test.notes || 'No notes available'}`;
 
         {/* Filters Section */}
         <div className="w-full">
-          <TestFilters
-            searchTerm={filters.searchQuery}
-            status={filters.status || []}
-            jilidLevel={filters.level || []}
-            onFilterChange={(key, value) => {
-              setFilters(prev => ({
-                ...prev,
-                [key === 'searchTerm' ? 'searchQuery' : key === 'jilidLevel' ? 'level' : key]: value
-              }));
-            }}
-          />
+          <TestFilters />
         </div>
 
         {/* Table Section */}

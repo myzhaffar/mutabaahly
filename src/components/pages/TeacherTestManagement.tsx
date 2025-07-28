@@ -9,16 +9,36 @@ import { useToast } from '@/hooks/use-toast';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
 import TestTable from '@/components/test-management/TestTable';
 import AddTestDialog from '@/components/AddTestDialog';
-import TestFilters from '@/components/test-management/TestFilters';
+
 import { fetchTestsWithFilters } from '@/utils/testQueries';
 import { GradientButton } from '@/components/ui/gradient-button';
 import type { TilawatiJilid, TestStatus, StudentForTest } from '@/types/tilawati';
+import { supabase } from '@/lib/supabase';
+import { calculateTilawatiEligibility, getStudentDisplayText } from '@/utils/eligibilityCalculations';
+
 
 interface TestFilters {
   searchTerm?: string;
   status?: TestStatus[];
   jilidLevel?: TilawatiJilid[];
 }
+
+const STATUS_TABS = [
+  { value: 'all', label: 'All' },
+  { value: 'scheduled', label: 'Scheduled' },
+  { value: 'passed', label: 'Passed' },
+  { value: 'failed', label: 'Failed' },
+];
+
+const LEVEL_TABS = [
+  { value: 'all', label: 'All Levels' },
+  { value: 'Level 1', label: 'Level 1' },
+  { value: 'Level 2', label: 'Level 2' },
+  { value: 'Level 3', label: 'Level 3' },
+  { value: 'Level 4', label: 'Level 4' },
+  { value: 'Level 5', label: 'Level 5' },
+  { value: 'Level 6', label: 'Level 6' },
+];
 
 const TeacherTestManagement: React.FC = () => {
   const router = useRouter();
@@ -37,8 +57,50 @@ const TeacherTestManagement: React.FC = () => {
   const { data: students, refetch: refetchStudents } = useQuery({
     queryKey: ['students-for-tests'],
     queryFn: async (): Promise<StudentForTest[]> => {
-      // For now, return empty array - this needs to be implemented properly
-      return [];
+      if (!profile?.id) return [];
+
+      // Get all students (any teacher can see all students)
+      const { data: teacherStudents, error: studentsError } = await supabase
+        .from('students')
+        .select(`
+          id,
+          name,
+          current_tilawati_jilid,
+          group_name,
+          teacher
+        `);
+
+      if (studentsError) {
+        console.error('Error fetching students:', studentsError);
+        return [];
+      }
+
+      if (!teacherStudents) return [];
+
+      // Calculate eligibility for each student
+      const studentsWithEligibility = await Promise.all(
+        teacherStudents.map(async (student: { id: string; name: string; current_tilawati_jilid: string | null; group_name: string | null; teacher: string | null }) => {
+          const eligibility = await calculateTilawatiEligibility(
+            student.id,
+            student.current_tilawati_jilid as TilawatiJilid | null
+          );
+
+          return {
+            id: student.id,
+            name: student.name,
+            current_tilawati_jilid: student.current_tilawati_jilid as TilawatiJilid,
+            class_name: student.group_name || 'Unknown Class',
+            teacher: student.teacher || 'Unknown Teacher',
+            eligibility
+          };
+        })
+      );
+
+      // Filter to only show eligible students or those with specific statuses
+      return studentsWithEligibility.filter((student: StudentForTest) => {
+        const displayText = getStudentDisplayText(student);
+        return displayText !== null;
+      });
     },
     enabled: !!profile?.id,
   });
@@ -63,12 +125,7 @@ const TeacherTestManagement: React.FC = () => {
     });
   };
 
-  const handleFilterChange = (key: string, value: string[] | string | undefined) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: value,
-    }));
-  };
+
 
   const getStudentName = (studentId: string) => {
     const student = students?.find(s => s.id === studentId);
@@ -100,13 +157,63 @@ const TeacherTestManagement: React.FC = () => {
           </GradientButton>
         </div>
 
-        {/* Filters Section */}
-        <TestFilters
-          searchTerm={filters.searchTerm}
-          status={filters.status || []}
-          jilidLevel={filters.jilidLevel || []}
-          onFilterChange={handleFilterChange}
-        />
+              {/* Status Tabs Section */}
+      <div className="mb-4">
+        <div className="flex flex-row gap-3">
+          {STATUS_TABS.map(tab => {
+            const isActive = (filters.status?.length === 0 && tab.value === 'all') || (filters.status?.[0] === tab.value);
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => {
+                  setFilters(prev => ({
+                    ...prev,
+                    status: tab.value === 'all' ? [] : [tab.value as TestStatus],
+                  }));
+                }}
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium focus:outline-none transition-all duration-200
+                  rounded-full
+                  ${isActive
+                    ? 'bg-green-500 text-white'
+                    : 'bg-white text-gray-700 border border-gray-300 hover:border-green-400 hover:text-green-600'}`}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+            {/* Level Tabs Section */}
+      <div className="mb-6">
+        <div className="flex flex-row gap-3 flex-wrap">
+          {LEVEL_TABS.map(tab => {
+            const isActive = (filters.jilidLevel?.length === 0 && tab.value === 'all') || (filters.jilidLevel?.[0] === tab.value);
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => {
+                  setFilters(prev => ({
+                    ...prev,
+                    jilidLevel: tab.value === 'all' ? [] : [tab.value as TilawatiJilid],
+                  }));
+                }}
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium focus:outline-none transition-all duration-200
+                  rounded-full
+                  ${isActive
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-400 hover:text-blue-600'}`}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
         {/* Table Section */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">

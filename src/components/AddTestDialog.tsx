@@ -26,6 +26,7 @@ import { useAuth } from '@/contexts/useAuth';
 import { saveTest } from '@/utils/testQueries';
 import type { StudentForTest, TilawatiTest, TilawatiJilid, TestStatus } from '@/types/tilawati';
 import { useToast } from '@/hooks/use-toast';
+import { getStudentDisplayText } from '@/utils/eligibilityCalculations';
 
 interface AddTestDialogProps {
   isOpen: boolean;
@@ -43,6 +44,12 @@ const STATUS_OPTIONS: TestStatus[] = [
   'scheduled', 'passed', 'failed'
 ];
 
+const EXAMINER_OPTIONS = [
+  { value: 'Ustz. Titin', label: 'Ustz. Titin (Level 1 & 6)' },
+  { value: 'Ustz. Witri', label: 'Ustz. Witri (Level 2 & 3)' },
+  { value: 'Ustz. Kholilah', label: 'Ustz. Kholilah (Level 4 & 5)' },
+];
+
 const AddTestDialog: React.FC<AddTestDialogProps> = ({
   isOpen,
   onClose,
@@ -56,7 +63,7 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
   const [className, setClassName] = useState('');
   const [tilawatiLevel, setTilawatiLevel] = useState<TilawatiJilid | ''>('');
   const [testDate, setTestDate] = useState('');
-  const [munaqisy, setMunaqisy] = useState(profile?.full_name || '');
+  const [munaqisy, setMunaqisy] = useState('');
   const [status, setStatus] = useState<TestStatus>('scheduled');
   const [notes, setNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -77,7 +84,7 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
       setClassName('');
       setTilawatiLevel('');
       setTestDate('');
-      setMunaqisy(profile?.full_name || '');
+      setMunaqisy('');
       setStatus('scheduled');
       setNotes('');
     }
@@ -89,8 +96,23 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
       if (selectedStudent?.class_name) {
         setClassName(selectedStudent.class_name);
       }
-      if (selectedStudent?.current_tilawati_jilid) {
+      // Use the level from eligibility calculation (which may be determined from progress)
+      if (selectedStudent?.eligibility?.currentLevel && selectedStudent.eligibility.currentLevel !== 'Unknown') {
+        setTilawatiLevel(selectedStudent.eligibility.currentLevel as TilawatiJilid);
+      } else if (selectedStudent?.current_tilawati_jilid) {
         setTilawatiLevel(selectedStudent.current_tilawati_jilid);
+      }
+      
+      // Auto-select examiner based on level
+      const level = selectedStudent?.eligibility?.currentLevel || selectedStudent?.current_tilawati_jilid;
+      if (level) {
+        if (level === 'Level 1' || level === 'Level 6') {
+          setMunaqisy('Ustz. Titin');
+        } else if (level === 'Level 2' || level === 'Level 3') {
+          setMunaqisy('Ustz. Witri');
+        } else if (level === 'Level 4' || level === 'Level 5') {
+          setMunaqisy('Ustz. Kholilah');
+        }
       }
     }
   }, [studentId, students, currentTest]);
@@ -102,6 +124,14 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
 
     if (!studentId || !tilawatiLevel || !testDate || !munaqisy || !className) {
       setError("All required fields must be filled.");
+      setIsLoading(false);
+      return;
+    }
+
+    // Check if selected student is eligible for testing
+    const selectedStudent = students.find(s => s.id === studentId);
+    if (selectedStudent && !selectedStudent.eligibility.isEligible) {
+      setError(`Cannot schedule test: ${selectedStudent.eligibility.reason}`);
       setIsLoading(false);
       return;
     }
@@ -154,24 +184,55 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
                 <SelectTrigger id="student">
                   <SelectValue placeholder="Select Student" />
                 </SelectTrigger>
-                <SelectContent>
-                  {students.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>
-                      {s.name} {s.class_name ? `(${s.class_name})` : ''} - {s.current_tilawati_jilid} 
-                    </SelectItem>
-                  ))}
-                </SelectContent>
+                        <SelectContent>
+          {students.map((s) => {
+            const displayText = getStudentDisplayText(s);
+            if (!displayText) return null;
+
+            return (
+              <SelectItem key={s.id} value={s.id}>
+                {displayText}
+              </SelectItem>
+            );
+          })}
+        </SelectContent>
               </Select>
-              {studentId && (
-                <div className="text-sm mt-1">
-                    <p className="text-green-600">
-                      ✅ Student has completed their current level and is ready for testing
-                  </p>
-                  {selectedStudent && (
-                    <p className="text-muted-foreground mt-1">
-                      Teacher: {selectedStudent.teacher}
+              {studentId && selectedStudent && (
+                <div className="text-sm mt-1 space-y-1">
+                  <div className={`p-2 rounded-md ${
+                    selectedStudent.eligibility.isEligible 
+                      ? 'bg-green-50 border border-green-200' 
+                      : selectedStudent.eligibility.status === 'already-passed'
+                      ? 'bg-red-50 border border-red-200'
+                      : selectedStudent.eligibility.status === 'recently-failed'
+                      ? 'bg-yellow-50 border border-yellow-200'
+                      : selectedStudent.eligibility.status === 'pending-test'
+                      ? 'bg-blue-50 border border-blue-200'
+                      : 'bg-gray-50 border border-gray-200'
+                  }`}>
+                    <p className={`font-medium ${
+                      selectedStudent.eligibility.isEligible 
+                        ? 'text-green-700' 
+                        : selectedStudent.eligibility.status === 'already-passed'
+                        ? 'text-red-700'
+                        : selectedStudent.eligibility.status === 'recently-failed'
+                        ? 'text-yellow-700'
+                        : selectedStudent.eligibility.status === 'pending-test'
+                        ? 'text-blue-700'
+                        : 'text-gray-700'
+                    }`}>
+                      {selectedStudent.eligibility.isEligible ? '✅ ' : '❌ '}
+                      {selectedStudent.eligibility.reason}
                     </p>
-                  )}
+                    {selectedStudent.eligibility.pagesCompleted > 0 && (
+                      <p className="text-xs text-gray-600">
+                        Progress: {selectedStudent.eligibility.pagesCompleted}/44 pages ({selectedStudent.eligibility.progress}%)
+                      </p>
+                    )}
+                  </div>
+                  <p className="text-muted-foreground">
+                    Teacher: {selectedStudent.teacher}
+                  </p>
                 </div>
               )}
             </div>
@@ -215,12 +276,21 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
               </div>
                 <div>
                 <Label htmlFor="munaqisy">Examiner</Label>
-                <Input
-                  id="munaqisy"
-                  value={munaqisy}
-                  onChange={(e) => setMunaqisy(e.target.value)}
-                  placeholder="Examiner Name"
-                />
+                <Select 
+                  value={munaqisy} 
+                  onValueChange={(value: string) => setMunaqisy(value)}
+                >
+                  <SelectTrigger id="munaqisy">
+                    <SelectValue placeholder="Select Examiner" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {EXAMINER_OPTIONS.map((examiner) => (
+                      <SelectItem key={examiner.value} value={examiner.value}>
+                        {examiner.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

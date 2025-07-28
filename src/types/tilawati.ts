@@ -7,6 +7,21 @@ export type TilawatiJilid =
 
 export type TestStatus = 'scheduled' | 'passed' | 'failed' | 'pending_retake' | 'cancelled';
 
+export interface TilawatiEligibility {
+  isEligible: boolean;
+  progress: number;           // 0-100% (must be 100%)
+  pagesCompleted: number;     // 0-44 (must be 44)
+  currentLevel: string;       // e.g., "Level 1", "Level 2"
+  reason: string;            // Why eligible/ineligible
+  status: 'ready' | 'already-passed' | 'recently-failed' | 'pending-test';
+  
+  // Conflict checks
+  hasPendingTest: boolean;
+  hasPassedTest: boolean;
+  lastFailedDate: Date | null;
+  isTilawatiStudent: boolean;
+}
+
 export interface StudentForTest {
   id: string;
   name: string;
@@ -14,8 +29,7 @@ export interface StudentForTest {
   class_name: string;
   class_id?: string;
   teacher: string;
-  progress_percentage?: number;
-  is_eligible_for_test?: boolean;
+  eligibility: TilawatiEligibility;
 }
 
 // Represents a single Tilawati Level Test record
