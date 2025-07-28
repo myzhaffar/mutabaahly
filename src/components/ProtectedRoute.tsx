@@ -2,8 +2,6 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/useAuth';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -11,19 +9,9 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
-  const { user, profile, loading } = useAuth();
-  const router = useRouter();
+  const { profile, loading } = useAuth();
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/auth');
-    } else if (!loading && user && profile && (profile.role !== 'teacher' && profile.role !== 'parent')) {
-      router.push('/select-role');
-    } else if (!loading && user && profile && requiredRole && profile.role !== requiredRole) {
-      router.push('/dashboard');
-    }
-  }, [user, profile, loading, router, requiredRole]);
-
+  // Show loading state while auth is being determined
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -35,7 +23,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole 
     );
   }
 
-  if (!user || (requiredRole && profile?.role !== requiredRole)) {
+  // Middleware handles most redirects, but we still check for role-specific access
+  if (requiredRole && profile?.role !== requiredRole) {
     return null;
   }
 

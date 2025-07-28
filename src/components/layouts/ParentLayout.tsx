@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/useAuth';
-import { useRouter } from 'next/navigation';
 import Breadcrumbs, { BreadcrumbItem } from '@/components/ui/Breadcrumbs';
 import ParentNavbar from '@/components/ParentNavbar';
 
@@ -13,14 +12,8 @@ interface ParentLayoutProps {
 
 const ParentLayout: React.FC<ParentLayoutProps> = ({ children, breadcrumbs }) => {
   const { profile, loading } = useAuth();
-  const router = useRouter();
 
-  React.useEffect(() => {
-    if (!loading && profile?.role !== 'parent') {
-      router.push('/dashboard');
-    }
-  }, [loading, profile, router]);
-
+  // Show loading state while auth is being determined
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -29,6 +22,7 @@ const ParentLayout: React.FC<ParentLayoutProps> = ({ children, breadcrumbs }) =>
     );
   }
 
+  // Middleware handles role-based redirects, but we still check for UI consistency
   if (profile?.role !== 'parent') {
     return null;
   }

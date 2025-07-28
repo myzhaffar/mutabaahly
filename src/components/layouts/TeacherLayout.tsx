@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/useAuth';
-import { useRouter } from 'next/navigation';
 import TeacherSidebar from '@/components/TeacherSidebar';
 import Breadcrumbs, { BreadcrumbItem } from '@/components/ui/Breadcrumbs';
 import { Menu } from 'lucide-react';
@@ -14,15 +13,9 @@ interface TeacherLayoutProps {
 
 const TeacherLayout: React.FC<TeacherLayoutProps> = ({ children, breadcrumbs }) => {
   const { profile, loading } = useAuth();
-  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  React.useEffect(() => {
-    if (!loading && profile?.role !== 'teacher') {
-      router.push('/dashboard');
-    }
-  }, [loading, profile, router]);
-
+  // Show loading state while auth is being determined
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -31,6 +24,7 @@ const TeacherLayout: React.FC<TeacherLayoutProps> = ({ children, breadcrumbs }) 
     );
   }
 
+  // Middleware handles role-based redirects, but we still check for UI consistency
   if (profile?.role !== 'teacher') {
     return null;
   }
