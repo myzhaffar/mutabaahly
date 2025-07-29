@@ -63,7 +63,7 @@ const StudentsGrid: React.FC<StudentsGridProps> = ({
         const mappedStudent = {
           id: student.id,
           name: student.name,
-          class: student.group_name,
+          class: `${student.grade} ${student.group_name}`,
           studyGroup: student.teacher,
           memorization: {
             progress: student.hafalan_progress?.percentage || 0,

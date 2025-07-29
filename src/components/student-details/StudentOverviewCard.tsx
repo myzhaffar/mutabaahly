@@ -20,6 +20,7 @@ import { Badge } from '@/components/ui/badge';
 interface Student {
   id: string;
   name: string;
+  grade?: string | null;
   group_name: string;
   teacher: string;
   photo: string | null;
@@ -101,7 +102,7 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
               </h2>
               <div className="flex flex-row flex-wrap gap-2 justify-center w-full mt-2">
                 <Badge variant="outline" className="border-islamic-200 text-islamic-700">
-                  {student.group_name}
+                  {student.grade ? `${student.grade} ${student.group_name}` : student.group_name}
                 </Badge>
                 <Badge variant="secondary" className="bg-accent/10 text-accent-foreground/80">
                   <User className="h-3 w-3 mr-1" />
@@ -121,7 +122,7 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
                   </h2>
                   <div className="flex flex-row flex-wrap gap-2 justify-start w-full">
                     <Badge variant="outline" className="border-islamic-200 text-islamic-700">
-                      {student.group_name}
+                      {student.grade ? `${student.grade} ${student.group_name}` : student.group_name}
                     </Badge>
                     <Badge variant="secondary" className="bg-accent/10 text-accent-foreground/80">
                       <User className="h-3 w-3 mr-1" />

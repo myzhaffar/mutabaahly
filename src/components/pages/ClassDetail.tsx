@@ -315,7 +315,7 @@ const ClassDetail: React.FC = () => {
 
   const breadcrumbs = [
     { label: 'Dashboard', href: '/dashboard' },
-    { label: className }
+    { label: !isNaN(Number(className)) ? `Grade ${className}` : className }
   ];
 
   const MainContent = (
@@ -332,7 +332,7 @@ const ClassDetail: React.FC = () => {
               <ChevronLeft className="h-6 w-6" />
             </button>
             <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-              {className}
+              {!isNaN(Number(className)) ? `Grade ${className}` : className}
               <span className="inline-flex items-center justify-center px-2 py-0.5 ml-1 text-xs font-semibold leading-none text-white bg-emerald-500 rounded-full">
                 {studentsToShow.length}
               </span>

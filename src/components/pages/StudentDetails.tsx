@@ -100,6 +100,7 @@ const StudentDetails = () => {
         student={{
           id: student.id,
           name: student.name,
+          grade: (student as Partial<Record<string, unknown>>)?.grade as string || null,
           group_name: className || (student as Partial<Record<string, unknown>>)?.group_name as string || 'Unknown Class',
           teacher: (student as Partial<Record<string, unknown>>)?.teacher as string || 'Unknown',
           photo: (student as Partial<Record<string, unknown>>)?.photo as string || null
