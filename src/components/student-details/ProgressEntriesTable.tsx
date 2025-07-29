@@ -85,7 +85,8 @@ const ProgressEntriesTable: React.FC<ProgressEntriesTableProps> = ({
                       <DeleteProgressDialog 
                         entryId={entry.id}
                         entryType={type} 
-                        onProgressDeleted={onProgressUpdated} 
+                        onProgressDeleted={onProgressUpdated}
+                        setActiveTab={setActiveTab}
                       />
                     </div>
                   </TableCell>

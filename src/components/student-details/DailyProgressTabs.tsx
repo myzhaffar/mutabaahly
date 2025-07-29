@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -20,26 +20,37 @@ interface DailyProgressTabsProps {
   tilawahEntries: ProgressEntry[];
   onProgressUpdated: () => void;
   onTabChange: (tab: string) => void;
+  activeTab?: string;
 }
 
 const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
   hafalanEntries,
   tilawahEntries,
   onProgressUpdated,
-  onTabChange
+  onTabChange,
+  activeTab = 'hafalan'
 }) => {
-  const [tab, setTab] = useState('hafalan');
+  const [tab, setTab] = useState(activeTab);
   const [exportOpen, setExportOpen] = useState(false);
   const { t } = useTranslation();
+
+  // Update internal tab state when activeTab prop changes
+  useEffect(() => {
+    setTab(activeTab);
+  }, [activeTab]);
 
   const handleTabChange = (value: string) => {
     setTab(value);
     onTabChange(value);
   };
 
-  const handleDuplicate = () => {
+  const handleDuplicate = (entry: ProgressEntry) => {
     // Handle duplicate functionality
     // TODO: Implement duplicate functionality
+    // For now, redirect to tahsin tab if duplicating tahsin progress
+    if (entry.type === 'tilawah') {
+      onTabChange('tilawah');
+    }
   };
 
   return (
@@ -78,7 +89,7 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
               entries={hafalanEntries}
               type="hafalan"
               onProgressUpdated={onProgressUpdated}
-              onDuplicateEntry={() => handleDuplicate()}
+              onDuplicateEntry={(entry) => handleDuplicate(entry)}
               setActiveTab={onTabChange}
             />
           </TabsContent>
@@ -88,7 +99,7 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
               entries={tilawahEntries}
               type="tilawah"
               onProgressUpdated={onProgressUpdated}
-              onDuplicateEntry={() => handleDuplicate()}
+              onDuplicateEntry={(entry) => handleDuplicate(entry)}
               setActiveTab={onTabChange}
             />
           </TabsContent>

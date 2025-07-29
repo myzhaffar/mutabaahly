@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import StudentDetailsHeader from '@/components/student-details/StudentDetailsHeader';
@@ -27,6 +27,8 @@ const StudentDetails = () => {
     loadingProgress,
     refetchData
   } = useStudentDetails(id);
+
+  const [activeTab, setActiveTab] = useState('hafalan');
 
   const handleStudentDeleted = () => {
     router.push('/students');
@@ -108,6 +110,7 @@ const StudentDetails = () => {
         progressData={progressData}
         onStudentUpdated={refetchData}
         onStudentDeleted={handleStudentDeleted}
+        setActiveTab={setActiveTab}
       />
           {loadingProgress ? (
             <div className="w-full max-w-4xl">
@@ -129,7 +132,8 @@ const StudentDetails = () => {
         hafalanEntries={hafalanEntries}
         tilawahEntries={tilawahEntries}
         onProgressUpdated={refetchData}
-        onTabChange={() => {}}
+        onTabChange={setActiveTab}
+        activeTab={activeTab}
       />
           )}
     </>

@@ -20,12 +20,14 @@ interface DeleteProgressDialogProps {
   entryId: string;
   entryType: string;
   onProgressDeleted: () => void;
+  setActiveTab?: (tab: string) => void;
 }
 
 const DeleteProgressDialog: React.FC<DeleteProgressDialogProps> = ({
   entryId,
   entryType,
-  onProgressDeleted
+  onProgressDeleted,
+  setActiveTab
 }) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -44,6 +46,11 @@ const DeleteProgressDialog: React.FC<DeleteProgressDialogProps> = ({
         description: "Progress entry deleted successfully!",
       });
       onProgressDeleted();
+      
+      // Redirect to tahsin tab if deleting tahsin progress
+      if (entryType === 'tilawah' && setActiveTab) {
+        setActiveTab('tilawah');
+      }
     } catch (error) {
       console.error('Error deleting progress:', error);
       toast({

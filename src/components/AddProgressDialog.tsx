@@ -17,13 +17,15 @@ interface AddProgressDialogProps {
   setOpen: (open: boolean) => void;
   studentId?: string;
   onProgressAdded?: () => void;
+  setActiveTab?: (tab: string) => void;
 }
 
 const AddProgressDialog: React.FC<AddProgressDialogProps> = ({ 
   open, 
   setOpen, 
   studentId, 
-  onProgressAdded 
+  onProgressAdded,
+  setActiveTab
 }) => {
   const [loading, setLoading] = useState(false);
   const { profile } = useAuth();
@@ -112,6 +114,11 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({
       // Call callback if provided
       if (onProgressAdded) {
         onProgressAdded();
+      }
+      
+      // Redirect to tahsin tab if adding tahsin progress
+      if (formData.type === 'tilawah' && setActiveTab) {
+        setActiveTab('tilawah');
       }
       
     } catch {

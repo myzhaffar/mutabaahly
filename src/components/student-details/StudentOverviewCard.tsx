@@ -31,13 +31,15 @@ interface StudentOverviewCardProps {
   progressData: ProgressData;
   onStudentUpdated: () => void;
   onStudentDeleted: () => void;
+  setActiveTab?: (tab: string) => void;
 }
 
 const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
   student,
   progressData,
   onStudentUpdated,
-  onStudentDeleted
+  onStudentDeleted,
+  setActiveTab
 }) => {
   const { profile } = useAuth();
   const isTeacher = profile?.role === 'teacher';
@@ -178,6 +180,7 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
                       // Refresh progress data
                       onStudentUpdated(); // This should trigger a refetch of progress data
                     }}
+                    setActiveTab={setActiveTab}
                   />
                 )}
               </div>

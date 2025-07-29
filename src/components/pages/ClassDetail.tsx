@@ -396,22 +396,11 @@ const ClassDetail: React.FC = () => {
             <div className="flex-1 text-left">
               <h3 className="font-semibold text-gray-900 text-base sm:text-lg">Teacher Filters</h3>
               <p className="text-xs sm:text-sm text-gray-500">Select one or more teachers to filter students</p>
-              {hasAnyActiveTeacherFilter && (
-                <div className="flex items-center gap-2 flex-wrap mt-2">
-                  <button
-                    type="button"
-                    onClick={clearTeacherFilters}
-                    className="ml-2 text-xs text-gray-500 hover:text-red-600 underline"
-                  >
-                    Clear Filters
-                  </button>
-                </div>
-              )}
             </div>
             <span className="ml-auto text-xs text-gray-500">{teacherFilterOpen ? 'Hide' : 'Show'}</span>
           </button>
           {teacherFilterOpen && (
-            <div className="p-4">
+            <div className="p-6">
               <div className="grid grid-cols-2 gap-4">
                 {/* Ustz. (female) teachers */}
                 <div>
