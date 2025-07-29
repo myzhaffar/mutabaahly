@@ -66,7 +66,7 @@ const StudentManagement: React.FC = () => {
 
   const filteredStudents = students?.filter(student =>
     student.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ).sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically A-Z
 
   return (
     <TeacherLayout>

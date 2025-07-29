@@ -250,7 +250,7 @@ const ClassDetail: React.FC = () => {
   };
 
   // Use fixed teacher list for filter
-  const hasAnyActiveTeacherFilter = false; // No teacher filter implemented
+  const hasAnyActiveTeacherFilter = selectedTeachers.length > 0;
   const clearTeacherFilters = () => setSelectedTeachers([]);
 
   // Selection handler for mass actions
@@ -273,8 +273,8 @@ const ClassDetail: React.FC = () => {
   // Compute filtered students for selection (move here after studentsToShow is defined)
   const filteredStudents = studentsToShow.filter(student =>
     student.name.toLowerCase().includes(search.toLowerCase()) &&
-    true // No teacher filter implemented
-  );
+    (selectedTeachers.length === 0 || selectedTeachers.includes(student.teacher))
+  ).sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically A-Z
   const filteredIds = filteredStudents.map(s => s.id);
   const allSelected = filteredIds.length > 0 && filteredIds.every(id => selectedStudentIds.includes(id));
   const someSelected = filteredIds.some(id => selectedStudentIds.includes(id)) && !allSelected;

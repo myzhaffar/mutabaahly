@@ -177,7 +177,7 @@ export function EditProfileDialog({ isOpen, onClose, onProfileUpdated }: EditPro
           }
         } catch (error) {
           // Log but don't fail the upload for cleanup errors
-          console.warn('Failed to remove old avatar:', error);
+          // Silently handle cleanup errors
         }
       }
 

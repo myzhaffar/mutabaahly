@@ -1,19 +1,39 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import ParentLayout from '@/components/layouts/ParentLayout';
-import TestFilters from '@/components/test-management/TestFilters';
 import ParentTestTable from '@/components/test-management/ParentTestTable';
 import { useAuth } from '@/contexts/useAuth';
 import { ChevronLeft } from 'lucide-react';
-import type { TilawatiTest } from '@/types/tilawati';
+import type { TilawatiTest, TestStatus, TilawatiJilid } from '@/types/tilawati';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+
+const STATUS_TABS = [
+  { value: 'all', label: 'All' },
+  { value: 'scheduled', label: 'Scheduled' },
+  { value: 'passed', label: 'Passed' },
+  { value: 'failed', label: 'Failed' },
+];
+
+const LEVEL_TABS = [
+  { value: 'all', label: 'All Levels' },
+  { value: 'Level 1', label: 'Level 1' },
+  { value: 'Level 2', label: 'Level 2' },
+  { value: 'Level 3', label: 'Level 3' },
+  { value: 'Level 4', label: 'Level 4' },
+  { value: 'Level 5', label: 'Level 5' },
+  { value: 'Level 6', label: 'Level 6' },
+];
 
 const ParentTestView: React.FC = () => {
   const { profile } = useAuth();
   const router = useRouter();
+  const [filters, setFilters] = useState<{ status: TestStatus[]; jilidLevel: TilawatiJilid[] }>({ 
+    status: [], 
+    jilidLevel: [] 
+  });
 
   const breadcrumbs = [
     { label: 'Dashboard', href: '/dashboard' },
@@ -22,16 +42,36 @@ const ParentTestView: React.FC = () => {
 
   // Fetch children's tests
   const { data: tests, isLoading } = useQuery({
-    queryKey: ['parent-tests'],
+    queryKey: ['parent-tests', profile?.id],
     queryFn: async () => {
+      if (!profile?.id) return [];
+
+      // First get the parent's children
+      const { data: children, error: childrenError } = await supabase
+        .from('students')
+        .select('id, name')
+        .eq('parent_id', profile.id);
+
+      if (childrenError) {
+        throw childrenError;
+      }
+
+      if (!children || children.length === 0) {
+        return [];
+      }
+
+      // Get tests for the parent's children
+      const childIds = children.map(child => child.id);
       const { data, error } = await supabase
         .from('tilawati_level_tests')
         .select(`
           *,
           student:student_id (
+            id,
             name
           )
         `)
+        .in('student_id', childIds)
         .order('date', { ascending: false });
 
       if (error) {
@@ -57,17 +97,32 @@ Notes: ${test.notes || 'No notes available'}`;
     alert(message);
   };
 
-  // Calculate stats
+  // Apply filters to tests
+  const filteredTests = React.useMemo(() => {
+    if (!tests) return [];
+    
+    return tests.filter(test => {
+      // Status filter
+      const matchesStatus = filters.status.length === 0 || filters.status.includes(test.status as TestStatus);
+      
+      // Level filter
+      const matchesLevel = filters.jilidLevel.length === 0 || filters.jilidLevel.includes(test.tilawati_level as TilawatiJilid);
+      
+      return matchesStatus && matchesLevel;
+    });
+  }, [tests, filters]);
+
+  // Calculate stats based on filtered tests
   const stats = React.useMemo(() => {
-    if (!tests) return { total: 0, passed: 0, scheduled: 0, failed: 0 };
+    if (!filteredTests) return { total: 0, passed: 0, scheduled: 0, failed: 0 };
     
     return {
-      total: tests.length,
-      passed: tests.filter(t => t.status === 'passed').length,
-      scheduled: tests.filter(t => t.status === 'scheduled').length,
-      failed: tests.filter(t => t.status === 'failed').length,
+      total: filteredTests.length,
+      passed: filteredTests.filter(t => t.status === 'passed').length,
+      scheduled: filteredTests.filter(t => t.status === 'scheduled').length,
+      failed: filteredTests.filter(t => t.status === 'failed').length,
     };
-  }, [tests]);
+  }, [filteredTests]);
 
   return (
     <ParentLayout breadcrumbs={breadcrumbs}>
@@ -107,15 +162,75 @@ Notes: ${test.notes || 'No notes available'}`;
           </div>
         </div>
 
-        {/* Filters Section */}
-        <div className="w-full">
-          <TestFilters />
+        {/* Status Tabs Section */}
+        <div className="mb-4">
+          <div className="flex flex-row gap-3">
+            {STATUS_TABS.map(tab => {
+              const isActive = (filters.status?.length === 0 && tab.value === 'all') || (filters.status?.[0] === tab.value);
+              return (
+                <button
+                  key={tab.value}
+                  type="button"
+                  onClick={() => {
+                    setFilters(prev => ({
+                      ...prev,
+                      status: tab.value === 'all' ? [] : [tab.value as TestStatus],
+                    }));
+                  }}
+                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium focus:outline-none transition-all duration-200
+                    rounded-full
+                    ${isActive
+                      ? 'bg-green-500 text-white'
+                      : 'bg-white text-gray-700 border border-gray-300 hover:border-green-400 hover:text-green-600'}`}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Level Tabs Section */}
+        <div className="mb-6">
+          <div className="flex flex-row gap-3 flex-wrap">
+            {LEVEL_TABS.map(tab => {
+              const isActive = (filters.jilidLevel?.length === 0 && tab.value === 'all') || (filters.jilidLevel?.[0] === tab.value);
+              return (
+                <button
+                  key={tab.value}
+                  type="button"
+                  onClick={() => {
+                    setFilters(prev => ({
+                      ...prev,
+                      jilidLevel: tab.value === 'all' ? [] : [tab.value as TilawatiJilid],
+                    }));
+                  }}
+                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium focus:outline-none transition-all duration-200
+                    rounded-full
+                    ${isActive
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-400 hover:text-blue-600'}`}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Results Count */}
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-gray-600">
+            Showing {filteredTests.length} of {tests?.length || 0} tests
+          </p>
         </div>
 
         {/* Table Section */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden w-full">
           <ParentTestTable
-            tests={tests || []}
+            tests={filteredTests || []}
             isLoading={isLoading}
             onViewDetails={handleViewTestDetails}
             showStudentName={true}

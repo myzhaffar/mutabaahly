@@ -37,9 +37,9 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
     onTabChange(value);
   };
 
-  const handleDuplicate = (entry: ProgressEntry) => {
+  const handleDuplicate = () => {
     // Handle duplicate functionality
-    console.log('Duplicate entry:', entry);
+    // TODO: Implement duplicate functionality
   };
 
   return (
@@ -78,7 +78,7 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
               entries={hafalanEntries}
               type="hafalan"
               onProgressUpdated={onProgressUpdated}
-              onDuplicateEntry={entry => handleDuplicate(entry)}
+              onDuplicateEntry={() => handleDuplicate()}
               setActiveTab={onTabChange}
             />
           </TabsContent>
@@ -88,7 +88,7 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
               entries={tilawahEntries}
               type="tilawah"
               onProgressUpdated={onProgressUpdated}
-              onDuplicateEntry={entry => handleDuplicate(entry)}
+              onDuplicateEntry={() => handleDuplicate()}
               setActiveTab={onTabChange}
             />
           </TabsContent>

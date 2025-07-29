@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 // Define a type for the student data we'll work with
@@ -93,30 +93,32 @@ export const useStudentProgressSummary = ({
   
   // Fetcher function for Supabase queries
   const fetcher = async () => {
-    // Always fetch all students first
     let query = supabase.from('students').select('*');
     
-    // Only apply filters to the database query if we're not fetching all students
-    if (!fetchAllStudents) {
-      if (parentId) {
-        query = query.eq('parent_id', parentId);
-      }
-      
-      if (teacherId) {
-        query = query.eq('teacher', teacherId);
-      }
-      
-      if (grade) {
-        query = query.eq('grade', grade);
-      }
-      
-      if (groupName) {
-        query = query.eq('group_name', groupName);
-      }
-      
-      if (studentId) {
-        query = query.eq('id', studentId);
-      }
+    // Apply filters to the database query
+    if (parentId) {
+      query = query.eq('parent_id', parentId);
+    }
+    
+    if (teacherId) {
+      query = query.eq('teacher', teacherId);
+    }
+    
+    if (grade) {
+      query = query.eq('grade', grade);
+    }
+    
+    if (groupName) {
+      query = query.eq('group_name', groupName);
+    }
+    
+    if (studentId) {
+      query = query.eq('id', studentId);
+    }
+    
+    // If fetchAllStudents is true and no specific filters are applied, fetch all students
+    if (fetchAllStudents && !parentId && !teacherId && !grade && !groupName && !studentId) {
+      query = supabase.from('students').select('*');
     }
     
     const { data, error } = await query;
@@ -184,19 +186,8 @@ export const useStudentProgressSummary = ({
     }
   );
   
-  // Filter data on the client side if we fetched all students
-  const data = useMemo(() => {
-    if (!allStudentsData || !fetchAllStudents) return allStudentsData;
-    
-    return allStudentsData.filter(student => {
-      // Apply filters
-      if (parentId && student.parent_id !== parentId) return false;
-      if (grade && student.grade !== grade) return false;
-      if (groupName && student.group_name !== groupName) return false;
-      if (studentId && student.id !== studentId) return false;
-      return true;
-    });
-  }, [allStudentsData, fetchAllStudents, parentId, grade, groupName, studentId]);
+  // Use the data directly since filters are now applied at the database level
+  const data = allStudentsData;
   
   // Custom refresh function
   const refresh = async () => {
@@ -237,6 +228,12 @@ export const useStudentProgressSummary = ({
         groupedByGrade[studentGrade].classes.push(student.group_name);
       }
     }
+    
+    // Sort students alphabetically within each grade group
+    Object.keys(groupedByGrade).forEach(grade => {
+      groupedByGrade[grade].students.sort((a, b) => a.name.localeCompare(b.name));
+      groupedByGrade[grade].classes.sort((a, b) => a.localeCompare(b));
+    });
   }
   
   return {

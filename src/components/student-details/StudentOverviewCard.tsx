@@ -175,7 +175,6 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
                     studentId={student.id}
                     onProgressAdded={() => {
                       // Refresh progress data
-                      console.log('Progress added for student:', student.id);
                       onStudentUpdated(); // This should trigger a refetch of progress data
                     }}
                   />

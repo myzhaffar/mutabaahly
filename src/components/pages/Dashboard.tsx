@@ -42,7 +42,8 @@ const Dashboard = () => {
     isLoading: dataLoading,
     studentProgressData
   } = useStudentProgressSummary({
-    fetchAllStudents: true // Fetch all students for both roles
+    fetchAllStudents: profile?.role === 'teacher', // Only fetch all students for teachers
+    parentId: profile?.role === 'parent' ? profile.id : undefined, // Pass parent ID for parents
   });
 
   useEffect(() => {
@@ -117,8 +118,6 @@ const Dashboard = () => {
 
   // Parent view
   const breadcrumbs = [{ label: t('navigation.dashboard') }];
-  // Debug log for groupedByGrade
-  console.log('Parent Dashboard groupedByGrade:', groupedByGrade);
 
   return (
     <ParentLayout breadcrumbs={breadcrumbs}>
