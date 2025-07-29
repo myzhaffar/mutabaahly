@@ -116,9 +116,11 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({
         onProgressAdded();
       }
       
-      // Redirect to tahsin tab if adding tahsin progress
+      // Redirect to appropriate tab based on progress type
       if (formData.type === 'tilawah' && setActiveTab) {
         setActiveTab('tilawah');
+      } else if (formData.type === 'hafalan' && setActiveTab) {
+        setActiveTab('hafalan');
       }
       
     } catch {

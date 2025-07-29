@@ -83,7 +83,12 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
       });
       setOpen(false);
       onProgressUpdated();
-      if (entry.type === 'tilawah' && setActiveTab) setActiveTab('tilawah');
+      // Redirect to appropriate tab based on entry type
+      if (entry.type === 'tilawah' && setActiveTab) {
+        setActiveTab('tilawah');
+      } else if (entry.type === 'hafalan' && setActiveTab) {
+        setActiveTab('hafalan');
+      }
       } else {
         throw new Error("Failed to update progress.");
       }

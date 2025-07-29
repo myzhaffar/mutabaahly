@@ -128,13 +128,14 @@ const StudentDetails = () => {
               </div>
             </div>
           ) : (
-      <DailyProgressTabs
-        hafalanEntries={hafalanEntries}
-        tilawahEntries={tilawahEntries}
-        onProgressUpdated={refetchData}
-        onTabChange={setActiveTab}
-        activeTab={activeTab}
-      />
+                    <DailyProgressTabs
+                hafalanEntries={hafalanEntries}
+                tilawahEntries={tilawahEntries}
+                onProgressUpdated={refetchData}
+                onTabChange={setActiveTab}
+                activeTab={activeTab}
+                studentId={id}
+              />
           )}
     </>
       )}

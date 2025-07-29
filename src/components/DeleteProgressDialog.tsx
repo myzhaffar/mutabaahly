@@ -47,9 +47,11 @@ const DeleteProgressDialog: React.FC<DeleteProgressDialogProps> = ({
       });
       onProgressDeleted();
       
-      // Redirect to tahsin tab if deleting tahsin progress
+      // Redirect to appropriate tab based on entry type
       if (entryType === 'tilawah' && setActiveTab) {
         setActiveTab('tilawah');
+      } else if (entryType === 'hafalan' && setActiveTab) {
+        setActiveTab('hafalan');
       }
     } catch (error) {
       console.error('Error deleting progress:', error);

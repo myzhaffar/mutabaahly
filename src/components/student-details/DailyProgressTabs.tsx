@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import ProgressEntriesTable from './ProgressEntriesTable';
 import ExportProgressDialog from './ExportProgressDialog';
 import { useTranslation } from 'react-i18next';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface ProgressEntry {
   id: string;
@@ -21,6 +23,7 @@ interface DailyProgressTabsProps {
   onProgressUpdated: () => void;
   onTabChange: (tab: string) => void;
   activeTab?: string;
+  studentId: string;
 }
 
 const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
@@ -28,11 +31,13 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
   tilawahEntries,
   onProgressUpdated,
   onTabChange,
-  activeTab = 'hafalan'
+  activeTab = 'hafalan',
+  studentId
 }) => {
   const [tab, setTab] = useState(activeTab);
   const [exportOpen, setExportOpen] = useState(false);
   const { t } = useTranslation();
+  const { toast } = useToast();
 
   // Update internal tab state when activeTab prop changes
   useEffect(() => {
@@ -44,12 +49,45 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
     onTabChange(value);
   };
 
-  const handleDuplicate = (entry: ProgressEntry) => {
-    // Handle duplicate functionality
-    // TODO: Implement duplicate functionality
-    // For now, redirect to tahsin tab if duplicating tahsin progress
-    if (entry.type === 'tilawah') {
-      onTabChange('tilawah');
+  const handleDuplicate = async (entry: ProgressEntry) => {
+    try {
+      // Create a new entry with the same data but today's date
+      const duplicateData = {
+        student_id: studentId,
+        type: entry.type as 'hafalan' | 'tilawah',
+        date: new Date().toISOString().split('T')[0], // Today's date
+        surah_or_jilid: entry.surah_or_jilid,
+        ayat_or_page: entry.ayat_or_page,
+        notes: entry.notes
+      };
+
+      const { error } = await supabase
+        .from('progress_entries')
+        .insert([duplicateData]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Progress entry duplicated successfully!",
+      });
+
+      // Refresh the data
+      onProgressUpdated();
+
+      // Redirect to appropriate tab based on entry type
+      if (entry.type === 'tilawah') {
+        onTabChange('tilawah');
+      } else if (entry.type === 'hafalan') {
+        onTabChange('hafalan');
+      }
+    } catch (error) {
+      console.error('Error duplicating progress:', error);
+      toast({
+        title: "Error",
+        description: "Failed to duplicate progress entry. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 

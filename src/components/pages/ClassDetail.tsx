@@ -250,7 +250,6 @@ const ClassDetail: React.FC = () => {
   };
 
   // Use fixed teacher list for filter
-  const hasAnyActiveTeacherFilter = selectedTeachers.length > 0;
   const clearTeacherFilters = () => setSelectedTeachers([]);
 
   // Selection handler for mass actions
