@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import ParentLayout from '@/components/layouts/ParentLayout';
 import ParentTestTable from '@/components/test-management/ParentTestTable';
-import { useAuth } from '@/contexts/useAuth';
 import { ChevronLeft } from 'lucide-react';
 import type { TilawatiTest, TestStatus, TilawatiJilid } from '@/types/tilawati';
 import { supabase } from '@/lib/supabase';
@@ -28,7 +27,6 @@ const LEVEL_TABS = [
 ];
 
 const ParentTestView: React.FC = () => {
-  const { profile } = useAuth();
   const router = useRouter();
   const [filters, setFilters] = useState<{ status: TestStatus[]; jilidLevel: TilawatiJilid[] }>({ 
     status: [], 
