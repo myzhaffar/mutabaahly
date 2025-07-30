@@ -9,26 +9,7 @@ CREATE TABLE profiles (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Enable RLS
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
--- -- Users can view their own profile
-CREATE POLICY "Users can view own profile" ON profiles
-    FOR SELECT
-    TO authenticated
-    USING (auth.uid() = id);
-
--- Users can update their own profile
-CREATE POLICY "Users can update own profile" ON profiles
-    FOR UPDATE
-    TO authenticated
-    USING (auth.uid() = id);
-
--- -- Users can insert their own profile
-CREATE POLICY "Users can insert own profile" ON profiles
-    FOR INSERT
-    TO authenticated
-    WITH CHECK (auth.uid() = id);
 
 -- Create trigger to update updated_at timestamp
 CREATE TRIGGER set_profiles_updated_at

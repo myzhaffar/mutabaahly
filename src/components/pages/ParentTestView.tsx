@@ -40,28 +40,11 @@ const ParentTestView: React.FC = () => {
     { label: 'Tilawati Tests' }
   ];
 
-  // Fetch children's tests
+  // Fetch all tests (parents can view all tests)
   const { data: tests, isLoading } = useQuery({
-    queryKey: ['parent-tests', profile?.id],
+    queryKey: ['parent-tests'],
     queryFn: async () => {
-      if (!profile?.id) return [];
-
-      // First get the parent's children
-      const { data: children, error: childrenError } = await supabase
-        .from('students')
-        .select('id, name')
-        .eq('parent_id', profile.id);
-
-      if (childrenError) {
-        throw childrenError;
-      }
-
-      if (!children || children.length === 0) {
-        return [];
-      }
-
-      // Get tests for the parent's children
-      const childIds = children.map(child => child.id);
+      // Get all tests for all students
       const { data, error } = await supabase
         .from('tilawati_level_tests')
         .select(`
@@ -71,7 +54,6 @@ const ParentTestView: React.FC = () => {
             name
           )
         `)
-        .in('student_id', childIds)
         .order('date', { ascending: false });
 
       if (error) {
@@ -80,7 +62,6 @@ const ParentTestView: React.FC = () => {
 
       return data || [];
     },
-    enabled: !!profile?.id,
   });
 
   const handleViewTestDetails = (test: TilawatiTest) => {

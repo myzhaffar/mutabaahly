@@ -20,11 +20,13 @@ export const useStudents = (profileId?: string, role?: string) => {
   
   // Build the Supabase query based on the role
   const getQuery = () => {
-    let query = supabase.from('students').select('*');
+    const query = supabase.from('students').select('*');
     
-    if (role === 'parent' && profileId) {
-      query = query.eq('parent_id', profileId);
-    }
+    // Parents can now see all students (not just their children)
+    // Only apply parent_id filter if specifically needed for other use cases
+    // if (role === 'parent' && profileId) {
+    //   query = query.eq('parent_id', profileId);
+    // }
     
     return query;
   };

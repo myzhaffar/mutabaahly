@@ -68,13 +68,22 @@ export interface SummaryStats {
 function formatGrade(grade: string | null): string {
   if (!grade) return 'Unknown';
   
+  // Clean and normalize the grade value
+  const cleanGrade = grade.toString().trim();
+  
   // If grade already includes the word "Grade" (like "Grade 6"), extract just the number
-  if (grade.toLowerCase().includes('grade')) {
-    return grade.replace(/[^\d]/g, '');
+  if (cleanGrade.toLowerCase().includes('grade')) {
+    const number = cleanGrade.replace(/[^\d]/g, '');
+    return number || 'Unknown';
   }
   
-  // If grade is just a number or other format, return it as is
-  return grade;
+  // If grade is just a number, return it as is
+  if (/^\d+$/.test(cleanGrade)) {
+    return cleanGrade;
+  }
+  
+  // For any other format, return as is
+  return cleanGrade;
 }
 
 // The main hook

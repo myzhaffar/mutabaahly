@@ -42,8 +42,7 @@ const Dashboard = () => {
     isLoading: dataLoading,
     studentProgressData
   } = useStudentProgressSummary({
-    fetchAllStudents: profile?.role === 'teacher', // Only fetch all students for teachers
-    parentId: profile?.role === 'parent' ? profile.id : undefined, // Pass parent ID for parents
+    fetchAllStudents: profile?.role === 'teacher' || profile?.role === 'parent', // Fetch all students for both teachers and parents
   });
 
   useEffect(() => {

@@ -7,7 +7,6 @@ CREATE INDEX IF NOT EXISTS idx_hafalan_progress_teacher_id ON public.hafalan_pro
 -- Step 2: Add indexes to foreign keys in students table
 CREATE INDEX IF NOT EXISTS idx_students_teacher_id ON public.students (teacher_id);
 CREATE INDEX IF NOT EXISTS idx_students_grade ON public.students (grade);
-CREATE INDEX IF NOT EXISTS idx_students_group_name ON public.students (group_name);
 
 -- Step 3: Add indexes to foreign keys in tilawah_progress table
 CREATE INDEX IF NOT EXISTS idx_tilawah_progress_student_id ON public.tilawah_progress (student_id);
@@ -18,7 +17,6 @@ CREATE INDEX IF NOT EXISTS idx_tilawati_level_tests_student_id ON public.tilawat
 CREATE INDEX IF NOT EXISTS idx_tilawati_level_tests_teacher_id ON public.tilawati_level_tests (teacher_id);
 
 -- Step 5: Add indexes for the most common queries in progress_entries table
-CREATE INDEX IF NOT EXISTS idx_progress_entries_student_id_type ON public.progress_entries (student_id, type);
 CREATE INDEX IF NOT EXISTS idx_progress_entries_date ON public.progress_entries (date DESC);
 
 -- Note: For the unused indexes on progress_entries that the Performance Advisor found,

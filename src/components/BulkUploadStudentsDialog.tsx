@@ -277,16 +277,18 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
       for (let i = 0; i < validStudents.length; i += batchSize) {
         const batch = validStudents.slice(i, i + batchSize);
         // Insert students and get their ids
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('students')
           .insert(batch)
           .select();
 
-        if (!data) {
+        if (error) {
+          console.error('Batch insert error:', error);
           failedCount += batch.length;
+        } else if (data && data.length > 0) {
+          successCount += data.length;
         } else {
-          successCount += batch.length;
-          // No progressInfo handling needed for new template
+          failedCount += batch.length;
         }
 
         setUploadProgress(prev => ({
@@ -312,9 +314,10 @@ const BulkUploadStudentsDialog: React.FC<BulkUploadStudentsDialogProps> = ({ onS
         });
       }
     } catch (error) {
+      console.error('Upload error:', error);
       toast({
         title: "Error",
-        description: "Failed to upload students. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to upload students. Please try again.",
         variant: "destructive",
       });
     } finally {

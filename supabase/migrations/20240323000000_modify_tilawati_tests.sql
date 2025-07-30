@@ -30,63 +30,7 @@ CREATE INDEX idx_tilawati_tests_student ON tilawati_level_tests(student_id);
 CREATE INDEX idx_tilawati_tests_class ON tilawati_level_tests(class_id);
 CREATE INDEX idx_tilawati_tests_status ON tilawati_level_tests(status);
 
--- Add RLS policies
-ALTER TABLE tilawati_level_tests ENABLE ROW LEVEL SECURITY;
 
--- Teachers can view and manage tests for their students
-CREATE POLICY "Teachers can view tests for their students" ON tilawati_level_tests
-    FOR SELECT
-    TO authenticated
-    USING (
-        EXISTS (
-            SELECT 1 FROM students s
-            WHERE s.id = tilawati_level_tests.student_id
-            AND (
-                s.teacher_id = auth.uid() OR
-                auth.uid() IN (SELECT teacher_id FROM class_teachers ct WHERE ct.class_id = s.class_id)
-            )
-        )
-    );
-
-CREATE POLICY "Teachers can insert tests" ON tilawati_level_tests
-    FOR INSERT
-    TO authenticated
-    WITH CHECK (
-        EXISTS (
-            SELECT 1 FROM students s
-            WHERE s.id = tilawati_level_tests.student_id
-            AND (
-                s.teacher_id = auth.uid() OR
-                auth.uid() IN (SELECT teacher_id FROM class_teachers ct WHERE ct.class_id = s.class_id)
-            )
-        )
-    );
-
-CREATE POLICY "Teachers can update tests" ON tilawati_level_tests
-    FOR UPDATE
-    TO authenticated
-    USING (
-        EXISTS (
-            SELECT 1 FROM students s
-            WHERE s.id = tilawati_level_tests.student_id
-            AND (
-                s.teacher_id = auth.uid() OR
-                auth.uid() IN (SELECT teacher_id FROM class_teachers ct WHERE ct.class_id = s.class_id)
-            )
-        )
-    );
-
--- Parents can only view their children's tests
-CREATE POLICY "Parents can view their children's tests" ON tilawati_level_tests
-    FOR SELECT
-    TO authenticated
-    USING (
-        EXISTS (
-            SELECT 1 FROM students s
-            WHERE s.id = tilawati_level_tests.student_id
-            AND s.parent_id = auth.uid()
-        )
-    );
 
 -- Create trigger to update updated_at timestamp
 CREATE TRIGGER set_updated_at
