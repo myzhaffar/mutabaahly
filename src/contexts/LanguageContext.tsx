@@ -61,11 +61,11 @@ const translations = {
     
     // Home Page
     'home.title': 'Mutabaahly',
-    'home.subtitle': 'Memantau Kemajuan Siswa dalam Hafalan Al-Quran & Tilawati',
-    'home.description': 'Platform komprehensif yang dirancang untuk membantu guru melacak dan memantau kemajuan siswa dalam hafalan Al-Quran dan tilawati. Dibangun dengan nilai-nilai Islam dan teknologi modern.',
+    'home.subtitle': 'Memantau Kemajuan Siswa dalam Tahfidz Al-Quran & Tilawati',
+    'home.description': 'Platform komprehensif yang dirancang untuk membantu guru melacak dan memantau kemajuan siswa dalam tahfidz Al-Quran dan tilawati. Dibangun dengan nilai-nilai Islam dan teknologi modern.',
     'home.features.title': 'Fitur Utama',
     'home.features.tracking': 'Pelacakan Progres',
-    'home.features.tracking.desc': 'Pantau kemajuan hafalan dan tilawati',
+    'home.features.tracking.desc': 'Pantau kemajuan tahfidz dan tilawati',
     'home.features.dashboard': 'Dashboard Guru',
     'home.features.dashboard.desc': 'Gambaran menyeluruh semua siswa',
     'home.features.responsive': 'Desain Responsif',
@@ -79,7 +79,7 @@ const translations = {
     'button.updateProgress': 'Perbarui Progres',
     
     // Progress
-    'progress.memorization': 'Hafalan',
+    'progress.memorization': 'Tahfidz',
     'progress.tilawati': 'Tilawati',
     'progress.completed': 'Selesai',
     'progress.inProgress': 'Sedang Berlangsung',

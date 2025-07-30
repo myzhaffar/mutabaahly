@@ -59,7 +59,7 @@ export interface GroupedData {
 // Type for the summary statistics
 export interface SummaryStats {
   totalStudents: number;
-  avgHafalanProgress: number;
+      avgTahfidzProgress: number;
   avgTilawahProgress: number;
   completedStudents: number;
 }
@@ -141,14 +141,14 @@ export const useStudentProgressSummary = ({
         .select('*')
         .eq('student_id', student.id);
       
-      // Calculate hafalan progress
-      const hafalanEntries = progressEntries?.filter(entry => entry.type === 'hafalan') || [];
-      const hafalanPercentage = hafalanEntries.length > 0 
-        ? Math.min(100, Math.round((hafalanEntries.length * 100) / 114))
-        : 0;
-      const lastSurah = hafalanEntries.length > 0
-        ? hafalanEntries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]?.surah_or_jilid
-        : null;
+                      // Calculate tahfidz progress
+        const tahfidzEntries = progressEntries?.filter(entry => entry.type === 'hafalan') || [];
+        const tahfidzPercentage = tahfidzEntries.length > 0
+          ? Math.min(100, Math.round((tahfidzEntries.length * 100) / 114))
+          : 0;
+        const lastSurah = tahfidzEntries.length > 0
+          ? tahfidzEntries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]?.surah_or_jilid
+          : null;
       
       // Calculate tilawah progress
       const tilawahEntries = progressEntries?.filter(entry => entry.type === 'tilawah') || [];
@@ -169,8 +169,8 @@ export const useStudentProgressSummary = ({
         teacher: student.teacher || '',
         photo: student.photo,
         parent_id: student.parent_id, // Keep parent_id for filtering
-        hafalan_progress: hafalanEntries.length > 0 ? {
-          percentage: hafalanPercentage,
+        hafalan_progress: tahfidzEntries.length > 0 ? {
+          percentage: tahfidzPercentage,
           last_surah: lastSurah
         } : null,
         tilawah_progress: tilawahEntries.length > 0 ? {
@@ -208,8 +208,8 @@ export const useStudentProgressSummary = ({
   // Calculate summary statistics
   const summaryStats: SummaryStats = {
     totalStudents: data?.length || 0,
-    avgHafalanProgress: data?.length 
-      ? Math.round(data.reduce((sum, student) => sum + (student.hafalan_progress?.percentage || 0), 0) / data.length) 
+        avgTahfidzProgress: data?.length
+      ? Math.round(data.reduce((sum, student) => sum + (student.hafalan_progress?.percentage || 0), 0) / data.length)
       : 0,
     avgTilawahProgress: data?.length 
       ? Math.round(data.reduce((sum, student) => sum + (student.tilawah_progress?.percentage || 0), 0) / data.length) 

@@ -185,7 +185,7 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
                 )}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                {/* Hafalan Progress */}
+                {/* Tahfidz Progress */}
                 <div className="bg-green-50 rounded-xl shadow-sm hover:shadow-md transition-shadow w-full h-full">
                   <div className="p-4">
                     <div className="flex items-center mb-3">

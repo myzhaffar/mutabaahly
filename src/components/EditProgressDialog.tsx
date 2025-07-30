@@ -42,7 +42,7 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
     : '';
   const [tahsinMode, setTahsinMode] = useState<'tilawati' | 'alquran' | ''>(initialTahsinMode);
 
-  // Juz selection for hafalan
+          // Juz selection for tahfidz
   const [selectedJuz, setSelectedJuz] = useState<number | ''>('');
 
   // Initialize juz based on current surah
@@ -122,7 +122,7 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]" aria-describedby="edit-progress-description">
         <DialogHeader>
-          <DialogTitle>Edit {entry.type === 'hafalan' ? 'Hafalan' : 'Tilawati'} Progress</DialogTitle>
+          <DialogTitle>Edit {entry.type === 'hafalan' ? 'Tahfidz' : 'Tilawati'} Progress</DialogTitle>
           <DialogDescription id="edit-progress-description">
             Update the progress details for this entry.
           </DialogDescription>
@@ -152,7 +152,7 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
               </Select>
             </div>
           )}
-          {/* Juz selection for Hafalan */}
+          {/* Juz selection for Tahfidz */}
           {entry.type === 'hafalan' && (
             <div className="space-y-2">
               <Label htmlFor="juz">Juz</Label>
@@ -255,7 +255,7 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
               </div>
             </>
           )}
-          {/* Hafalan ayat input */}
+          {/* Tahfidz ayat input */}
           {entry.type === 'hafalan' && (
             <div className="space-y-2">
               <Label htmlFor="ayat_or_page">Ayat</Label>

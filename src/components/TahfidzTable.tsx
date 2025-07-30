@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Award, BookOpen, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
-import { fetchHafalanRankingData, StudentRankingData, RankingFilters } from '@/utils/rankingDataService';
+import { fetchTahfidzRankingData, StudentRankingData, RankingFilters } from '@/utils/rankingDataService';
 import { useToast } from '@/hooks/use-toast';
 
 interface Filters {
@@ -17,12 +17,12 @@ interface Pagination {
   onPageChange: (page: number) => void;
 }
 
-interface HafalanTableProps {
+interface TahfidzTableProps {
   filters: Filters;
   pagination: Pagination;
 }
 
-const HafalanTable: React.FC<HafalanTableProps> = ({ filters, pagination }) => {
+const TahfidzTable: React.FC<TahfidzTableProps> = ({ filters, pagination }) => {
   const [allStudents, setAllStudents] = useState<StudentRankingData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,14 +40,14 @@ const HafalanTable: React.FC<HafalanTableProps> = ({ filters, pagination }) => {
           grade: filters.grades[0] || ''
         };
         
-        const data = await fetchHafalanRankingData(rankingFilters);
+        const data = await fetchTahfidzRankingData(rankingFilters);
         setAllStudents(data);
       } catch (err) {
-        console.error('Error fetching Hafalan ranking data:', err);
+        console.error('Error fetching Tahfidz ranking data:', err);
         setError('Failed to load ranking data');
         toast({
           title: "Error",
-          description: "Failed to load Hafalan ranking data. Please try again.",
+          description: "Failed to load Tahfidz ranking data. Please try again.",
           variant: "destructive",
         });
       } finally {
@@ -287,4 +287,4 @@ const HafalanTable: React.FC<HafalanTableProps> = ({ filters, pagination }) => {
   );
 };
 
-export default HafalanTable; 
+export default TahfidzTable; 

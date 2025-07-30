@@ -4,7 +4,7 @@ import { getSurahByName } from './quranData';
 // Constants for total verses and pages
 const PAGES_PER_TILAWATI_LEVEL = 44; // Each Tilawati level has 44 pages
 
-export const calculateHafalanProgress = (entries: ProgressEntry[]) => {
+export const calculateTahfidzProgress = (entries: ProgressEntry[]) => {
   if (!entries || entries.length === 0) {
     return { percentage: 0, last_surah: null, total_verses: 0 };
   }

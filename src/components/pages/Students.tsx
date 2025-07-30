@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/useAuth';
 import ParentLayout from '@/components/layouts/ParentLayout';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
 import TilawatiTable from '@/components/TilawatiTable';
-import HafalanTable from '@/components/HafalanTable';
+import TahfidzTable from '@/components/TahfidzTable';
 import { fetchGrades } from '@/utils/rankingDataService';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useRouter } from 'next/navigation';
@@ -15,7 +15,7 @@ import { BookOpen, Award, ChevronLeft, Filter, Loader2 } from 'lucide-react';
 const Students = () => {
   const { profile } = useAuth();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'tilawati' | 'hafalan'>('tilawati');
+  const [activeTab, setActiveTab] = useState<'tilawati' | 'tahfidz'>('tilawati');
   
   // Filter states
   // Removed teacher filter
@@ -204,19 +204,19 @@ const Students = () => {
            </button>
            <button
              type="button"
-             onClick={() => setActiveTab('hafalan')}
+             onClick={() => setActiveTab('tahfidz')}
              className={`flex items-center gap-2 px-6 py-2 text-lg font-semibold focus:outline-none transition-all duration-200
                rounded-t-xl rounded-b-md
-               ${activeTab === 'hafalan'
+               ${activeTab === 'tahfidz'
                  ? 'bg-green-50 text-green-700 shadow-sm border-b-0 z-10'
                  : 'bg-transparent text-gray-400 hover:text-green-600'}`}
              style={{
-               borderBottomLeftRadius: activeTab === 'hafalan' ? 0 : '0.75rem',
-               borderBottomRightRadius: activeTab === 'hafalan' ? 0 : '0.75rem',
-               marginBottom: activeTab === 'hafalan' ? '-1px' : 0,
-               borderBottom: activeTab === 'hafalan' ? '2px solid #22c55e' : 'none',
+               borderBottomLeftRadius: activeTab === 'tahfidz' ? 0 : '0.75rem',
+               borderBottomRightRadius: activeTab === 'tahfidz' ? 0 : '0.75rem',
+               marginBottom: activeTab === 'tahfidz' ? '-1px' : 0,
+               borderBottom: activeTab === 'tahfidz' ? '2px solid #22c55e' : 'none',
              }}
-             aria-current={activeTab === 'hafalan' ? 'page' : undefined}
+             aria-current={activeTab === 'tahfidz' ? 'page' : undefined}
            >
              <Award className="h-5 w-5" /> Tahfidz
            </button>
@@ -235,7 +235,7 @@ const Students = () => {
                 }}
               />
             ) : (
-              <HafalanTable
+              <TahfidzTable
                 filters={{
                   grades: selectedGrades
                 }}
@@ -366,19 +366,19 @@ const Students = () => {
              </button>
              <button
                type="button"
-               onClick={() => setActiveTab('hafalan')}
+               onClick={() => setActiveTab('tahfidz')}
                className={`flex items-center gap-2 px-6 py-2 text-lg font-semibold focus:outline-none transition-all duration-200
                  rounded-t-xl rounded-b-md
-                 ${activeTab === 'hafalan'
+                 ${activeTab === 'tahfidz'
                    ? 'bg-green-50 text-green-700 shadow-sm border-b-0 z-10'
                    : 'bg-transparent text-gray-400 hover:text-green-600'}`}
                style={{
-                 borderBottomLeftRadius: activeTab === 'hafalan' ? 0 : '0.75rem',
-                 borderBottomRightRadius: activeTab === 'hafalan' ? 0 : '0.75rem',
-                 marginBottom: activeTab === 'hafalan' ? '-1px' : 0,
-                 borderBottom: activeTab === 'hafalan' ? '2px solid #22c55e' : 'none',
+                 borderBottomLeftRadius: activeTab === 'tahfidz' ? 0 : '0.75rem',
+                 borderBottomRightRadius: activeTab === 'tahfidz' ? 0 : '0.75rem',
+                 marginBottom: activeTab === 'tahfidz' ? '-1px' : 0,
+                 borderBottom: activeTab === 'tahfidz' ? '2px solid #22c55e' : 'none',
                }}
-               aria-current={activeTab === 'hafalan' ? 'page' : undefined}
+               aria-current={activeTab === 'tahfidz' ? 'page' : undefined}
              >
                <Award className="h-5 w-5" /> Tahfidz
              </button>
@@ -397,7 +397,7 @@ const Students = () => {
                   }}
                 />
               ) : (
-                <HafalanTable
+                <TahfidzTable
                   filters={{
                     grades: selectedGrades
                   }}

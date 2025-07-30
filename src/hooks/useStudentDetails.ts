@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
+import { calculateTahfidzProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
 import { useAuth } from '@/contexts/useAuth';
 import { Database } from '@/integrations/supabase/types';
 
@@ -28,7 +28,7 @@ export const useStudentDetails = (id: string | undefined) => {
     hafalan_progress: null,
     tilawah_progress: null
   });
-  const [hafalanEntries, setHafalanEntries] = useState<ProgressEntry[]>([]);
+  const [tahfidzEntries, setTahfidzEntries] = useState<ProgressEntry[]>([]);
   const [tilawahEntries, setTilawahEntries] = useState<ProgressEntry[]>([]);
   const [loadingStudent, setLoadingStudent] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(true);
@@ -85,14 +85,14 @@ export const useStudentDetails = (id: string | undefined) => {
         .eq('student_id', id)
         .order('date', { ascending: false });
 
-      const hafalan = entries?.filter(entry => entry.type === 'hafalan') || [];
+      const tahfidz = entries?.filter(entry => entry.type === 'hafalan') || [];
       const tilawah = entries?.filter(entry => entry.type === 'tilawah') || [];
 
-      setHafalanEntries(hafalan);
+      setTahfidzEntries(tahfidz);
       setTilawahEntries(tilawah);
 
       // Calculate dynamic progress
-      const hafalanProgress = calculateHafalanProgress(hafalan);
+      const hafalanProgress = calculateTahfidzProgress(tahfidz);
       const tilawahProgress = calculateTilawahProgress(tilawah);
 
       setProgressData({
@@ -128,7 +128,7 @@ export const useStudentDetails = (id: string | undefined) => {
     student,
     className,
     progressData,
-    hafalanEntries,
+    tahfidzEntries,
     tilawahEntries,
     loading: loadingStudent || loadingProgress,
     loadingStudent,

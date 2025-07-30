@@ -18,7 +18,7 @@ interface ProgressEntry {
 }
 
 interface DailyProgressTabsProps {
-  hafalanEntries: ProgressEntry[];
+  tahfidzEntries: ProgressEntry[];
   tilawahEntries: ProgressEntry[];
   onProgressUpdated: () => void;
   onTabChange: (tab: string) => void;
@@ -27,11 +27,11 @@ interface DailyProgressTabsProps {
 }
 
 const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
-  hafalanEntries,
+  tahfidzEntries,
   tilawahEntries,
   onProgressUpdated,
   onTabChange,
-  activeTab = 'hafalan',
+  activeTab = 'tahfidz',
   studentId
 }) => {
   const [tab, setTab] = useState(activeTab);
@@ -79,7 +79,7 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
       if (entry.type === 'tilawah') {
         onTabChange('tilawah');
       } else if (entry.type === 'hafalan') {
-        onTabChange('hafalan');
+        onTabChange('tahfidz');
       }
     } catch (error) {
       console.error('Error duplicating progress:', error);
@@ -101,7 +101,7 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
         <ExportProgressDialog
           open={exportOpen}
           onOpenChange={setExportOpen}
-          hafalanEntries={hafalanEntries}
+          hafalanEntries={tahfidzEntries}
           tilawahEntries={tilawahEntries}
         />
       </CardHeader>
@@ -109,7 +109,7 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
         <Tabs value={tab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger
-              value="hafalan"
+              value="tahfidz"
               className="data-[state=active]:bg-green-100 data-[state=active]:text-green-700"
             >
               {t('tabs.tahfidz')}
@@ -122,9 +122,9 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
             </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="hafalan" className="mt-6">
+          <TabsContent value="tahfidz" className="mt-6">
             <ProgressEntriesTable 
-              entries={hafalanEntries}
+              entries={tahfidzEntries}
               type="hafalan"
               onProgressUpdated={onProgressUpdated}
               onDuplicateEntry={(entry) => handleDuplicate(entry)}

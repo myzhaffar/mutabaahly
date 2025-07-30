@@ -7,7 +7,7 @@ import ParentLayout from '@/components/layouts/ParentLayout';
 import { useAuth } from '@/contexts/useAuth';
 import StudentsGrid from '@/components/dashboard/StudentsGrid';
 import { supabase } from '@/integrations/supabase/client';
-import { calculateHafalanProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
+import { calculateTahfidzProgress, calculateTilawahProgress } from '@/utils/progressCalculations';
 import { ChevronLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -201,11 +201,11 @@ const ClassDetail: React.FC = () => {
             }
 
             // Calculate progress based on actual entries
-            const hafalanEntries = progressEntries?.filter(entry => entry.type === 'hafalan') || [];
-            const tilawahEntries = progressEntries?.filter(entry => entry.type === 'tilawah') || [];
+                    const tahfidzEntries = progressEntries?.filter(entry => entry.type === 'hafalan') || [];
+        const tilawahEntries = progressEntries?.filter(entry => entry.type === 'tilawah') || [];
 
-            // Calculate progress percentages
-            const hafalanProgress = calculateHafalanProgress(hafalanEntries);
+        // Calculate progress percentages
+        const tahfidzProgress = calculateTahfidzProgress(tahfidzEntries);
             const tilawahProgress = calculateTilawahProgress(tilawahEntries);
 
             return {
@@ -215,10 +215,10 @@ const ClassDetail: React.FC = () => {
               group_name: student.group_name || '',
               teacher: student.teacher || '',
               photo: student.photo,
-              hafalan_progress: hafalanProgress.percentage > 0 ? {
-                percentage: hafalanProgress.percentage,
-                last_surah: hafalanProgress.last_surah
-              } : null,
+                      hafalan_progress: tahfidzProgress.percentage > 0 ? {
+          percentage: tahfidzProgress.percentage,
+          last_surah: tahfidzProgress.last_surah
+        } : null,
               tilawah_progress: tilawahProgress.percentage > 0 ? {
                 percentage: tilawahProgress.percentage,
                 jilid: tilawahProgress.jilid

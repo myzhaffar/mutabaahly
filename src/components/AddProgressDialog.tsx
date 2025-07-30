@@ -205,8 +205,8 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({
             />
           </div>
 
-          {/* Juz selection for Hafalan */}
-          {formData.type === 'hafalan' && (
+          {/* Juz selection for Tahfidz */}
+{formData.type === 'hafalan' && (
             <div className="space-y-2">
               <Label htmlFor="juz">Juz</Label>
               <Select
@@ -309,8 +309,8 @@ const AddProgressDialog: React.FC<AddProgressDialogProps> = ({
               </div>
             </>
           )}
-          {/* Hafalan ayat input */}
-          {formData.type === 'hafalan' && (
+          {/* Tahfidz ayat input */}
+{formData.type === 'hafalan' && (
             <div className="space-y-2">
               <Label htmlFor="ayat_or_page">Ayat</Label>
               <Input

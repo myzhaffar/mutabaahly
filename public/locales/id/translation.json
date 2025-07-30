@@ -78,7 +78,7 @@
     "parentDashboard": "Dasbor Orang Tua",
     "stats": {
       "totalStudents": "Total Siswa",
-      "avgHafalanProgress": "Rata-rata Progres Hafalan",
+      "avgTahfidzProgress": "Rata-rata Progres Tahfidz",
       "avgTilawahProgress": "Rata-rata Progres Tilawah",
       "completedStudents": "Siswa Selesai"
     }

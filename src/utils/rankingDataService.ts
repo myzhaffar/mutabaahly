@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { calculateHafalanProgress, calculateTilawahProgress } from './progressCalculations';
+import { calculateTahfidzProgress, calculateTilawahProgress } from './progressCalculations';
 import { ProgressEntry } from '@/types/progress';
 import { getJuzBySurah, quranSurahs } from './quranData';
 
@@ -13,7 +13,7 @@ export interface StudentRankingData {
   // Tilawati specific
   level?: number | undefined;
   page?: number;
-  // Hafalan specific
+      // Tahfidz specific
   juz: number | null;
   surah: string | null;
   verse: number;
@@ -153,7 +153,7 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
   }
 };
 
-export const fetchHafalanRankingData = async (filters: RankingFilters): Promise<StudentRankingData[]> => {
+export const fetchTahfidzRankingData = async (filters: RankingFilters): Promise<StudentRankingData[]> => {
   try {
     // Build the query based on filters
     let query = supabase
@@ -194,7 +194,7 @@ export const fetchHafalanRankingData = async (filters: RankingFilters): Promise<
       data.map(async (student) => {
         try {
           // Fetch progress entries first
-          const { data: hafalanEntries, error: entriesError } = await supabase
+          const { data: tahfidzEntries, error: entriesError } = await supabase
             .from('progress_entries')
             .select('*')
             .eq('student_id', student.id)
@@ -206,11 +206,11 @@ export const fetchHafalanRankingData = async (filters: RankingFilters): Promise<
           }
 
           // Calculate progress from entries
-          const calculatedProgress = calculateHafalanProgress(hafalanEntries || []);
+          const calculatedProgress = calculateTahfidzProgress(tahfidzEntries || []);
 
           // Get current surah and verse information
           const currentSurah = calculatedProgress.last_surah;
-          const currentVerse = getCurrentVerse(hafalanEntries || []);
+          const currentVerse = getCurrentVerse(tahfidzEntries || []);
           
           // Calculate juz based on surah
           let currentJuz = null;

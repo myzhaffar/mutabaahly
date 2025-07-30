@@ -78,7 +78,7 @@
     "parentDashboard": "Parent Dashboard",
     "stats": {
       "totalStudents": "Total Students",
-      "avgHafalanProgress": "Avg. Hafalan Progress",
+      "avgTahfidzProgress": "Avg. Tahfidz Progress",
       "avgTilawahProgress": "Avg. Tilawah Progress",
       "completedStudents": "Completed Students"
     }

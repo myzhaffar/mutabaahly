@@ -7,7 +7,7 @@ import '@/i18n';
 interface StatsCardsProps {
   stats: {
     totalStudents: number;
-    avgHafalanProgress: number;
+    avgTahfidzProgress: number;
     avgTilawahProgress: number;
     completedStudents: number;
   };
@@ -25,8 +25,8 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
       bgColor: 'bg-blue-50'
     },
     {
-      title: t('dashboard.stats.avgHafalanProgress'),
-      value: `${Math.round(stats.avgHafalanProgress)}%`,
+          title: t('dashboard.stats.avgTahfidzProgress'),
+    value: `${Math.round(stats.avgTahfidzProgress)}%`,
       icon: Award,
       color: 'text-green-600',
       bgColor: 'bg-green-50'

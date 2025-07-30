@@ -21,14 +21,14 @@ const StudentDetails = () => {
     student,
     className,
     progressData,
-    hafalanEntries,
+    tahfidzEntries,
     tilawahEntries,
     loadingStudent,
     loadingProgress,
     refetchData
   } = useStudentDetails(id);
 
-  const [activeTab, setActiveTab] = useState('hafalan');
+  const [activeTab, setActiveTab] = useState('tahfidz');
 
   const handleStudentDeleted = () => {
     router.push('/students');
@@ -129,7 +129,7 @@ const StudentDetails = () => {
             </div>
           ) : (
                     <DailyProgressTabs
-                hafalanEntries={hafalanEntries}
+                tahfidzEntries={tahfidzEntries}
                 tilawahEntries={tilawahEntries}
                 onProgressUpdated={refetchData}
                 onTabChange={setActiveTab}
