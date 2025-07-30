@@ -16,7 +16,7 @@ interface ProgressEntry {
 }
 
 interface ProgressData {
-  hafalan_progress: { percentage: number; last_surah: string | null } | null;
+  tahfidz_progress: { percentage: number; last_surah: string | null } | null;
   tilawah_progress: { percentage: number; jilid: string | null } | null;
 }
 
@@ -25,7 +25,7 @@ export const useStudentDetails = (id: string | undefined) => {
   const [student, setStudent] = useState<Student | null>(null);
   const [className, setClassName] = useState<string | null>(null);
   const [progressData, setProgressData] = useState<ProgressData>({
-    hafalan_progress: null,
+    tahfidz_progress: null,
     tilawah_progress: null
   });
   const [tahfidzEntries, setTahfidzEntries] = useState<ProgressEntry[]>([]);
@@ -96,7 +96,7 @@ export const useStudentDetails = (id: string | undefined) => {
       const tilawahProgress = calculateTilawahProgress(tilawah);
 
       setProgressData({
-        hafalan_progress: hafalanProgress.percentage > 0 ? hafalanProgress : null,
+        tahfidz_progress: hafalanProgress.percentage > 0 ? hafalanProgress : null,
         tilawah_progress: tilawahProgress.percentage > 0 ? tilawahProgress : null
       });
 

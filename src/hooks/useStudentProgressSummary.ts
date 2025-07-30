@@ -11,7 +11,7 @@ export interface StudentData {
   teacher: string | null;
   photo: string | null;
   parent_id: string | null;
-  hafalan_progress?: {
+      tahfidz_progress?: {
     percentage: number;
     last_surah: string | null;
   } | null;
@@ -40,7 +40,7 @@ export interface ProcessedStudent {
   teacher: string;
   photo: string | null;
   parent_id: string | null; // Added to support filtering
-  hafalan_progress: {
+      tahfidz_progress: {
     percentage: number;
     last_surah: string | null;
   } | null;
@@ -169,7 +169,7 @@ export const useStudentProgressSummary = ({
         teacher: student.teacher || '',
         photo: student.photo,
         parent_id: student.parent_id, // Keep parent_id for filtering
-        hafalan_progress: tahfidzEntries.length > 0 ? {
+        tahfidz_progress: tahfidzEntries.length > 0 ? {
           percentage: tahfidzPercentage,
           last_surah: lastSurah
         } : null,
@@ -209,13 +209,13 @@ export const useStudentProgressSummary = ({
   const summaryStats: SummaryStats = {
     totalStudents: data?.length || 0,
         avgTahfidzProgress: data?.length
-      ? Math.round(data.reduce((sum, student) => sum + (student.hafalan_progress?.percentage || 0), 0) / data.length)
+      ? Math.round(data.reduce((sum, student) => sum + (student.tahfidz_progress?.percentage || 0), 0) / data.length)
       : 0,
     avgTilawahProgress: data?.length 
       ? Math.round(data.reduce((sum, student) => sum + (student.tilawah_progress?.percentage || 0), 0) / data.length) 
       : 0,
     completedStudents: data?.filter(s => 
-      (s.hafalan_progress?.percentage || 0) === 100 && 
+              (s.tahfidz_progress?.percentage || 0) === 100 && 
       (s.tilawah_progress?.percentage || 0) === 100
     ).length || 0
   };

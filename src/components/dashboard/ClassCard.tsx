@@ -13,7 +13,7 @@ interface Student {
   group_name: string;
   teacher: string;
   photo: string | null;
-  hafalan_progress: {
+  tahfidz_progress: {
     percentage: number;
     last_surah: string | null;
   } | null;
@@ -52,7 +52,7 @@ function getGradeColor(grade: string) {
 function getTopPerformers(students: Student[]) {
   return students
     .map(student => {
-      const hafalanProgress = student.hafalan_progress?.percentage || 0;
+      const hafalanProgress = student.tahfidz_progress?.percentage || 0;
       const tilawahProgress = student.tilawah_progress?.percentage || 0;
       const combinedProgress = (hafalanProgress + tilawahProgress) / 2;
       

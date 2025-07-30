@@ -14,7 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      hafalan_progress: {
+      tahfidz_progress: {
         Row: {
           created_at: string
           id: string
@@ -44,7 +44,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "hafalan_progress_student_id_fkey"
+            foreignKeyName: "tahfidz_progress_student_id_fkey"
             columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "students"

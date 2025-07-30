@@ -11,6 +11,6 @@ export interface ProgressEntry {
 }
 
 export interface ProgressData {
-  hafalan_progress: { percentage: number; last_surah: string | null } | null;
+  tahfidz_progress: { percentage: number; last_surah: string | null } | null;
   tilawah_progress: { percentage: number; jilid: string | null } | null;
 } 

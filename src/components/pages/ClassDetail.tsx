@@ -29,7 +29,7 @@ interface ClassStudent {
   group_name: string;
   teacher: string;
   photo: string | null;
-  hafalan_progress: {
+      tahfidz_progress: {
     percentage: number;
     last_surah: string | null;
   } | null;
@@ -215,7 +215,7 @@ const ClassDetail: React.FC = () => {
               group_name: student.group_name || '',
               teacher: student.teacher || '',
               photo: student.photo,
-                      hafalan_progress: tahfidzProgress.percentage > 0 ? {
+                      tahfidz_progress: tahfidzProgress.percentage > 0 ? {
           percentage: tahfidzProgress.percentage,
           last_surah: tahfidzProgress.last_surah
         } : null,
@@ -233,7 +233,7 @@ const ClassDetail: React.FC = () => {
               group_name: student.group_name || '',
               teacher: student.teacher || '',
               photo: student.photo,
-              hafalan_progress: null,
+              tahfidz_progress: null,
               tilawah_progress: null,
             };
           }

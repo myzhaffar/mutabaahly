@@ -56,9 +56,9 @@ const DeleteStudentDialog: React.FC<DeleteStudentDialogProps> = ({
       //   .delete()
       //   .eq('student_id', studentId);
 
-              // Delete related tahfidz progress
-      // await supabase
-      //   .from('hafalan_progress')
+                      // Delete related tahfidz progress
+        // await supabase
+        //   .from('tahfidz_progress')
       //   .delete()
       //   .eq('student_id', studentId);
 

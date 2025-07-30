@@ -46,8 +46,8 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
   const [addProgressOpen, setAddProgressOpen] = useState(false);
 
   // Ensure we have valid progress values
-  const hafalanPercentage = progressData?.hafalan_progress?.percentage || 0;
-  const hafalanLastSurah = progressData?.hafalan_progress?.last_surah || 'Not started';
+  const tahfidzPercentage = progressData?.tahfidz_progress?.percentage || 0;
+  const tahfidzLastSurah = progressData?.tahfidz_progress?.last_surah || 'Not started';
   const tilawahPercentage = progressData?.tilawah_progress?.percentage || 0;
   const tilawahJilid = progressData?.tilawah_progress?.jilid || 'Not started';
 
@@ -194,16 +194,16 @@ const StudentOverviewCard: React.FC<StudentOverviewCardProps> = ({
                     </div>
                     <div className="space-y-3">
                       <Progress 
-                        value={hafalanPercentage} 
+                        value={tahfidzPercentage} 
                         className="h-2.5"
-                        indicatorClassName={getProgressColor(hafalanPercentage)}
+                        indicatorClassName={getProgressColor(tahfidzPercentage)}
                       />
                       <div className="flex justify-between items-center">
                         <p className="text-sm font-medium text-foreground">
-                          {hafalanPercentage}% completed
+                          {tahfidzPercentage}% completed
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {hafalanLastSurah}
+                          {tahfidzLastSurah}
                         </p>
                       </div>
                     </div>

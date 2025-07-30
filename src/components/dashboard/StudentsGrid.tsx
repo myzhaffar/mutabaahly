@@ -10,7 +10,7 @@ interface Student {
   group_name: string;
   teacher: string;
   photo: string | null;
-  hafalan_progress: {
+  tahfidz_progress: {
     percentage: number;
     last_surah: string | null;
   } | null;
@@ -66,10 +66,10 @@ const StudentsGrid: React.FC<StudentsGridProps> = ({
           class: `${student.grade} ${student.group_name}`,
           studyGroup: student.teacher,
           memorization: {
-            progress: student.hafalan_progress?.percentage || 0,
-            status: ((student.hafalan_progress?.percentage || 0) === 100 ? 'completed' : 
-                    (student.hafalan_progress?.percentage || 0) > 0 ? 'inProgress' : 'notStarted') as 'completed' | 'inProgress' | 'notStarted',
-            currentSurah: student.hafalan_progress?.last_surah || 'Not started'
+            progress: student.tahfidz_progress?.percentage || 0,
+            status: ((student.tahfidz_progress?.percentage || 0) === 100 ? 'completed' : 
+                    (student.tahfidz_progress?.percentage || 0) > 0 ? 'inProgress' : 'notStarted') as 'completed' | 'inProgress' | 'notStarted',
+            currentSurah: student.tahfidz_progress?.last_surah || 'Not started'
           },
           tilawati: {
             progress: student.tilawah_progress?.percentage || 0,
