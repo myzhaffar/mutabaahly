@@ -9,6 +9,7 @@ import TilawatiTable from '@/components/TilawatiTable';
 import TahfidzTable from '@/components/TahfidzTable';
 import { fetchGrades } from '@/utils/rankingDataService';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
 import { BookOpen, Award, ChevronLeft, Filter, Loader2 } from 'lucide-react';
 
@@ -305,10 +306,23 @@ const Students = () => {
             </button>
             {filtersOpen && (
               loading ? (
-                <div className="flex items-center justify-center py-8 sm:py-12">
-                  <div className="flex items-center gap-3">
-                    <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-                    <span className="text-gray-600">Loading filters...</span>
+                <div className="p-4 sm:p-6">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
+                    {/* Grade Filter Skeleton */}
+                    <div className="space-y-2 sm:space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="w-2 h-2 rounded-full" />
+                        <Skeleton className="h-4 w-16" />
+                      </div>
+                      <div className="space-y-2">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <div key={i} className="flex items-center space-x-2">
+                            <Skeleton className="w-4 h-4 rounded-full" />
+                            <Skeleton className="h-4 w-24" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               ) : (

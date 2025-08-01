@@ -31,7 +31,7 @@ const STATUS_TABS = [
 ];
 
 const LEVEL_TABS = [
-  { value: 'all', label: 'All Levels' },
+  { value: 'all', label: 'All' },
   { value: 'Level 1', label: 'Level 1' },
   { value: 'Level 2', label: 'Level 2' },
   { value: 'Level 3', label: 'Level 3' },
@@ -159,7 +159,8 @@ const TeacherTestManagement: React.FC = () => {
 
               {/* Status Tabs Section */}
       <div className="mb-4">
-        <div className="flex flex-row gap-3">
+        <div className="flex flex-row items-center gap-3">
+          <span className="text-sm text-gray-400 font-medium">Status</span>
           {STATUS_TABS.map(tab => {
             const isActive = (filters.status?.length === 0 && tab.value === 'all') || (filters.status?.[0] === tab.value);
             return (
@@ -188,7 +189,8 @@ const TeacherTestManagement: React.FC = () => {
 
             {/* Level Tabs Section */}
       <div className="mb-6">
-        <div className="flex flex-row gap-3 flex-wrap">
+        <div className="flex flex-row items-center gap-3 flex-wrap">
+          <span className="text-sm text-gray-400 font-medium">Level</span>
           {LEVEL_TABS.map(tab => {
             const isActive = (filters.jilidLevel?.length === 0 && tab.value === 'all') || (filters.jilidLevel?.[0] === tab.value);
             return (
