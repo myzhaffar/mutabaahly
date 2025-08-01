@@ -68,34 +68,52 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
     setLoading(true);
 
     try {
+      // Validate required fields
+      if (!formData.date) {
+        throw new Error("Date is required");
+      }
+
+      // Prepare update payload with proper data formatting
       const updatePayload = {
-        ...formData,
+        date: formData.date,
+        surah_or_jilid: formData.surah_or_jilid || null,
+        ayat_or_page: formData.ayat_or_page || null,
+        notes: formData.notes || null,
         updated_at: new Date().toISOString(),
       };
-      const { data } = await supabase
+
+      const { data, error } = await supabase
         .from('progress_entries')
         .update(updatePayload)
-        .eq('id', entry.id);
-      if (data) {
-      toast({
-        title: "Success",
-        description: "Progress updated successfully!",
-      });
-      setOpen(false);
-      onProgressUpdated();
-      // Redirect to appropriate tab based on entry type
-      if (entry.type === 'tilawah' && setActiveTab) {
-        setActiveTab('tilawah');
-      } else if (entry.type === 'hafalan' && setActiveTab) {
-        setActiveTab('hafalan');
+        .eq('id', entry.id)
+        .select();
+
+      if (error) {
+        console.error('Supabase error:', error);
+        throw new Error(error.message || "Failed to update progress");
       }
+
+      if (data && data.length > 0) {
+        toast({
+          title: "Success",
+          description: "Progress updated successfully!",
+        });
+        setOpen(false);
+        onProgressUpdated();
+        // Redirect to appropriate tab based on entry type
+        if (entry.type === 'tilawah' && setActiveTab) {
+          setActiveTab('tilawah');
+        } else if (entry.type === 'hafalan' && setActiveTab) {
+          setActiveTab('hafalan');
+        }
       } else {
-        throw new Error("Failed to update progress.");
+        throw new Error("No data returned from update");
       }
     } catch (error) {
+      console.error('Update error:', error);
       toast({
         title: "Error",
-        description: "Failed to update progress. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to update progress. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -120,14 +138,14 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
           <Edit className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]" aria-describedby="edit-progress-description">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit {entry.type === 'hafalan' ? 'Tahfidz' : 'Tilawati'} Progress</DialogTitle>
-          <DialogDescription id="edit-progress-description">
+          <DialogDescription>
             Update the progress details for this entry.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div className="space-y-2">
             <Label htmlFor="date">Date</Label>
             <Input
@@ -140,9 +158,9 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
           </div>
           {entry.type === 'tilawah' && (
             <div className="space-y-2">
-              <Label htmlFor="tahsin_mode">Tahsin Mode</Label>
+              <Label htmlFor="tahsin-mode">Tahsin Mode</Label>
               <Select value={tahsinMode} onValueChange={(value) => setTahsinMode(value as 'tilawati' | 'alquran' | '')}>
-                <SelectTrigger>
+                <SelectTrigger id="tahsin-mode">
                   <SelectValue placeholder="Choose mode" />
                 </SelectTrigger>
                 <SelectContent>
@@ -155,12 +173,12 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
           {/* Juz selection for Tahfidz */}
           {entry.type === 'hafalan' && (
             <div className="space-y-2">
-              <Label htmlFor="juz">Juz</Label>
+              <Label htmlFor="juz-select">Juz</Label>
               <Select
                 value={selectedJuz === '' ? '0' : selectedJuz.toString()}
                 onValueChange={handleJuzChange}
               >
-                <SelectTrigger>
+                <SelectTrigger id="juz-select">
                   <SelectValue placeholder="Select a juz (optional)" />
                 </SelectTrigger>
                 <SelectContent>
@@ -177,12 +195,12 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
           {/* Surah/Jilid/Level selection */}
           {entry.type === 'hafalan' && (
             <div className="space-y-2">
-              <Label htmlFor="surah_or_jilid">Surah</Label>
+              <Label htmlFor="surah-select">Surah</Label>
               <Select
                 value={formData.surah_or_jilid}
                 onValueChange={(value) => handleInputChange('surah_or_jilid', value)}
               >
-                <SelectTrigger>
+                <SelectTrigger id="surah-select">
                   <SelectValue placeholder="Select a surah" />
                 </SelectTrigger>
                 <SelectContent>
@@ -198,12 +216,12 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
           {entry.type === 'tilawah' && tahsinMode === 'tilawati' && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="surah_or_jilid">Level</Label>
+                <Label htmlFor="level-select">Level</Label>
                 <Select
                   value={formData.surah_or_jilid}
                   onValueChange={(value) => handleInputChange('surah_or_jilid', value)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="level-select">
                     <SelectValue placeholder="Select level" />
                   </SelectTrigger>
                   <SelectContent>
@@ -214,9 +232,9 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="ayat_or_page">Page</Label>
+                <Label htmlFor="page-input">Page</Label>
                 <Input
-                  id="ayat_or_page"
+                  id="page-input"
                   value={formData.ayat_or_page}
                   onChange={(e) => handleInputChange('ayat_or_page', e.target.value)}
                   placeholder="e.g., 1-44"
@@ -227,12 +245,12 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
           {entry.type === 'tilawah' && tahsinMode === 'alquran' && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="surah_or_jilid">Surah</Label>
+                <Label htmlFor="alquran-surah-select">Surah</Label>
                 <Select
                   value={formData.surah_or_jilid}
                   onValueChange={(value) => handleInputChange('surah_or_jilid', value)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="alquran-surah-select">
                     <SelectValue placeholder="Select a surah" />
                   </SelectTrigger>
                   <SelectContent>
@@ -245,9 +263,9 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="ayat_or_page">Ayat/Verse</Label>
+                <Label htmlFor="ayat-input">Ayat/Verse</Label>
                 <Input
-                  id="ayat_or_page"
+                  id="ayat-input"
                   value={formData.ayat_or_page}
                   onChange={(e) => handleInputChange('ayat_or_page', e.target.value)}
                   placeholder="e.g., 1-7"
@@ -258,9 +276,9 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
           {/* Tahfidz ayat input */}
           {entry.type === 'hafalan' && (
             <div className="space-y-2">
-              <Label htmlFor="ayat_or_page">Ayat</Label>
+              <Label htmlFor="tahfidz-ayat-input">Ayat</Label>
               <Input
-                id="ayat_or_page"
+                id="tahfidz-ayat-input"
                 value={formData.ayat_or_page}
                 onChange={(e) => handleInputChange('ayat_or_page', e.target.value)}
                 placeholder="e.g., 1-7"
@@ -281,9 +299,18 @@ const EditProgressDialog: React.FC<EditProgressDialogProps> = ({ entry, onProgre
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button 
+              type="submit" 
+              disabled={loading}
+              aria-describedby={loading ? "loading-status" : undefined}
+            >
               {loading ? 'Updating...' : 'Update Progress'}
             </Button>
+            {loading && (
+              <div id="loading-status" className="sr-only">
+                Updating progress entry
+              </div>
+            )}
           </div>
         </form>
       </DialogContent>
