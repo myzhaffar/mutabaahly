@@ -2,8 +2,7 @@
   "/auth/page": "app/auth/page.js",
   "/dashboard/page": "app/dashboard/page.js",
   "/class/[className]/page": "app/class/[className]/page.js",
-  "/tests/manage/page": "app/tests/manage/page.js",
-  "/_not-found/page": "app/_not-found/page.js",
   "/students/page": "app/students/page.js",
-  "/page": "app/page.js"
+  "/tests/manage/page": "app/tests/manage/page.js",
+  "/_not-found/page": "app/_not-found/page.js"
 }

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Award, BookOpen, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { Award, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';
 import { fetchTahfidzRankingData, StudentRankingData, RankingFilters } from '@/utils/rankingDataService';
 import { useToast } from '@/hooks/use-toast';
 
