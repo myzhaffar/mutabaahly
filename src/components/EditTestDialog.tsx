@@ -70,14 +70,14 @@ const EditTestDialog: React.FC<EditTestDialogProps> = ({ test, onTestUpdated }) 
           <Edit className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]" aria-describedby="edit-test-description">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto" aria-describedby="edit-test-description">
+        <DialogHeader className="px-4 sm:px-6 pt-6">
           <DialogTitle>Edit Test</DialogTitle>
           <DialogDescription id="edit-test-description">
             Update the test details for this student.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 px-4 sm:px-6 pb-6">
           <div className="space-y-2">
             <Label htmlFor="date">Test Date</Label>
             <Input
@@ -95,7 +95,7 @@ const EditTestDialog: React.FC<EditTestDialogProps> = ({ test, onTestUpdated }) 
               value={formData.tilawati_level} 
               onValueChange={(value) => handleInputChange('tilawati_level', value)}
             >
-              <SelectTrigger>
+              <SelectTrigger id="tilawati_level">
                 <SelectValue placeholder="Select target level" />
               </SelectTrigger>
               <SelectContent>
@@ -127,7 +127,7 @@ const EditTestDialog: React.FC<EditTestDialogProps> = ({ test, onTestUpdated }) 
               value={formData.status} 
               onValueChange={(value) => handleInputChange('status', value)}
             >
-              <SelectTrigger>
+              <SelectTrigger id="status">
                 <SelectValue placeholder="Select test status" />
               </SelectTrigger>
               <SelectContent>
@@ -151,11 +151,11 @@ const EditTestDialog: React.FC<EditTestDialogProps> = ({ test, onTestUpdated }) 
             />
           </div>
 
-          <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+          <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-2 pt-4">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} className="w-full sm:w-auto">
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} className="w-full sm:w-auto">
               {loading ? 'Updating...' : 'Update Test'}
             </Button>
           </div>

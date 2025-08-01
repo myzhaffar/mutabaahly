@@ -134,10 +134,10 @@ const TeacherTestManagement: React.FC = () => {
 
   return (
     <TeacherLayout breadcrumbs={breadcrumbs}>
-      <div className="container mx-auto px-0 md:px-6 md:py-6">
+      <div className="container mx-auto px-4 md:px-6 py-4 md:py-6">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 w-full mb-6">
-          <div className="flex flex-row items-center gap-3 sm:gap-4 mt-2">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 w-full mb-6">
+          <div className="flex flex-row items-center gap-3 sm:gap-4">
             <button
               type="button"
               onClick={() => router.push('/dashboard')}
@@ -146,86 +146,90 @@ const TeacherTestManagement: React.FC = () => {
             >
               <ChevronLeft className="h-6 w-6" />
             </button>
-            <h1 className="text-2xl font-bold">Tilawati Tests</h1>
+            <h1 className="text-xl sm:text-2xl font-bold">Tilawati Tests</h1>
           </div>
           <GradientButton 
             onClick={() => setIsAddDialogOpen(true)}
-            className="w-full md:w-auto"
+            className="w-full sm:w-auto"
           >
             <Plus className="mr-2 h-4 w-4" />
             Schedule Test
           </GradientButton>
         </div>
 
-              {/* Status Tabs Section */}
-      <div className="mb-4">
-        <div className="flex flex-row items-center gap-3">
-          <span className="text-sm text-gray-400 font-medium">Status</span>
-          {STATUS_TABS.map(tab => {
-            const isActive = (filters.status?.length === 0 && tab.value === 'all') || (filters.status?.[0] === tab.value);
-            return (
-              <button
-                key={tab.value}
-                type="button"
-                onClick={() => {
-                  setFilters(prev => ({
-                    ...prev,
-                    status: tab.value === 'all' ? [] : [tab.value as TestStatus],
-                  }));
-                }}
-                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium focus:outline-none transition-all duration-200
-                  rounded-full
-                  ${isActive
-                    ? 'bg-green-500 text-white'
-                    : 'bg-white text-gray-700 border border-gray-300 hover:border-green-400 hover:text-green-600'}`}
-                aria-current={isActive ? 'page' : undefined}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
+        {/* Status Tabs Section */}
+        <div className="mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+            <span className="text-sm text-gray-400 font-medium">Status</span>
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              {STATUS_TABS.map(tab => {
+                const isActive = (filters.status?.length === 0 && tab.value === 'all') || (filters.status?.[0] === tab.value);
+                return (
+                  <button
+                    key={tab.value}
+                    type="button"
+                    onClick={() => {
+                      setFilters(prev => ({
+                        ...prev,
+                        status: tab.value === 'all' ? [] : [tab.value as TestStatus],
+                      }));
+                    }}
+                    className={`flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium focus:outline-none transition-all duration-200
+                      rounded-full whitespace-nowrap
+                      ${isActive
+                        ? 'bg-green-500 text-white'
+                        : 'bg-white text-gray-700 border border-gray-300 hover:border-green-400 hover:text-green-600'}`}
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
-      </div>
 
-            {/* Level Tabs Section */}
-      <div className="mb-6">
-        <div className="flex flex-row items-center gap-3 flex-wrap">
-          <span className="text-sm text-gray-400 font-medium">Level</span>
-          {LEVEL_TABS.map(tab => {
-            const isActive = (filters.jilidLevel?.length === 0 && tab.value === 'all') || (filters.jilidLevel?.[0] === tab.value);
-            return (
-              <button
-                key={tab.value}
-                type="button"
-                onClick={() => {
-                  setFilters(prev => ({
-                    ...prev,
-                    jilidLevel: tab.value === 'all' ? [] : [tab.value as TilawatiJilid],
-                  }));
-                }}
-                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium focus:outline-none transition-all duration-200
-                  rounded-full
-                  ${isActive
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-400 hover:text-blue-600'}`}
-                aria-current={isActive ? 'page' : undefined}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
+        {/* Level Tabs Section */}
+        <div className="mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+            <span className="text-sm text-gray-400 font-medium">Level</span>
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              {LEVEL_TABS.map(tab => {
+                const isActive = (filters.jilidLevel?.length === 0 && tab.value === 'all') || (filters.jilidLevel?.[0] === tab.value);
+                return (
+                  <button
+                    key={tab.value}
+                    type="button"
+                    onClick={() => {
+                      setFilters(prev => ({
+                        ...prev,
+                        jilidLevel: tab.value === 'all' ? [] : [tab.value as TilawatiJilid],
+                      }));
+                    }}
+                    className={`flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium focus:outline-none transition-all duration-200
+                      rounded-full whitespace-nowrap
+                      ${isActive
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-400 hover:text-blue-600'}`}
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
-      </div>
 
         {/* Table Section */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <TestTable
-          tests={tests || []}
-          isLoading={isLoading}
-          onTestUpdated={handleTestUpdate}
-          showStudentName={true}
-          getStudentName={getStudentName}
-        />
+          <TestTable
+            tests={tests || []}
+            isLoading={isLoading}
+            onTestUpdated={handleTestUpdate}
+            showStudentName={true}
+            getStudentName={getStudentName}
+          />
         </div>
 
         {/* Add Test Dialog */}

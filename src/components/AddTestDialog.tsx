@@ -168,7 +168,7 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[525px] bg-white flex flex-col h-[calc(100vh-32px)] sm:h-auto max-h-[calc(100vh-32px)] p-0" aria-describedby="add-test-description">
-        <DialogHeader className="px-6 pt-6 flex-shrink-0">
+        <DialogHeader className="px-4 sm:px-6 pt-6 flex-shrink-0">
           <DialogTitle>{currentTest ? 'Edit Tilawati Test' : 'Schedule Tilawati Test'}</DialogTitle>
           <DialogDescription id="add-test-description">
             {currentTest ? 'Edit test details below.' : 'Fill in the Tilawati test details for the student.'}
@@ -176,7 +176,7 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col min-h-0 flex-1">
-          <div className="flex-1 overflow-y-auto px-6">
+          <div className="flex-1 overflow-y-auto px-4 sm:px-6">
             <div className="space-y-4 py-4">
             <div>
               <Label htmlFor="student">Student</Label>
@@ -264,35 +264,35 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
               </Select>
             </div>
 
-              <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="testDate">Test Date</Label>
-                <Input
-                  id="testDate"
-                  type="date"
-                  value={testDate}
-                  onChange={(e) => setTestDate(e.target.value)}
-                />
-              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                <Label htmlFor="munaqisy">Examiner</Label>
-                <Select 
-                  value={munaqisy} 
-                  onValueChange={(value: string) => setMunaqisy(value)}
-                >
-                  <SelectTrigger id="munaqisy">
-                    <SelectValue placeholder="Select Examiner" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {EXAMINER_OPTIONS.map((examiner) => (
-                      <SelectItem key={examiner.value} value={examiner.value}>
-                        {examiner.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  <Label htmlFor="testDate">Test Date</Label>
+                  <Input
+                    id="testDate"
+                    type="date"
+                    value={testDate}
+                    onChange={(e) => setTestDate(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="munaqisy">Examiner</Label>
+                  <Select 
+                    value={munaqisy} 
+                    onValueChange={(value: string) => setMunaqisy(value)}
+                  >
+                    <SelectTrigger id="munaqisy">
+                      <SelectValue placeholder="Select Examiner" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {EXAMINER_OPTIONS.map((examiner) => (
+                        <SelectItem key={examiner.value} value={examiner.value}>
+                          {examiner.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-            </div>
 
             <div>
               <Label htmlFor="status">Status</Label>
@@ -332,12 +332,12 @@ const AddTestDialog: React.FC<AddTestDialogProps> = ({
           )}
           </div>
 
-          <DialogFooter className="px-6 py-4 bg-gray-50 border-t mt-auto flex-shrink-0">
-            <div className="flex justify-end gap-4 w-full">
-            <DialogClose asChild>
-                <Button variant="outline" onClick={onClose}>Cancel</Button>
-            </DialogClose>
-              <GradientButton type="submit" disabled={isLoading}>
+          <DialogFooter className="px-4 sm:px-6 py-4 bg-gray-50 border-t mt-auto flex-shrink-0">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 w-full">
+              <DialogClose asChild>
+                <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">Cancel</Button>
+              </DialogClose>
+              <GradientButton type="submit" disabled={isLoading} className="w-full sm:w-auto">
                 {isLoading ? 'Saving...' : currentTest ? 'Save Changes' : 'Add Test'}
               </GradientButton>
             </div>
