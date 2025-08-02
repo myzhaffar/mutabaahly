@@ -116,92 +116,98 @@ Notes: ${test.notes || 'No notes available'}`;
           >
             <ChevronLeft className="h-6 w-6" />
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
             Tilawati Test
           </h1>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
-          <div className="bg-gradient-to-r from-orange-50 to-yellow-100 rounded-lg shadow-sm p-4 text-gray-900 transition duration-200 hover:shadow-lg hover:scale-105 cursor-pointer">
-            <h3 className="text-sm text-gray-500">Total Tests</h3>
-            <p className="text-2xl font-bold">{stats.total}</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 w-full">
+          <div className="bg-gradient-to-r from-orange-50 to-yellow-100 rounded-lg shadow-sm p-3 sm:p-4 text-gray-900 transition duration-200 hover:shadow-lg hover:scale-105 cursor-pointer">
+            <h3 className="text-xs sm:text-sm text-gray-500">Total Tests</h3>
+            <p className="text-lg sm:text-2xl font-bold">{stats.total}</p>
           </div>
-          <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg shadow-sm p-4 text-gray-900 transition duration-200 hover:shadow-lg hover:scale-105 cursor-pointer">
-            <h3 className="text-sm text-gray-500">Passed</h3>
-            <p className="text-2xl font-bold text-green-600">{stats.passed}</p>
+          <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg shadow-sm p-3 sm:p-4 text-gray-900 transition duration-200 hover:shadow-lg hover:scale-105 cursor-pointer">
+            <h3 className="text-xs sm:text-sm text-gray-500">Passed</h3>
+            <p className="text-lg sm:text-2xl font-bold text-green-600">{stats.passed}</p>
           </div>
-          <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg shadow-sm p-4 text-gray-900 transition duration-200 hover:shadow-lg hover:scale-105 cursor-pointer">
-            <h3 className="text-sm text-gray-500">Scheduled</h3>
-            <p className="text-2xl font-bold text-blue-600">{stats.scheduled}</p>
+          <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg shadow-sm p-3 sm:p-4 text-gray-900 transition duration-200 hover:shadow-lg hover:scale-105 cursor-pointer">
+            <h3 className="text-xs sm:text-sm text-gray-500">Scheduled</h3>
+            <p className="text-lg sm:text-2xl font-bold text-blue-600">{stats.scheduled}</p>
           </div>
-          <div className="bg-gradient-to-r from-red-50 to-red-100 rounded-lg shadow-sm p-4 text-gray-900 transition duration-200 hover:shadow-lg hover:scale-105 cursor-pointer">
-            <h3 className="text-sm text-gray-500">Failed</h3>
-            <p className="text-2xl font-bold text-red-600">{stats.failed}</p>
+          <div className="bg-gradient-to-r from-red-50 to-red-100 rounded-lg shadow-sm p-3 sm:p-4 text-gray-900 transition duration-200 hover:shadow-lg hover:scale-105 cursor-pointer">
+            <h3 className="text-xs sm:text-sm text-gray-500">Failed</h3>
+            <p className="text-lg sm:text-2xl font-bold text-red-600">{stats.failed}</p>
           </div>
         </div>
 
         {/* Status Tabs Section */}
         <div className="mb-4">
-          <div className="flex flex-row gap-3">
-            {STATUS_TABS.map(tab => {
-              const isActive = (filters.status?.length === 0 && tab.value === 'all') || (filters.status?.[0] === tab.value);
-              return (
-                <button
-                  key={tab.value}
-                  type="button"
-                  onClick={() => {
-                    setFilters(prev => ({
-                      ...prev,
-                      status: tab.value === 'all' ? [] : [tab.value as TestStatus],
-                    }));
-                  }}
-                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium focus:outline-none transition-all duration-200
-                    rounded-full
-                    ${isActive
-                      ? 'bg-green-500 text-white'
-                      : 'bg-white text-gray-700 border border-gray-300 hover:border-green-400 hover:text-green-600'}`}
-                  aria-current={isActive ? 'page' : undefined}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+            <span className="text-sm text-gray-400 font-medium">Status</span>
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              {STATUS_TABS.map(tab => {
+                const isActive = (filters.status?.length === 0 && tab.value === 'all') || (filters.status?.[0] === tab.value);
+                return (
+                  <button
+                    key={tab.value}
+                    type="button"
+                    onClick={() => {
+                      setFilters(prev => ({
+                        ...prev,
+                        status: tab.value === 'all' ? [] : [tab.value as TestStatus],
+                      }));
+                    }}
+                    className={`flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium focus:outline-none transition-all duration-200
+                      rounded-full whitespace-nowrap
+                      ${isActive
+                        ? 'bg-green-500 text-white'
+                        : 'bg-white text-gray-700 border border-gray-300 hover:border-green-400 hover:text-green-600'}`}
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
         {/* Level Tabs Section */}
         <div className="mb-6">
-          <div className="flex flex-row gap-3 flex-wrap">
-            {LEVEL_TABS.map(tab => {
-              const isActive = (filters.jilidLevel?.length === 0 && tab.value === 'all') || (filters.jilidLevel?.[0] === tab.value);
-              return (
-                <button
-                  key={tab.value}
-                  type="button"
-                  onClick={() => {
-                    setFilters(prev => ({
-                      ...prev,
-                      jilidLevel: tab.value === 'all' ? [] : [tab.value as TilawatiJilid],
-                    }));
-                  }}
-                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium focus:outline-none transition-all duration-200
-                    rounded-full
-                    ${isActive
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-400 hover:text-blue-600'}`}
-                  aria-current={isActive ? 'page' : undefined}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+            <span className="text-sm text-gray-400 font-medium">Level</span>
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              {LEVEL_TABS.map(tab => {
+                const isActive = (filters.jilidLevel?.length === 0 && tab.value === 'all') || (filters.jilidLevel?.[0] === tab.value);
+                return (
+                  <button
+                    key={tab.value}
+                    type="button"
+                    onClick={() => {
+                      setFilters(prev => ({
+                        ...prev,
+                        jilidLevel: tab.value === 'all' ? [] : [tab.value as TilawatiJilid],
+                      }));
+                    }}
+                    className={`flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium focus:outline-none transition-all duration-200
+                      rounded-full whitespace-nowrap
+                      ${isActive
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-400 hover:text-blue-600'}`}
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
         {/* Results Count */}
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-600">
+          <p className="text-xs sm:text-sm text-gray-600">
             Showing {filteredTests.length} of {tests?.length || 0} tests
           </p>
         </div>
