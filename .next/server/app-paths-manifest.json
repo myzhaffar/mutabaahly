@@ -1,9 +1,5 @@
 {
-  "/tests/view/page": "app/tests/view/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
+  "/page": "app/page.js",
   "/auth/page": "app/auth/page.js",
-  "/profile/page": "app/profile/page.js",
-  "/_not-found/page": "app/_not-found/page.js",
-  "/tests/manage/page": "app/tests/manage/page.js",
-  "/page": "app/page.js"
+  "/dashboard/page": "app/dashboard/page.js"
 }

@@ -1,18 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 
-export default function ConfirmPage() {
+function ConfirmPageContent() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
-
 
   useEffect(() => {
     const handleEmailConfirmation = async () => {
@@ -116,5 +115,27 @@ export default function ConfirmPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function ConfirmPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-teal-50 p-4">
+        <div className="w-full max-w-md">
+          <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur">
+            <CardContent className="p-8">
+              <div className="text-center">
+                <Loader2 className="h-12 w-12 text-teal-500 animate-spin mx-auto mb-4" />
+                <h2 className="text-2xl font-bold mb-4 text-gray-900">Loading...</h2>
+                <p className="text-gray-600">Please wait while we load the confirmation page...</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    }>
+      <ConfirmPageContent />
+    </Suspense>
   );
 } 

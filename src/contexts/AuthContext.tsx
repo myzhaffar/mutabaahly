@@ -81,48 +81,85 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    // Set a timeout to prevent infinite loading
+    const loadingTimeout = setTimeout(() => {
+      console.warn('Auth loading timeout - forcing loading to false');
+      setLoading(false);
+    }, 10000); // 10 seconds timeout
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_, session) => {
+      async (event, session) => {
+        console.log('Auth state change:', event, session?.user?.email_confirmed_at);
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Fetch user profile immediately
-          await fetchProfile(session.user.id);
-          // Check if profile exists
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-          if (!profileData && !profileError) {
-            // Create profile with role from user metadata
-            await supabase.from('profiles').insert([
-              {
-                id: session.user.id,
-                full_name: session.user.user_metadata.full_name || session.user.user_metadata.name || '',
-                role: session.user.user_metadata.role || undefined, // <-- set role from metadata
-                email: session.user.email || undefined,
-                avatar_url: null,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              },
-            ]);
-            // Refetch profile after creation
+          // Check if email is confirmed
+          if (!session.user.email_confirmed_at) {
+            console.log('User email not confirmed');
+            setProfile(null);
+            setLoading(false);
+            return;
+          }
+          
+          try {
+            // Fetch user profile immediately
             await fetchProfile(session.user.id);
-          } else {
-            // If profile exists but role is null, and user metadata has a role, upsert it
-            if (profileData && (!profileData.role || profileData.role === null) && session.user.user_metadata.role) {
-              await supabase.from('profiles').update({
-                role: session.user.user_metadata.role
-              }).eq('id', session.user.id);
-              // Refetch profile after update
-              await fetchProfile(session.user.id);
+            // Check if profile exists
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single();
+            
+            if (profileError) {
+              console.error('Error checking profile:', profileError);
+              // If profile doesn't exist, create it
+              if (profileError.code === 'PGRST116') {
+                console.log('Creating new profile for OAuth user');
+                const { error: insertError } = await supabase.from('profiles').insert([
+                  {
+                    id: session.user.id,
+                    full_name: session.user.user_metadata.full_name || session.user.user_metadata.name || '',
+                    role: null, // OAuth users always start with null role
+                    email: session.user.email || undefined,
+                    avatar_url: null,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                  },
+                ]);
+                if (insertError) {
+                  console.error('Error creating profile:', insertError);
+                }
+                // Refetch profile after creation
+                await fetchProfile(session.user.id);
+              }
+            } else if (profileData) {
+              // Profile exists, set it directly
+              // For OAuth users, we ensure they start with null role
+              // OAuth users should explicitly select their role on the select-role page
+              const profile = profileData as Profile;
+              
+              // If this is an OAuth user (no password) and they have a role, reset it to null
+              // This ensures OAuth users always go through role selection
+              if (session.user.app_metadata.provider === 'google' && profile.role) {
+                console.log('OAuth user has role, resetting to null for role selection');
+                await supabase.from('profiles').update({
+                  role: null
+                }).eq('id', session.user.id);
+                profile.role = null;
+              }
+              
+              setProfile(profile);
             }
+          } catch (error) {
+            console.error('Error in auth state change:', error);
+            setProfile(null);
           }
           setLoading(false);
         } else {
+          console.log('No user in session, setting loading to false');
           setProfile(null);
           setLoading(false);
         }
@@ -131,14 +168,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check:', !!session, session?.user?.id);
       setSession(session);
       setUser(session?.user ?? null);
       if (!session) {
+        console.log('No session found, setting loading to false');
         setLoading(false);
       }
+    }).catch((error) => {
+      console.error('Error getting session:', error);
+      setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(loadingTimeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const refreshProfile = async () => {

@@ -11,7 +11,7 @@ import { toast } from "sonner";
 export default function TestEmailPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<{ data: unknown; error: unknown } | null>(null);
 
   const testEmailSignup = async () => {
     if (!email) {
@@ -183,7 +183,7 @@ export default function TestEmailPage() {
                 <h4 className="font-semibold text-green-600">To Fix:</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 mt-2">
                   <li>Go to Supabase Dashboard → Settings → Auth → Email Templates</li>
-                  <li>Configure SMTP settings or use Supabase's email service</li>
+                  <li>Configure SMTP settings or use Supabase&apos;s email service</li>
                   <li>Verify your domain in Supabase</li>
                   <li>Check environment variables: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_KEY</li>
                   <li>Test with a different email address</li>
