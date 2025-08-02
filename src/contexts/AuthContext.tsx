@@ -167,12 +167,71 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       console.log('Initial session check:', !!session, session?.user?.id);
       setSession(session);
       setUser(session?.user ?? null);
+      
       if (!session) {
         console.log('No session found, setting loading to false');
+        setLoading(false);
+        return;
+      }
+      
+      // If session exists, fetch profile and set loading to false
+      if (session.user) {
+        try {
+          console.log('Session exists, fetching profile for user:', session.user.id);
+          await fetchProfile(session.user.id);
+          
+          // Check if profile exists
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+          
+          if (profileError) {
+            console.error('Error checking profile:', profileError);
+            // If profile doesn't exist, create it
+            if (profileError.code === 'PGRST116') {
+              console.log('Creating new profile for existing session user');
+              const { error: insertError } = await supabase.from('profiles').insert([
+                {
+                  id: session.user.id,
+                  full_name: session.user.user_metadata.full_name || session.user.user_metadata.name || '',
+                  role: null, // OAuth users always start with null role
+                  email: session.user.email || undefined,
+                  avatar_url: null,
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString(),
+                },
+              ]);
+              if (insertError) {
+                console.error('Error creating profile:', insertError);
+              }
+              // Refetch profile after creation
+              await fetchProfile(session.user.id);
+            }
+          } else if (profileData) {
+            // Profile exists, set it directly
+            const profile = profileData as Profile;
+            
+            // If this is an OAuth user and they have a role, reset it to null
+            if (session.user.app_metadata.provider === 'google' && profile.role) {
+              console.log('OAuth user has role, resetting to null for role selection');
+              await supabase.from('profiles').update({
+                role: null
+              }).eq('id', session.user.id);
+              profile.role = null;
+            }
+            
+            setProfile(profile);
+          }
+        } catch (error) {
+          console.error('Error in initial session profile fetch:', error);
+          setProfile(null);
+        }
         setLoading(false);
       }
     }).catch((error) => {
