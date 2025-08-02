@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 import '@/i18n';
 
 const Index = () => {
-  const { user, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   const { t } = useTranslation();
 
   const router = useRouter();
@@ -29,11 +29,16 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Redirect authenticated users to dashboard
+    // Redirect authenticated users based on their role
     if (!loading && user) {
-      router.push('/dashboard');
+      // Check if user has a role, if not redirect to select-role
+      if (profile && profile.role) {
+        router.push('/dashboard');
+      } else {
+        router.push('/select-role');
+      }
     }
-  }, [user, loading, router]);
+  }, [user, profile, loading, router]);
 
   const testimonials = [
     {

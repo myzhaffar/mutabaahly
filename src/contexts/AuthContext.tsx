@@ -137,18 +137,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               }
             } else if (profileData) {
               // Profile exists, set it directly
-              // For OAuth users, we ensure they start with null role
-              // OAuth users should explicitly select their role on the select-role page
               const profile = profileData as Profile;
               
-              // If this is an OAuth user (no password) and they have a role, reset it to null
-              // This ensures OAuth users always go through role selection
-              if (session.user.app_metadata.provider === 'google' && profile.role) {
-                console.log('OAuth user has role, resetting to null for role selection');
-                await supabase.from('profiles').update({
-                  role: null
-                }).eq('id', session.user.id);
-                profile.role = null;
+              // Only reset role to null for NEW OAuth users (those without an existing role)
+              // Existing email users who sign in with OAuth should keep their role
+              if (session.user.app_metadata.provider === 'google' && !profile.role) {
+                console.log('New OAuth user detected, role is already null');
+              } else if (session.user.app_metadata.provider === 'google' && profile.role) {
+                console.log('Existing user signing in with OAuth, keeping existing role:', profile.role);
               }
               
               setProfile(profile);
@@ -217,13 +213,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Profile exists, set it directly
             const profile = profileData as Profile;
             
-            // If this is an OAuth user and they have a role, reset it to null
-            if (session.user.app_metadata.provider === 'google' && profile.role) {
-              console.log('OAuth user has role, resetting to null for role selection');
-              await supabase.from('profiles').update({
-                role: null
-              }).eq('id', session.user.id);
-              profile.role = null;
+            // Only reset role to null for NEW OAuth users (those without an existing role)
+            // Existing email users who sign in with OAuth should keep their role
+            if (session.user.app_metadata.provider === 'google' && !profile.role) {
+              console.log('New OAuth user detected, role is already null');
+            } else if (session.user.app_metadata.provider === 'google' && profile.role) {
+              console.log('Existing user signing in with OAuth, keeping existing role:', profile.role);
             }
             
             setProfile(profile);

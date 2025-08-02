@@ -91,8 +91,14 @@ export async function middleware(req: NextRequest) {
   }
   
   if (isAuthRoute && session) {
-    // User already authenticated, redirect to dashboard
-    return NextResponse.redirect(new URL('/dashboard', req.url));
+    // User already authenticated, check their role and redirect accordingly
+    if (userProfile && userProfile.role) {
+      // User has a role, redirect to dashboard
+      return NextResponse.redirect(new URL('/dashboard', req.url));
+    } else {
+      // User doesn't have a role, redirect to select-role
+      return NextResponse.redirect(new URL('/select-role', req.url));
+    }
   }
   
   if (session && userProfile) {
