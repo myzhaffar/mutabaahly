@@ -1,17 +1,18 @@
 {
-  "/auth/page": "app/auth/page.js",
-  "/_not-found/page": "app/_not-found/page.js",
   "/api/delete-user/route": "app/api/delete-user/route.js",
-  "/auth/callback/route": "app/auth/callback/route.js",
   "/api/send-confirmation-email/route": "app/api/send-confirmation-email/route.js",
-  "/page": "app/page.js",
-  "/tests/view/page": "app/tests/view/page.js",
+  "/auth/page": "app/auth/page.js",
+  "/auth/check-email/page": "app/auth/check-email/page.js",
   "/auth/confirm/page": "app/auth/confirm/page.js",
+  "/page": "app/page.js",
   "/select-role/page": "app/select-role/page.js",
-  "/profile/page": "app/profile/page.js",
+  "/auth/callback/route": "app/auth/callback/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/tests/view/page": "app/tests/view/page.js",
   "/class/[className]/page": "app/class/[className]/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/students/page": "app/students/page.js",
   "/student/[id]/page": "app/student/[id]/page.js",
-  "/tests/manage/page": "app/tests/manage/page.js"
+  "/dashboard/page": "app/dashboard/page.js",
+  "/tests/manage/page": "app/tests/manage/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/students/page": "app/students/page.js"
 }

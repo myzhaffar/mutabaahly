@@ -93,8 +93,8 @@ const Auth = () => {
             title: "Success",
             description: "Account created successfully! Please check your email to verify your account.",
           });
-          // Redirect to confirmation page
-          router.push(`/auth/confirm?email=${encodeURIComponent(email)}`);
+          // Redirect to check email page instead of confirmation page
+          router.push(`/auth/check-email?email=${encodeURIComponent(email)}`);
         }
       }
     } catch {

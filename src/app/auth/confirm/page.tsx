@@ -21,9 +21,6 @@ function ConfirmPageContent() {
         if (email) {
           console.log('Processing email confirmation for:', email);
           
-          // Since we're using Resend for email confirmation, we'll mark the user as confirmed
-          // by updating their profile or setting a confirmation flag
-          
           // Get current user session
           const { data: { session } } = await supabase.auth.getSession();
           
@@ -31,8 +28,15 @@ function ConfirmPageContent() {
             // User is logged in and email matches, mark as confirmed
             console.log('User session found, marking email as confirmed');
             
-            // Update the user's email_confirmed_at in Supabase (if needed)
-            // For now, we'll just show success since the user clicked the email link
+            // Mark the user as email confirmed in Supabase
+            const { error: updateError } = await supabase.auth.updateUser({
+              data: { email_confirmed: true }
+            });
+            
+            if (updateError) {
+              console.error('Error updating user:', updateError);
+            }
+            
             setStatus('success');
             setMessage('Email confirmed successfully! You can now access your account.');
           } else {
