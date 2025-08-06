@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 interface Filters {
   teachers?: string[];
   grades: string[];
+  classes: string[];
 }
 
 interface Pagination {
@@ -38,7 +39,8 @@ const TahfidzTable: React.FC<TahfidzTableProps> = ({ filters, pagination }) => {
       try {
         const rankingFilters: RankingFilters = {
           teacher: filters.teachers?.[0] || '',
-          grade: filters.grades[0] || ''
+          grade: filters.grades[0] || '',
+          class: filters.classes[0] || ''
         };
         
         const data = await fetchTahfidzRankingData(rankingFilters);
@@ -57,14 +59,15 @@ const TahfidzTable: React.FC<TahfidzTableProps> = ({ filters, pagination }) => {
     };
 
     fetchData();
-  }, [filters.teachers, filters.grades, toast]);
+  }, [filters.teachers, filters.grades, filters.classes, toast]);
 
   // Apply filters
   const filteredStudents = allStudents.filter(student => {
     const teachers = filters.teachers || [];
     const matchesTeacher = teachers.length === 0 || teachers.includes(student.teacherId);
     const matchesGrade = filters.grades.length === 0 || filters.grades.includes('all') || filters.grades.includes(student.grade);
-    return matchesTeacher && matchesGrade;
+    const matchesClass = filters.classes.length === 0 || filters.classes.includes('all') || filters.classes.includes(student.class);
+    return matchesTeacher && matchesGrade && matchesClass;
   });
 
   // The data is already sorted by Juz (30 to 1) then by verse from the service

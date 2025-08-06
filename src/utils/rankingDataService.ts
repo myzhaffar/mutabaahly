@@ -24,6 +24,7 @@ export interface StudentRankingData {
 export interface RankingFilters {
   teacher: string;
   grade: string;
+  class?: string;
 }
 
 export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise<StudentRankingData[]> => {
@@ -48,6 +49,14 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
         query = query.in('group_name', gradeArr);
       } else {
         query = query.eq('group_name', filters.grade);
+      }
+    }
+    if (filters.class && filters.class !== 'all') {
+      if (filters.class.includes(',')) {
+        const classArr = filters.class.split(',').map(c => c.trim()).filter(Boolean);
+        query = query.in('group_name', classArr);
+      } else {
+        query = query.eq('group_name', filters.class);
       }
     }
 
@@ -180,6 +189,14 @@ export const fetchTahfidzRankingData = async (filters: RankingFilters): Promise<
         query = query.in('group_name', gradeArr);
       } else {
         query = query.eq('group_name', filters.grade);
+      }
+    }
+    if (filters.class && filters.class !== 'all') {
+      if (filters.class.includes(',')) {
+        const classArr = filters.class.split(',').map(c => c.trim()).filter(Boolean);
+        query = query.in('group_name', classArr);
+      } else {
+        query = query.eq('group_name', filters.class);
       }
     }
 
