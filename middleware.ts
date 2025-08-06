@@ -35,14 +35,12 @@ export async function middleware(req: NextRequest) {
         .single();
       
       if (error) {
-        console.log('Profile fetch error in middleware:', error.message);
         // Don't set userProfile to null, let it remain null so we can handle it properly
       } else {
         userProfile = profile;
-        console.log('Profile found in middleware:', profile?.role);
       }
     } catch (error) {
-      console.log('Profile fetch exception in middleware:', error);
+      // Handle profile fetch error silently
     }
   }
   
@@ -102,7 +100,6 @@ export async function middleware(req: NextRequest) {
   // Allow access to select-role page for OAuth users
   // This page is only for OAuth users who need to select their role
   if (currentPath === '/select-role') {
-    console.log('Allowing access to select-role page');
     return res;
   }
   
@@ -142,10 +139,8 @@ export async function middleware(req: NextRequest) {
     if (isProtectedRoute && currentPath !== '/select-role') {
       // For protected routes, allow access and let client-side handle the profile loading
       // This prevents redirect loops when the profile is still being fetched
-      console.log('User authenticated but profile not loaded yet, allowing access to protected route');
     } else if (currentPath === '/select-role') {
       // If user is on select-role page but profile is loading, allow them to stay there
-      console.log('User on select-role page, profile loading, allowing access');
     }
   }
   

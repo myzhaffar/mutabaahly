@@ -32,7 +32,6 @@ interface AuthContextType {
   signOut: () => Promise<{ error: AuthError | null }>;
   refreshProfile: () => Promise<void>;
   updateUserRole: (role: 'teacher' | 'parent') => Promise<{ error: AuthError | PostgrestError | string | null }>;
-  checkSessionStorage: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -45,8 +44,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchProfile = useCallback(async (userId: string) => {
     try {
-      console.log('Fetching profile for user:', userId);
-      
       const { data: profileData, error } = await supabase
         .from('profiles')
         .select('*')
@@ -58,23 +55,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // If profile doesn't exist, create it
         if (error.code === 'PGRST116') {
-          console.log('Profile not found, creating new profile for user:', userId);
-          
           // Get current user to determine if this is OAuth or email user
           const { data: { user } } = await supabase.auth.getUser();
           
           if (user) {
             const isOAuthUser = user.app_metadata.provider === 'google';
             const userRole = isOAuthUser ? null : user.user_metadata.role;
-            
-            // If user has no role in metadata but should have one, try to get it from the database
-            if (!userRole && !isOAuthUser) {
-              console.log('No role in user metadata, checking if user should have a role');
-              // This might be a user who signed up before we started storing roles in metadata
-              // We'll let them select their role later
-            }
-            
-            console.log('User type:', isOAuthUser ? 'OAuth' : 'Email', 'Role:', userRole);
             
             const { data: newProfile, error: insertError } = await supabase.from('profiles').insert([
               {
@@ -92,7 +78,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               console.error('Error creating profile:', insertError);
               setProfile(null);
             } else if (newProfile) {
-              console.log('Profile created successfully:', newProfile);
               // Set the profile directly instead of calling fetchProfile again
               const typedProfile: Profile = {
                 id: newProfile.id,
@@ -111,7 +96,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setProfile(null);
         }
       } else if (profileData) {
-        console.log('Profile found:', profileData);
         // Type assertion for the database response
         const dbProfile = profileData as {
           id: string;
@@ -135,7 +119,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
         setProfile(typedProfile);
       } else {
-        console.log('No profile data returned');
         setProfile(null);
       }
     } catch (error) {
@@ -155,21 +138,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state change:', event, session?.user?.id);
+      async (_, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
           try {
-            console.log('Processing user session:', session.user.id);
             await fetchProfile(session.user.id);
           } catch (error) {
             console.error('Error in auth state change:', error);
             setProfile(null);
           }
         } else {
-          console.log('No user in session, clearing profile');
           setProfile(null);
         }
         
@@ -184,24 +164,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Check for existing session
     const initializeAuth = async () => {
       try {
-        console.log('Initializing auth...');
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('Error getting session:', error);
         }
         
-        console.log('Initial session check:', !!session, session?.user?.id);
-        console.log('Session data:', session);
-        
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          console.log('Session exists, fetching profile for user:', session.user.id);
           await fetchProfile(session.user.id);
-        } else {
-          console.log('No session found - user needs to sign in');
         }
         
         // Set loading to false after initial session check and profile fetch
@@ -346,33 +319,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const checkSessionStorage = () => {
-    console.log('=== Session Storage Debug ===');
-    console.log('Current session:', session);
-    console.log('Current user:', user);
-    console.log('Current profile:', profile);
-    console.log('Loading state:', loading);
-    
-    // Check browser session storage
-    if (typeof window !== 'undefined') {
-      const sessionKey = `sb-isyhakwwgdozgtlquzis-auth-token`;
-      const sessionData = sessionStorage.getItem(sessionKey);
-      console.log('Session storage key:', sessionKey);
-      console.log('Session storage data:', sessionData);
-      
-      if (sessionData) {
-        try {
-          const parsed = JSON.parse(sessionData);
-          console.log('Parsed session data:', parsed);
-        } catch (e) {
-          console.log('Failed to parse session data:', e);
-        }
-      } else {
-        console.log('No session data in session storage');
-      }
-    }
-    console.log('=== End Session Storage Debug ===');
-  };
+
 
 
 
@@ -387,7 +334,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       signOut,
       refreshProfile,
       updateUserRole,
-      checkSessionStorage,
     }}>
       {children}
     </AuthContext.Provider>
