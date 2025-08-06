@@ -37,6 +37,7 @@ export async function middleware(req: NextRequest) {
   
   // Define route patterns
   const protectedRoutes = [
+    '/',
     '/dashboard',
     '/students', 
     '/student',
@@ -59,7 +60,7 @@ export async function middleware(req: NextRequest) {
   ];
   
   const authRoutes = ['/auth'];
-  const publicRoutes = ['/', '/select-role', '/auth/confirm', '/auth/check-email'];
+  const publicRoutes = ['/select-role', '/auth/confirm', '/auth/check-email'];
   
   const currentPath = req.nextUrl.pathname;
   
@@ -90,6 +91,18 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/auth', req.url));
   }
   
+  // Redirect authenticated users from root to dashboard
+  if (session && currentPath === '/') {
+    if (userProfile && userProfile.role) {
+      // User has a role, redirect to dashboard
+      return NextResponse.redirect(new URL('/dashboard', req.url));
+    } else if (userProfile && !userProfile.role) {
+      // User has no role, redirect to select-role
+      return NextResponse.redirect(new URL('/select-role', req.url));
+    }
+    // If profile is not loaded yet, let the client handle it
+  }
+  
   if (isAuthRoute && session) {
     // User already authenticated, check their role and redirect accordingly
     if (userProfile && userProfile.role) {
@@ -117,6 +130,11 @@ export async function middleware(req: NextRequest) {
     if (!userProfile.role && !isPublicRoute && currentPath !== '/select-role') {
       return NextResponse.redirect(new URL('/select-role', req.url));
     }
+  } else if (session && !userProfile) {
+    // User is authenticated but profile is not loaded yet
+    // Don't redirect, let the client-side handle the profile loading
+    // This prevents redirect loops when the profile is still being fetched
+    console.log('User authenticated but profile not loaded yet, allowing access');
   }
   
   return res;

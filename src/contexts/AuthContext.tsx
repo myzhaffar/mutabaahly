@@ -148,6 +148,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setProfile(null);
         }
         
+        // Only set loading to false after profile is processed
         if (!isInitialized) {
           isInitialized = true;
           setLoading(false);
@@ -168,9 +169,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('Session exists, fetching profile for user:', session.user.id);
           await fetchProfile(session.user.id);
         }
+        
+        // Set loading to false after initial session check and profile fetch
+        if (!isInitialized) {
+          isInitialized = true;
+          setLoading(false);
+        }
       } catch (error) {
         console.error('Error getting session:', error);
-      } finally {
         if (!isInitialized) {
           isInitialized = true;
           setLoading(false);
