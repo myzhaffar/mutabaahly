@@ -32,6 +32,7 @@ interface AuthContextType {
   signOut: () => Promise<{ error: AuthError | null }>;
   refreshProfile: () => Promise<void>;
   updateUserRole: (role: 'teacher' | 'parent') => Promise<{ error: AuthError | PostgrestError | string | null }>;
+  checkSessionStorage: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -183,8 +184,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Check for existing session
     const initializeAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        console.log('Initializing auth...');
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error getting session:', error);
+        }
+        
         console.log('Initial session check:', !!session, session?.user?.id);
+        console.log('Session data:', session);
         
         setSession(session);
         setUser(session?.user ?? null);
@@ -192,6 +200,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (session?.user) {
           console.log('Session exists, fetching profile for user:', session.user.id);
           await fetchProfile(session.user.id);
+        } else {
+          console.log('No session found - user needs to sign in');
         }
         
         // Set loading to false after initial session check and profile fetch
@@ -336,6 +346,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const checkSessionStorage = () => {
+    console.log('=== Session Storage Debug ===');
+    console.log('Current session:', session);
+    console.log('Current user:', user);
+    console.log('Current profile:', profile);
+    console.log('Loading state:', loading);
+    
+    // Check browser session storage
+    if (typeof window !== 'undefined') {
+      const sessionKey = `sb-isyhakwwgdozgtlquzis-auth-token`;
+      const sessionData = sessionStorage.getItem(sessionKey);
+      console.log('Session storage key:', sessionKey);
+      console.log('Session storage data:', sessionData);
+      
+      if (sessionData) {
+        try {
+          const parsed = JSON.parse(sessionData);
+          console.log('Parsed session data:', parsed);
+        } catch (e) {
+          console.log('Failed to parse session data:', e);
+        }
+      } else {
+        console.log('No session data in session storage');
+      }
+    }
+    console.log('=== End Session Storage Debug ===');
+  };
+
 
 
   return (
@@ -349,6 +387,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       signOut,
       refreshProfile,
       updateUserRole,
+      checkSessionStorage,
     }}>
       {children}
     </AuthContext.Provider>

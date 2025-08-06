@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 
 export default function SelectRolePage() {
-  const { user, profile, updateUserRole } = useAuth();
+  const { user, profile, updateUserRole, checkSessionStorage } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [selectedRole, setSelectedRole] = useState<string>("");
@@ -91,6 +91,15 @@ export default function SelectRolePage() {
               </div>
               <Button type="submit" className="w-full bg-gradient-to-r from-emerald-500 to-teal-400 text-white text-lg font-semibold rounded-lg py-3 flex items-center justify-center gap-2 hover:opacity-90" disabled={loading}>
                 {loading ? "Saving..." : "Continue"}
+              </Button>
+              
+              {/* Debug button - remove this later */}
+              <Button 
+                type="button" 
+                onClick={checkSessionStorage}
+                className="w-full mt-2 bg-gray-500 text-white text-sm font-semibold rounded-lg py-2"
+              >
+                Debug Session Storage
               </Button>
             </form>
           </CardContent>
