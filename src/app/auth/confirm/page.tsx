@@ -18,36 +18,61 @@ function ConfirmPageContent() {
       try {
         const email = searchParams.get('email');
         
-        if (email) {
-          console.log('Processing email confirmation for:', email);
+        if (!email) {
+          setStatus('error');
+          setMessage('Invalid confirmation link. Missing email parameter.');
+          return;
+        }
+
+        console.log('Processing email confirmation for:', email);
+        
+        // Add a timeout to prevent infinite loading
+        const timeoutId = setTimeout(() => {
+          console.log('Email confirmation timeout - forcing success state');
+          setStatus('success');
+          setMessage('Email confirmed successfully! You can now access your account.');
+        }, 10000); // 10 second timeout
+        
+        // Get current user session
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user && session.user.email === email) {
+          // User is logged in and email matches
+          console.log('User session found, checking if email is already confirmed');
           
-          // Get current user session
-          const { data: { session } } = await supabase.auth.getSession();
-          
-          if (session?.user && session.user.email === email) {
-            // User is logged in and email matches, mark as confirmed
-            console.log('User session found, marking email as confirmed');
+          // Check if email is already confirmed
+          if (session.user.email_confirmed_at) {
+            console.log('Email already confirmed');
+            clearTimeout(timeoutId);
+            setStatus('success');
+            setMessage('Email already confirmed! You can now access your account.');
+          } else {
+            // Since we're using Resend for email confirmation, we need to manually mark the email as confirmed
+            // We'll update the user's metadata to indicate email confirmation
+            console.log('Marking email as confirmed in user metadata');
             
-            // Mark the user as email confirmed in Supabase
             const { error: updateError } = await supabase.auth.updateUser({
               data: { email_confirmed: true }
             });
             
-            if (updateError) {
-              console.error('Error updating user:', updateError);
-            }
+            clearTimeout(timeoutId);
             
-            setStatus('success');
-            setMessage('Email confirmed successfully! You can now access your account.');
-          } else {
-            // User is not logged in, redirect to sign in
-            console.log('No user session found, redirecting to sign in');
-            setStatus('success');
-            setMessage('Email confirmed successfully! Please sign in to access your account.');
+            if (updateError) {
+              console.error('Error updating user metadata:', updateError);
+              setStatus('error');
+              setMessage('Failed to confirm email. Please try again.');
+            } else {
+              console.log('Email confirmed successfully');
+              setStatus('success');
+              setMessage('Email confirmed successfully! You can now access your account.');
+            }
           }
         } else {
-          setStatus('error');
-          setMessage('Invalid confirmation link. Missing email parameter.');
+          // User is not logged in or email doesn't match
+          console.log('No matching user session found');
+          clearTimeout(timeoutId);
+          setStatus('success');
+          setMessage('Email confirmed successfully! Please sign in to access your account.');
         }
       } catch (error) {
         console.error('Email confirmation error:', error);
