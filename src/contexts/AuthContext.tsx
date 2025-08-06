@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = useCallback(async (userId: string) => {
     try {
       const { data: profileData, error } = await supabase
         .from('profiles')
@@ -51,6 +51,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (error) {
         console.error('Error fetching profile:', error);
+        
+        // If profile doesn't exist, create it
+        if (error.code === 'PGRST116') {
+          console.log('Profile not found, creating new profile for user:', userId);
+          
+          // Get current user to determine if this is OAuth or email user
+          const { data: { user } } = await supabase.auth.getUser();
+          
+          if (user) {
+            const isOAuthUser = user.app_metadata.provider === 'google';
+            const userRole = isOAuthUser ? null : user.user_metadata.role;
+            
+            console.log('User type:', isOAuthUser ? 'OAuth' : 'Email', 'Role:', userRole);
+            
+            const { error: insertError } = await supabase.from('profiles').insert([
+              {
+                id: userId,
+                full_name: user.user_metadata.full_name || user.user_metadata.name || '',
+                role: userRole, // OAuth users get null, email users get their role
+                email: user.email || undefined,
+                avatar_url: user.user_metadata.avatar_url || null,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              },
+            ]);
+            
+            if (insertError) {
+              console.error('Error creating profile:', insertError);
+              setProfile(null);
+            } else {
+              console.log('Profile created successfully');
+              // Fetch the created profile
+              await fetchProfile(userId);
+            }
+          }
+        } else {
+          setProfile(null);
+        }
       } else if (profileData) {
         // Type assertion for the database response
         const dbProfile = profileData as {
@@ -77,8 +115,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (error) {
       console.error('Error in profile fetch:', error);
+      setProfile(null);
     }
-  };
+  }, []);
 
   useEffect(() => {
     // Set a timeout to prevent infinite loading
@@ -87,67 +126,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     }, 10000); // 10 seconds timeout
 
+    let isInitialized = false;
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state change:', event, session?.user?.email_confirmed_at);
+        console.log('Auth state change:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Since we're using Resend for email confirmation, don't block unconfirmed users
-          // They can still access the confirmation page
-          
           try {
             console.log('Processing user session:', session.user.id);
-            
-            // Check if profile exists first
-            const { data: profileData, error: profileError } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .single();
-            
-            if (profileError) {
-              console.error('Error checking profile:', profileError);
-              // If profile doesn't exist, create it
-              if (profileError.code === 'PGRST116') {
-                console.log('Creating new profile for user');
-                
-                // Determine if this is an OAuth user or email user
-                const isOAuthUser = session.user.app_metadata.provider === 'google';
-                const userRole = isOAuthUser ? null : session.user.user_metadata.role;
-                
-                console.log('User type:', isOAuthUser ? 'OAuth' : 'Email', 'Role:', userRole);
-                
-                // Create new profile (simplified - no duplicate check for now)
-                const { error: insertError } = await supabase.from('profiles').insert([
-                  {
-                    id: session.user.id,
-                    full_name: session.user.user_metadata.full_name || session.user.user_metadata.name || '',
-                    role: userRole, // OAuth users get null, email users get their role
-                    email: session.user.email || undefined,
-                    avatar_url: session.user.user_metadata.avatar_url || null,
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                  },
-                ]);
-                
-                if (insertError) {
-                  console.error('Error creating profile:', insertError);
-                  // Don't fail the auth process, just log the error
-                } else {
-                  console.log('Profile created successfully');
-                  // Fetch the created profile
-                  await fetchProfile(session.user.id);
-                }
-              }
-            } else if (profileData) {
-              // Profile exists, set it directly
-              console.log('Profile found, setting it');
-              const profile = profileData as Profile;
-              setProfile(profile);
-            }
+            await fetchProfile(session.user.id);
           } catch (error) {
             console.error('Error in auth state change:', error);
             setProfile(null);
@@ -156,87 +147,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('No user in session, clearing profile');
           setProfile(null);
         }
-        setLoading(false);
+        
+        if (!isInitialized) {
+          isInitialized = true;
+          setLoading(false);
+        }
       }
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      console.log('Initial session check:', !!session, session?.user?.id);
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (!session) {
-        console.log('No session found, setting loading to false');
-        setLoading(false);
-        return;
-      }
-      
-      // If session exists, fetch profile and set loading to false
-      if (session.user) {
-        try {
+    const initializeAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('Initial session check:', !!session, session?.user?.id);
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
           console.log('Session exists, fetching profile for user:', session.user.id);
           await fetchProfile(session.user.id);
-          
-          // Check if profile exists
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-          
-          if (profileError) {
-            console.error('Error checking profile:', profileError);
-            // If profile doesn't exist, create it
-            if (profileError.code === 'PGRST116') {
-              console.log('Creating new profile for existing session user');
-              const { error: insertError } = await supabase.from('profiles').insert([
-                {
-                  id: session.user.id,
-                  full_name: session.user.user_metadata.full_name || session.user.user_metadata.name || '',
-                  role: null, // OAuth users always start with null role
-                  email: session.user.email || undefined,
-                  avatar_url: null,
-                  created_at: new Date().toISOString(),
-                  updated_at: new Date().toISOString(),
-                },
-              ]);
-              if (insertError) {
-                console.error('Error creating profile:', insertError);
-              }
-              // Refetch profile after creation
-              await fetchProfile(session.user.id);
-            }
-          } else if (profileData) {
-            // Profile exists, set it directly
-            const profile = profileData as Profile;
-            
-            // Only reset role to null for NEW OAuth users (those without an existing role)
-            // Existing email users who sign in with OAuth should keep their role
-            if (session.user.app_metadata.provider === 'google' && !profile.role) {
-              console.log('New OAuth user detected, role is already null');
-            } else if (session.user.app_metadata.provider === 'google' && profile.role) {
-              console.log('Existing user signing in with OAuth, keeping existing role:', profile.role);
-            }
-            
-            setProfile(profile);
-          }
-        } catch (error) {
-          console.error('Error in initial session profile fetch:', error);
-          setProfile(null);
         }
-        setLoading(false);
+      } catch (error) {
+        console.error('Error getting session:', error);
+      } finally {
+        if (!isInitialized) {
+          isInitialized = true;
+          setLoading(false);
+        }
       }
-    }).catch((error) => {
-      console.error('Error getting session:', error);
-      setLoading(false);
-    });
+    };
+
+    initializeAuth();
 
     return () => {
       clearTimeout(loadingTimeout);
       subscription.unsubscribe();
     };
-  }, []);
+  }, [fetchProfile]);
 
   const refreshProfile = async () => {
     if (user) {
