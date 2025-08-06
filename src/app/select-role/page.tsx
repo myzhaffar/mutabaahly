@@ -15,14 +15,28 @@ export default function SelectRolePage() {
   const [selectedRole, setSelectedRole] = useState<string>("");
 
   useEffect(() => {
-    // If user already has a role, redirect away
-    if (profile && (profile.role === "teacher" || profile.role === "parent")) {
-      router.replace("/dashboard");
-    }
     // If not logged in, redirect to auth
     if (!user && !loading) {
       router.replace("/auth");
+      return;
     }
+    
+    // If user already has a role, redirect to dashboard
+    if (profile && (profile.role === "teacher" || profile.role === "parent")) {
+      router.replace("/dashboard");
+      return;
+    }
+    
+    // If user is not an OAuth user (email signup), redirect to dashboard
+    // OAuth users have provider in app_metadata, email users don't
+    if (user && !user.app_metadata.provider) {
+      console.log('Email user detected, redirecting to dashboard');
+      router.replace("/dashboard");
+      return;
+    }
+    
+    // Only OAuth users without a role should stay on this page
+    console.log('OAuth user without role, allowing access to select-role');
   }, [user, profile, loading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {

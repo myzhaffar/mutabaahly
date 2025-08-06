@@ -37,19 +37,27 @@ export async function GET(request: NextRequest) {
     }
 
     if (data.user) {
-      // Check if user has a role
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', data.user.id)
-        .single();
+      // Check if this is an OAuth user (has provider in app_metadata)
+      const isOAuthUser = data.user.app_metadata.provider === 'google';
+      
+      if (isOAuthUser) {
+        // Check if OAuth user has a role
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
 
-      if (profile && profile.role) {
-        // User has a role, redirect to dashboard
-        return NextResponse.redirect(new URL('/dashboard', requestUrl.origin));
+        if (profile && profile.role) {
+          // OAuth user has a role, redirect to dashboard
+          return NextResponse.redirect(new URL('/dashboard', requestUrl.origin));
+        } else {
+          // OAuth user doesn't have a role, redirect to select-role
+          return NextResponse.redirect(new URL('/select-role', requestUrl.origin));
+        }
       } else {
-        // User doesn't have a role, redirect to select-role
-        return NextResponse.redirect(new URL('/select-role', requestUrl.origin));
+        // Email user, redirect to dashboard (role should already be set during signup)
+        return NextResponse.redirect(new URL('/dashboard', requestUrl.origin));
       }
     }
   }

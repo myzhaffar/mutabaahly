@@ -71,7 +71,6 @@ export async function middleware(req: NextRequest) {
   ];
   
   const authRoutes = ['/auth'];
-  const publicRoutes = ['/select-role', '/auth/confirm', '/auth/check-email'];
   
   const currentPath = req.nextUrl.pathname;
   
@@ -92,9 +91,7 @@ export async function middleware(req: NextRequest) {
     currentPath.startsWith(route)
   );
   
-  const isPublicRoute = publicRoutes.some(route => 
-    currentPath === route
-  );
+
   
   // Redirect logic
   if (isProtectedRoute && !session) {
@@ -102,8 +99,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/auth', req.url));
   }
   
-  // Allow access to select-role page even without session
-  // This is needed for users who need to select their role after authentication
+  // Allow access to select-role page for OAuth users
+  // This page is only for OAuth users who need to select their role
   if (currentPath === '/select-role') {
     console.log('Allowing access to select-role page');
     return res;
@@ -114,22 +111,15 @@ export async function middleware(req: NextRequest) {
     if (userProfile && userProfile.role) {
       // User has a role, redirect to dashboard
       return NextResponse.redirect(new URL('/dashboard', req.url));
-    } else if (userProfile && !userProfile.role) {
-      // User has no role, redirect to select-role
-      return NextResponse.redirect(new URL('/select-role', req.url));
+    } else {
+      // User has no role, redirect to dashboard (let client handle role selection)
+      return NextResponse.redirect(new URL('/dashboard', req.url));
     }
-    // If profile is not loaded yet, let the client handle it
   }
   
   if (isAuthRoute && session) {
-    // User already authenticated, check their role and redirect accordingly
-    if (userProfile && userProfile.role) {
-      // User has a role, redirect to dashboard
-      return NextResponse.redirect(new URL('/dashboard', req.url));
-    } else {
-      // User doesn't have a role, redirect to select-role
-      return NextResponse.redirect(new URL('/select-role', req.url));
-    }
+    // User already authenticated, redirect to dashboard
+    return NextResponse.redirect(new URL('/dashboard', req.url));
   }
   
   if (session && userProfile) {
@@ -144,10 +134,8 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL('/dashboard', req.url));
     }
     
-    // If user has no role and not on select-role page, redirect to select-role
-    if (!userProfile.role && !isPublicRoute && currentPath !== '/select-role') {
-      return NextResponse.redirect(new URL('/select-role', req.url));
-    }
+    // If user has no role, let them access the page (client will handle role selection)
+    // Only OAuth users should be redirected to select-role, and that's handled client-side
   } else if (session && !userProfile) {
     // User is authenticated but profile is not loaded yet
     // Check if this is a protected route that requires a role
