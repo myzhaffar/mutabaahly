@@ -43,6 +43,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchProfile = useCallback(async (userId: string) => {
     try {
+      console.log('Fetching profile for user:', userId);
+      
       const { data: profileData, error } = await supabase
         .from('profiles')
         .select('*')
@@ -65,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             
             console.log('User type:', isOAuthUser ? 'OAuth' : 'Email', 'Role:', userRole);
             
-            const { error: insertError } = await supabase.from('profiles').insert([
+            const { data: newProfile, error: insertError } = await supabase.from('profiles').insert([
               {
                 id: userId,
                 full_name: user.user_metadata.full_name || user.user_metadata.name || '',
@@ -75,21 +77,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
               },
-            ]);
+            ]).select().single();
             
             if (insertError) {
               console.error('Error creating profile:', insertError);
               setProfile(null);
-            } else {
-              console.log('Profile created successfully');
-              // Fetch the created profile
-              await fetchProfile(userId);
+            } else if (newProfile) {
+              console.log('Profile created successfully:', newProfile);
+              // Set the profile directly instead of calling fetchProfile again
+              const typedProfile: Profile = {
+                id: newProfile.id,
+                full_name: newProfile.full_name,
+                role: newProfile.role as 'teacher' | 'parent' | null,
+                email: undefined, // Email is not returned by the insert query
+                avatar_url: newProfile.avatar_url,
+                created_at: newProfile.created_at,
+                updated_at: newProfile.updated_at,
+              };
+              setProfile(typedProfile);
             }
           }
         } else {
+          console.error('Profile fetch error (not PGRST116):', error);
           setProfile(null);
         }
       } else if (profileData) {
+        console.log('Profile found:', profileData);
         // Type assertion for the database response
         const dbProfile = profileData as {
           id: string;
@@ -112,6 +125,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           updated_at: dbProfile.updated_at,
         };
         setProfile(typedProfile);
+      } else {
+        console.log('No profile data returned');
+        setProfile(null);
       }
     } catch (error) {
       console.error('Error in profile fetch:', error);

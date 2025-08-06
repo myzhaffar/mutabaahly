@@ -27,12 +27,23 @@ export async function middleware(req: NextRequest) {
   // Get user profile if session exists
   let userProfile = null;
   if (session?.user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', session.user.id)
-      .single();
-    userProfile = profile;
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+      
+      if (error) {
+        console.log('Profile fetch error in middleware:', error.message);
+        // Don't set userProfile to null, let it remain null so we can handle it properly
+      } else {
+        userProfile = profile;
+        console.log('Profile found in middleware:', profile?.role);
+      }
+    } catch (error) {
+      console.log('Profile fetch exception in middleware:', error);
+    }
   }
   
   // Define route patterns
@@ -132,9 +143,15 @@ export async function middleware(req: NextRequest) {
     }
   } else if (session && !userProfile) {
     // User is authenticated but profile is not loaded yet
-    // Don't redirect, let the client-side handle the profile loading
-    // This prevents redirect loops when the profile is still being fetched
-    console.log('User authenticated but profile not loaded yet, allowing access');
+    // Check if this is a protected route that requires a role
+    if (isProtectedRoute && currentPath !== '/select-role') {
+      // For protected routes, allow access and let client-side handle the profile loading
+      // This prevents redirect loops when the profile is still being fetched
+      console.log('User authenticated but profile not loaded yet, allowing access to protected route');
+    } else if (currentPath === '/select-role') {
+      // If user is on select-role page but profile is loading, allow them to stay there
+      console.log('User on select-role page, profile loading, allowing access');
+    }
   }
   
   return res;
