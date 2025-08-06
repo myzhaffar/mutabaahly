@@ -19,6 +19,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
+    // Check if RESEND_API_KEY is configured
+    if (!process.env.RESEND_API_KEY) {
+      console.error('RESEND_API_KEY is not configured in environment variables');
+      return NextResponse.json({ 
+        error: 'Email service is not configured. Please contact support.' 
+      }, { status: 500 });
+    }
+
     const supabase = createClient(
       'https://isyhakwwgdozgtlquzis.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlzeWhha3d3Z2Rvemd0bHF1emlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NTY3NzcsImV4cCI6MjA2MjUzMjc3N30.-2Ya944q8mgJzRAuhMpRAWgxWVmt2yc3CqM0jjgFuuY'
@@ -65,17 +73,28 @@ export async function POST(req: NextRequest) {
       </div>
     `;
 
-    const resend = getResend();
-    const { error: emailError } = await resend.emails.send({
-      from: 'Mutabaahly <noreply@mutabaahly.com>',
-      to: [email],
-      subject: 'Welcome to Mutabaahly - Confirm Your Email',
-      html: confirmationHtml,
-    });
+    try {
+      const resend = getResend();
+      const { error: emailError } = await resend.emails.send({
+        from: 'Mutabaahly <noreply@mutabaahly.com>',
+        to: [email],
+        subject: 'Welcome to Mutabaahly - Confirm Your Email',
+        html: confirmationHtml,
+      });
 
-    if (emailError) {
-      console.error('Error sending email:', emailError);
-      return NextResponse.json({ error: 'Failed to send confirmation email' }, { status: 500 });
+      if (emailError) {
+        console.error('Resend API error:', emailError);
+        return NextResponse.json({ 
+          error: 'Failed to send confirmation email',
+          details: emailError.message 
+        }, { status: 500 });
+      }
+    } catch (resendError) {
+      console.error('Error initializing or calling Resend:', resendError);
+      return NextResponse.json({ 
+        error: 'Email service error',
+        details: resendError instanceof Error ? resendError.message : 'Unknown error'
+      }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, message: 'Reminder email sent successfully' });
