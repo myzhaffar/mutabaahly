@@ -59,7 +59,7 @@ export async function middleware(req: NextRequest) {
   ];
   
   const authRoutes = ['/auth'];
-  const publicRoutes = ['/', '/select-role'];
+  const publicRoutes = ['/', '/select-role', '/auth/confirm'];
   
   const currentPath = req.nextUrl.pathname;
   

@@ -93,6 +93,8 @@ const Auth = () => {
             title: "Success",
             description: "Account created successfully! Please check your email to verify your account.",
           });
+          // Redirect to confirmation page
+          router.push(`/auth/confirm?email=${encodeURIComponent(email)}`);
         }
       }
     } catch {
@@ -107,7 +109,12 @@ const Auth = () => {
   };
   
   const handleGoogleLogin = async () => {
-    await supabase.auth.signInWithOAuth({ provider: 'google' });
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: 'https://mutabaahly.com/auth/callback'
+      }
+    });
   };
 
   return (

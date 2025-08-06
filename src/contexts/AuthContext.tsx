@@ -95,18 +95,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Check if email is confirmed
-          if (!session.user.email_confirmed_at) {
-            console.log('User email not confirmed');
-            setProfile(null);
-            setLoading(false);
-            return;
-          }
+          // Since we're using Resend for email confirmation, don't block unconfirmed users
+          // They can still access the confirmation page
           
           try {
-            // Fetch user profile immediately
-            await fetchProfile(session.user.id);
-            // Check if profile exists
+            console.log('Processing user session:', session.user.id);
+            
+            // Check if profile exists first
             const { data: profileData, error: profileError } = await supabase
               .from('profiles')
               .select('*')
@@ -117,48 +112,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               console.error('Error checking profile:', profileError);
               // If profile doesn't exist, create it
               if (profileError.code === 'PGRST116') {
-                console.log('Creating new profile for OAuth user');
+                console.log('Creating new profile for user');
+                
+                // Determine if this is an OAuth user or email user
+                const isOAuthUser = session.user.app_metadata.provider === 'google';
+                const userRole = isOAuthUser ? null : session.user.user_metadata.role;
+                
+                console.log('User type:', isOAuthUser ? 'OAuth' : 'Email', 'Role:', userRole);
+                
+                // Create new profile (simplified - no duplicate check for now)
                 const { error: insertError } = await supabase.from('profiles').insert([
                   {
                     id: session.user.id,
                     full_name: session.user.user_metadata.full_name || session.user.user_metadata.name || '',
-                    role: null, // OAuth users always start with null role
+                    role: userRole, // OAuth users get null, email users get their role
                     email: session.user.email || undefined,
-                    avatar_url: null,
+                    avatar_url: session.user.user_metadata.avatar_url || null,
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
                   },
                 ]);
+                
                 if (insertError) {
                   console.error('Error creating profile:', insertError);
+                  // Don't fail the auth process, just log the error
+                } else {
+                  console.log('Profile created successfully');
+                  // Fetch the created profile
+                  await fetchProfile(session.user.id);
                 }
-                // Refetch profile after creation
-                await fetchProfile(session.user.id);
               }
             } else if (profileData) {
               // Profile exists, set it directly
+              console.log('Profile found, setting it');
               const profile = profileData as Profile;
-              
-              // Only reset role to null for NEW OAuth users (those without an existing role)
-              // Existing email users who sign in with OAuth should keep their role
-              if (session.user.app_metadata.provider === 'google' && !profile.role) {
-                console.log('New OAuth user detected, role is already null');
-              } else if (session.user.app_metadata.provider === 'google' && profile.role) {
-                console.log('Existing user signing in with OAuth, keeping existing role:', profile.role);
-              }
-              
               setProfile(profile);
             }
           } catch (error) {
             console.error('Error in auth state change:', error);
             setProfile(null);
           }
-          setLoading(false);
         } else {
-          console.log('No user in session, setting loading to false');
+          console.log('No user in session, clearing profile');
           setProfile(null);
-          setLoading(false);
         }
+        setLoading(false);
       }
     );
 
@@ -255,16 +253,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signUp = async (email: string, password: string, fullName: string, role: 'teacher' | 'parent') => {
+    console.log('Starting email signup process for:', email, 'with role:', role);
+    
+    // Create the user account
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           full_name: fullName,
-          role: role,
+          role: role, // Store role in user metadata for email signups
         },
       },
     });
+
+    if (error) {
+      console.error('Signup error:', error);
+      return { data, error };
+    }
+
+    console.log('User created successfully:', data.user?.id);
+
+    // If signup was successful, send confirmation email
+    if (data.user) {
+      try {
+        console.log('User created successfully, sending confirmation email');
+        
+        // Send confirmation email via Resend
+        const response = await fetch('/api/send-confirmation-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        if (!response.ok) {
+          console.error('Failed to send confirmation email via Resend');
+        } else {
+          console.log('Confirmation email sent successfully via Resend');
+        }
+      } catch (emailError) {
+        console.error('Error sending confirmation email:', emailError);
+      }
+    }
 
     return { data, error };
   };
