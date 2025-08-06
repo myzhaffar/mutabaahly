@@ -56,10 +56,10 @@ function CheckEmailPageContent() {
                 Click the confirmation link in the email to verify your account and complete your registration.
               </p>
               
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <Button 
                   onClick={handleResendEmail}
-                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-400 text-white font-semibold rounded-lg py-3"
+                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-400 text-white font-semibold rounded-lg py-3 hover:opacity-90 transition-opacity"
                 >
                   Resend Confirmation Email
                 </Button>
@@ -67,7 +67,7 @@ function CheckEmailPageContent() {
                 <Link href="/auth">
                   <Button 
                     variant="outline"
-                    className="w-full border-gray-300 text-gray-700 font-semibold rounded-lg py-3"
+                    className="w-full border-gray-300 text-gray-700 font-semibold rounded-lg py-3 hover:bg-gray-50 transition-colors"
                   >
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Back to Sign In
