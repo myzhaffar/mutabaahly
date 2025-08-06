@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
+
 import { toast } from "sonner";
 
 export default function SelectRolePage() {
-  const { user, profile, refreshProfile } = useAuth();
+  const { user, profile, updateUserRole } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [selectedRole, setSelectedRole] = useState<string>("");
@@ -37,17 +37,16 @@ export default function SelectRolePage() {
       return;
     }
     setLoading(true);
-    const { error } = await supabase
-      .from("profiles")
-      .update({ role: selectedRole })
-      .eq("id", user.id);
+    
+    const { error } = await updateUserRole(selectedRole as 'teacher' | 'parent');
+    
     setLoading(false);
     if (error) {
-      toast.error("Failed to update role: " + error.message);
+      const errorMessage = typeof error === 'string' ? error : error.message || 'Unknown error';
+      toast.error("Failed to update role: " + errorMessage);
     } else {
       toast.success("Role updated successfully!");
-      await refreshProfile();
-      router.replace("/");
+      router.replace("/dashboard");
     }
   };
 

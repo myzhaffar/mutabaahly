@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useState, useEffect, useCallback } from 'react';
-import { User, Session, AuthError } from '@supabase/supabase-js';
+import { User, Session, AuthError, PostgrestError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Profile {
@@ -31,6 +31,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, fullName: string, role: 'teacher' | 'parent') => Promise<AuthResponse>;
   signOut: () => Promise<{ error: AuthError | null }>;
   refreshProfile: () => Promise<void>;
+  updateUserRole: (role: 'teacher' | 'parent') => Promise<{ error: AuthError | PostgrestError | string | null }>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -64,6 +65,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (user) {
             const isOAuthUser = user.app_metadata.provider === 'google';
             const userRole = isOAuthUser ? null : user.user_metadata.role;
+            
+            // If user has no role in metadata but should have one, try to get it from the database
+            if (!userRole && !isOAuthUser) {
+              console.log('No role in user metadata, checking if user should have a role');
+              // This might be a user who signed up before we started storing roles in metadata
+              // We'll let them select their role later
+            }
             
             console.log('User type:', isOAuthUser ? 'OAuth' : 'Email', 'Role:', userRole);
             
@@ -214,6 +222,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateUserRole = async (role: 'teacher' | 'parent') => {
+    if (!user) return { error: 'No user found' };
+
+    try {
+      console.log('Updating user role to:', role);
+      
+      // Update user metadata
+      const { error: metadataError } = await supabase.auth.updateUser({
+        data: { role: role }
+      });
+
+      if (metadataError) {
+        console.error('Error updating user metadata:', metadataError);
+        return { error: metadataError };
+      }
+
+      // Update profile in database
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ role: role })
+        .eq('id', user.id);
+
+      if (profileError) {
+        console.error('Error updating profile:', profileError);
+        return { error: profileError };
+      }
+
+      // Refresh the profile
+      await fetchProfile(user.id);
+      
+      console.log('User role updated successfully');
+      return { error: null };
+    } catch (error) {
+      console.error('Error updating user role:', error);
+      return { error: error as AuthError | string };
+    }
+  };
+
   const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -302,6 +348,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       signUp,
       signOut,
       refreshProfile,
+      updateUserRole,
     }}>
       {children}
     </AuthContext.Provider>
