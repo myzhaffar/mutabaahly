@@ -155,7 +155,7 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
                       Student
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Class
+                      Grade Class
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Teacher
@@ -248,7 +248,7 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
                     Student
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Class
+                    Grade Class
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Teacher
@@ -284,7 +284,7 @@ const TilawatiTable: React.FC<TilawatiTableProps> = ({ filters, pagination }) =>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Badge variant="outline" className="border-gray-200 text-gray-700">
-                          {student.class}
+                          {student.grade && student.grade !== 'Unknown' ? `${student.grade} ${student.class}` : student.class}
                         </Badge>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

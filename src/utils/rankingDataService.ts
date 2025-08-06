@@ -3,6 +3,42 @@ import { calculateTahfidzProgress, calculateTilawahProgress } from './progressCa
 import { ProgressEntry } from '@/types/progress';
 import { getJuzBySurah, quranSurahs } from './quranData';
 
+// Helper function to parse group_name and extract grade and class
+// If gradeFilter is provided, use it to determine the grade
+const parseGroupName = (groupName: string, gradeFilter?: string): { grade: string; class: string } => {
+  if (!groupName) return { grade: 'Unknown', class: 'Unknown' };
+  
+  // First, try to extract grade number from the beginning of group_name
+  const gradeMatch = groupName.match(/^(\d+)/);
+  if (gradeMatch) {
+    const grade = gradeMatch[1];
+    const className = groupName.replace(/^\d+\s*/, '').trim();
+    return { grade, class: className };
+  }
+  
+  // If no grade number found, check if it's a known class name
+  const className = groupName.trim();
+  const knownClasses = ['Makkah', 'Madinah', 'Aqsha'];
+  
+  if (knownClasses.includes(className)) {
+    // If we have a grade filter, use it
+    if (gradeFilter && gradeFilter !== 'all' && gradeFilter !== 'Unknown') {
+      return { grade: gradeFilter, class: className };
+    }
+    
+    // Otherwise, assign a default grade based on class
+    const classGradeMapping: Record<string, string> = {
+      'Makkah': '1',
+      'Madinah': '3', 
+      'Aqsha': '6'
+    };
+    const grade = classGradeMapping[className] || 'Unknown';
+    return { grade, class: className };
+  }
+  
+  return { grade: 'Unknown', class: groupName };
+};
+
 export interface StudentRankingData {
   id: string;
   name: string;
@@ -39,25 +75,9 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
         teacher
       `);
 
-    // Apply filters
+    // Apply teacher filter at database level
     if (filters.teacher) {
       query = query.eq('teacher', filters.teacher);
-    }
-    if (filters.grade && filters.grade !== 'all') {
-      if (filters.grade.includes(',')) {
-        const gradeArr = filters.grade.split(',').map(g => g.trim()).filter(Boolean);
-        query = query.in('group_name', gradeArr);
-      } else {
-        query = query.eq('group_name', filters.grade);
-      }
-    }
-    if (filters.class && filters.class !== 'all') {
-      if (filters.class.includes(',')) {
-        const classArr = filters.class.split(',').map(c => c.trim()).filter(Boolean);
-        query = query.in('group_name', classArr);
-      } else {
-        query = query.eq('group_name', filters.class);
-      }
     }
 
     const { data } = await query;
@@ -83,13 +103,14 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
           // If student has Quran progress (surah is a valid surah name), treat as Quran
           const surahIsQuran = calculatedProgress.surah && isNaN(Number(calculatedProgress.surah));
           if (surahIsQuran) {
+            const { grade, class: className } = parseGroupName(student.group_name, filters.grade);
             return {
               id: student.id,
               name: student.name,
-              class: student.group_name || 'Unknown',
+              class: className,
               teacher: student.teacher || 'Unknown',
               teacherId: student.teacher,
-              grade: student.group_name || 'Unknown',
+              grade: grade,
               level: undefined,
               page: undefined,
               surah: calculatedProgress.surah,
@@ -102,14 +123,15 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
             // Otherwise, treat as Tilawati (either jilid or surah is a number)
             const levelNumber = getTilawatiLevelNumber(calculatedProgress.jilid || calculatedProgress.surah);
             const currentPage = calculatedProgress.total_pages || calculatedProgress.ayat || 0;
+            const { grade, class: className } = parseGroupName(student.group_name, filters.grade);
             
             return {
               id: student.id,
               name: student.name,
-              class: student.group_name || 'Unknown',
+              class: className,
               teacher: student.teacher || 'Unknown',
               teacherId: student.teacher,
-              grade: student.group_name || 'Unknown',
+              grade: grade,
               level: levelNumber,
               page: currentPage,
               surah: null,
@@ -131,8 +153,31 @@ export const fetchTilawatiRankingData = async (filters: RankingFilters): Promise
     // Filter out students with no progress
     const validStudents = studentsWithProgress.filter(student => student !== null);
 
+    // Apply grade and class filters after parsing
+    let filteredStudents = validStudents;
+    
+    if (filters.grade && filters.grade !== 'all') {
+      const selectedGrades = filters.grade.includes(',') 
+        ? filters.grade.split(',').map(g => g.trim()).filter(Boolean)
+        : [filters.grade];
+      
+      filteredStudents = filteredStudents.filter(student => 
+        selectedGrades.includes(student.grade)
+      );
+    }
+    
+    if (filters.class && filters.class !== 'all') {
+      const selectedClasses = filters.class.includes(',') 
+        ? filters.class.split(',').map(c => c.trim()).filter(Boolean)
+        : [filters.class];
+      
+      filteredStudents = filteredStudents.filter(student => 
+        selectedClasses.includes(student.class)
+      );
+    }
+
     // Sort: All Quran students first (regardless of surah/ayat), then Tilawati students by level/page
-    const sortedStudents = validStudents.sort((a, b) => {
+    const sortedStudents = filteredStudents.sort((a, b) => {
       // Quran students first (regardless of surah/ayat)
       if (a.standing === 'quran' && b.standing !== 'quran') return -1;
       if (a.standing !== 'quran' && b.standing === 'quran') return 1;
@@ -174,29 +219,13 @@ export const fetchTahfidzRankingData = async (filters: RankingFilters): Promise<
         teacher
       `);
 
-    // Apply filters
+    // Apply teacher filter at database level
     if (filters.teacher) {
       if (filters.teacher.includes(',')) {
         const teacherArr = filters.teacher.split(',').map(t => t.trim()).filter(Boolean);
         query = query.in('teacher', teacherArr);
       } else {
         query = query.eq('teacher', filters.teacher);
-      }
-    }
-    if (filters.grade && filters.grade !== 'all') {
-      if (filters.grade.includes(',')) {
-        const gradeArr = filters.grade.split(',').map(g => g.trim()).filter(Boolean);
-        query = query.in('group_name', gradeArr);
-      } else {
-        query = query.eq('group_name', filters.grade);
-      }
-    }
-    if (filters.class && filters.class !== 'all') {
-      if (filters.class.includes(',')) {
-        const classArr = filters.class.split(',').map(c => c.trim()).filter(Boolean);
-        query = query.in('group_name', classArr);
-      } else {
-        query = query.eq('group_name', filters.class);
       }
     }
 
@@ -238,13 +267,15 @@ export const fetchTahfidzRankingData = async (filters: RankingFilters): Promise<
             }
           }
 
+          const { grade, class: className } = parseGroupName(student.group_name, filters.grade);
+
           return {
             id: student.id,
             name: student.name,
-            class: student.group_name || 'Unknown',
+            class: className,
             teacher: student.teacher || 'Unknown',
             teacherId: student.teacher,
-            grade: student.group_name || 'Unknown',
+            grade: grade,
             juz: currentJuz,
             surah: currentSurah,
             verse: currentVerse,
@@ -256,14 +287,39 @@ export const fetchTahfidzRankingData = async (filters: RankingFilters): Promise<
       })
     );
 
-    // Filter out null values and sort by custom ranking logic
-    const sortedStudents = studentsWithProgress
+    // Filter out null values
+    const validStudents = studentsWithProgress
       .filter((student): student is StudentRankingData =>
         student !== null &&
         typeof student.verse === 'number' &&
         student.verse > 0
-      )
-      .sort((a, b) => {
+      );
+
+    // Apply grade and class filters after parsing
+    let filteredStudents = validStudents;
+    
+    if (filters.grade && filters.grade !== 'all') {
+      const selectedGrades = filters.grade.includes(',') 
+        ? filters.grade.split(',').map(g => g.trim()).filter(Boolean)
+        : [filters.grade];
+      
+      filteredStudents = filteredStudents.filter(student => 
+        selectedGrades.includes(student.grade)
+      );
+    }
+    
+    if (filters.class && filters.class !== 'all') {
+      const selectedClasses = filters.class.includes(',') 
+        ? filters.class.split(',').map(c => c.trim()).filter(Boolean)
+        : [filters.class];
+      
+      filteredStudents = filteredStudents.filter(student => 
+        selectedClasses.includes(student.class)
+      );
+    }
+
+    // Sort by custom ranking logic
+    const sortedStudents = filteredStudents.sort((a, b) => {
       // First, rank by Juz (lower Juz = higher rank, so Juz 1 > Juz 30)
       if (a.juz !== null && b.juz !== null && a.juz !== b.juz) {
         return a.juz - b.juz; // Lower juz number = higher rank
