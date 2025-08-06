@@ -102,6 +102,13 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/auth', req.url));
   }
   
+  // Allow access to select-role page even without session
+  // This is needed for users who need to select their role after authentication
+  if (currentPath === '/select-role') {
+    console.log('Allowing access to select-role page');
+    return res;
+  }
+  
   // Redirect authenticated users from root to dashboard
   if (session && currentPath === '/') {
     if (userProfile && userProfile.role) {

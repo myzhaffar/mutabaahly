@@ -17,13 +17,13 @@ export default function SelectRolePage() {
   useEffect(() => {
     // If user already has a role, redirect away
     if (profile && (profile.role === "teacher" || profile.role === "parent")) {
-      router.replace("/");
+      router.replace("/dashboard");
     }
     // If not logged in, redirect to auth
-    if (!user) {
+    if (!user && !loading) {
       router.replace("/auth");
     }
-  }, [user, profile, router]);
+  }, [user, profile, loading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
