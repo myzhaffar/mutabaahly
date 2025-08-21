@@ -134,10 +134,10 @@ const TeacherTestManagement: React.FC = () => {
 
   return (
     <TeacherLayout breadcrumbs={breadcrumbs}>
-      <div className="container mx-auto px-4 md:px-6 py-4 md:py-6">
+      <div className="container mx-auto px-0 py-0 md:px-6 md:py-6">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 w-full mb-6">
-          <div className="flex flex-row items-center gap-3 sm:gap-4">
+          <div className="flex flex-row items-center gap-3 sm:gap-4 mt-2 w-full">
             <button
               type="button"
               onClick={() => router.push('/dashboard')}
