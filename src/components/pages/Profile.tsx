@@ -268,8 +268,17 @@ const Profile: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
-            {/* Mobile-only Sign Out button for parent role, under Account Information card */}
-            {/* No mobile sign out for teacher here, only for parent in the parent case above */}
+            {/* Sign Out button for teacher role, positioned at bottom like parent */}
+            <div className="mt-6">
+              <Button
+                onClick={handleSignOut}
+                variant="outline"
+                className="w-full flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+              >
+                <LogOut className="h-5 w-5" />
+                Sign Out
+              </Button>
+            </div>
           </div>
           {/* Edit Profile Dialog */}
           <EditProfileDialog

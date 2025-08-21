@@ -2,10 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/useAuth';
-import { Home, Users, BookMarked, UserCircle, LogOut } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Home, Users, BookMarked, UserCircle } from 'lucide-react';
+
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useTranslation } from 'react-i18next';
 import '@/i18n';
@@ -105,8 +105,7 @@ const LanguageSwitcher = () => {
 
 const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const pathname = usePathname();
-  const router = useRouter();
-  const { profile, signOut } = useAuth();
+  const { profile } = useAuth();
   const { t } = useTranslation();
 
   // Close mobile menu when route changes
@@ -128,10 +127,7 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIs
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMobileMenuOpen, setIsMobileMenuOpen]);
 
-  const handleSignOut = async () => {
-    await signOut();
-    router.push('/');
-  };
+
 
   if (profile?.role !== 'teacher') {
     return null;
@@ -219,14 +215,6 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIs
             </div>
             <LanguageSwitcher />
           </div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start text-gray-200 hover:text-white hover:bg-teal-600/50 transition-all duration-300 ease-out hover:scale-105 transform"
-            onClick={handleSignOut}
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            {t('signOut')}
-          </Button>
         </div>
       </aside>
     </>
