@@ -41,8 +41,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profileCreating, setProfileCreating] = useState(false);
 
   const fetchProfile = useCallback(async (userId: string) => {
+    // Prevent multiple simultaneous profile creation attempts
+    if (profileCreating) {
+      console.log('Profile creation already in progress, skipping...');
+      return;
+    }
+
     try {
       const { data: profileData, error } = await supabase
         .from('profiles')
@@ -55,41 +62,82 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // If profile doesn't exist, create it
         if (error.code === 'PGRST116') {
-          // Get current user to determine if this is OAuth or email user
-          const { data: { user } } = await supabase.auth.getUser();
+          setProfileCreating(true);
           
-          if (user) {
-            const isOAuthUser = user.app_metadata.provider === 'google';
-            const userRole = isOAuthUser ? null : user.user_metadata.role;
+          try {
+            // Get current user to determine if this is OAuth or email user
+            const { data: { user } } = await supabase.auth.getUser();
             
-            const { data: newProfile, error: insertError } = await supabase.from('profiles').insert([
-              {
-                id: userId,
-                full_name: user.user_metadata.full_name || user.user_metadata.name || '',
-                role: userRole, // OAuth users get null, email users get their role
-                email: user.email || undefined,
-                avatar_url: user.user_metadata.avatar_url || null,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              },
-            ]).select().single();
-            
-            if (insertError) {
-              console.error('Error creating profile:', insertError);
-              setProfile(null);
-            } else if (newProfile) {
-              // Set the profile directly instead of calling fetchProfile again
-              const typedProfile: Profile = {
-                id: newProfile.id,
-                full_name: newProfile.full_name,
-                role: newProfile.role as 'teacher' | 'parent' | null,
-                email: undefined, // Email is not returned by the insert query
-                avatar_url: newProfile.avatar_url,
-                created_at: newProfile.created_at,
-                updated_at: newProfile.updated_at,
-              };
-              setProfile(typedProfile);
+            if (user) {
+              const isOAuthUser = user.app_metadata.provider === 'google';
+              const userRole = isOAuthUser ? null : user.user_metadata.role;
+              
+              // Use upsert instead of insert to handle potential duplicates gracefully
+              const { data: newProfile, error: insertError } = await supabase
+                .from('profiles')
+                .upsert([
+                  {
+                    id: userId,
+                    full_name: user.user_metadata.full_name || user.user_metadata.name || '',
+                    role: userRole, // OAuth users get null, email users get their role
+                    email: user.email || undefined,
+                    avatar_url: user.user_metadata.avatar_url || null,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                  },
+                ], {
+                  onConflict: 'id', // Handle conflicts on the primary key
+                  ignoreDuplicates: false // Update if exists, insert if not
+                })
+                .select()
+                .single();
+              
+              if (insertError) {
+                console.error('Error creating/updating profile:', insertError);
+                
+                // If it's a duplicate key error, try to fetch the existing profile
+                if (insertError.code === '23505') {
+                  console.log('Profile already exists, fetching existing profile...');
+                  const { data: existingProfile, error: fetchError } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+                  
+                  if (fetchError) {
+                    console.error('Error fetching existing profile:', fetchError);
+                    setProfile(null);
+                  } else if (existingProfile) {
+                    const typedProfile: Profile = {
+                      id: existingProfile.id,
+                      full_name: existingProfile.full_name,
+                      role: existingProfile.role as 'teacher' | 'parent' | null,
+                      email: (existingProfile as { email?: string }).email, // Type assertion for email field
+                      avatar_url: existingProfile.avatar_url,
+                      created_at: existingProfile.created_at,
+                      updated_at: existingProfile.updated_at,
+                    };
+                    setProfile(typedProfile);
+                  }
+                } else {
+                  setProfile(null);
+                }
+              } else if (newProfile) {
+                // Set the profile directly instead of calling fetchProfile again
+                const typedProfile: Profile = {
+                  id: newProfile.id,
+                  full_name: newProfile.full_name,
+                  role: newProfile.role as 'teacher' | 'parent' | null,
+                  email: (newProfile as { email?: string }).email, // Type assertion for email field
+                  avatar_url: newProfile.avatar_url,
+                  created_at: newProfile.created_at,
+                  updated_at: newProfile.updated_at,
+                };
+                setProfile(typedProfile);
+              }
             }
+          } finally {
+            setProfileCreating(false);
           }
         } else {
           console.error('Profile fetch error (not PGRST116):', error);
@@ -125,7 +173,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Error in profile fetch:', error);
       setProfile(null);
     }
-  }, []);
+  }, [profileCreating]);
 
   useEffect(() => {
     // Set a timeout to prevent infinite loading
