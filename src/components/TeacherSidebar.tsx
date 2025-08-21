@@ -1,112 +1,24 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/useAuth';
 import { Home, Users, BookMarked, UserCircle } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useTranslation } from 'react-i18next';
-import '@/i18n';
-import { Menu as DropdownMenu, Transition } from '@headlessui/react';
+
 
 interface TeacherSidebarProps {
   isMobileMenuOpen: boolean;
   setIsMobileMenuOpen: (open: boolean) => void;
 }
 
-const LanguageSwitcher = () => {
-  const { i18n } = useTranslation();
-  const [isChanging, setIsChanging] = useState(false);
-  const [, forceUpdate] = useState({});
 
-  // Initialize language from localStorage only once on mount
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem('i18nextLng') || 'en';
-    if (i18n.language !== savedLanguage) {
-      i18n.changeLanguage(savedLanguage);
-    }
-  }, [i18n]); // Include i18n as dependency
-
-  const handleLanguageChange = async (language: string) => {
-    if (isChanging || i18n.language === language) return;
-    
-    setIsChanging(true);
-    try {
-      i18n.changeLanguage(language, (err) => {
-        if (!err) {
-          localStorage.setItem('i18nextLng', language);
-          forceUpdate({}); // Force re-render
-        }
-      });
-    } catch (error) {
-      console.error('Error changing language:', error);
-    } finally {
-      setIsChanging(false);
-    }
-  };
-
-  const current = i18n.language === 'id' ? 'ID' : 'EN';
-  return (
-    <DropdownMenu as="div" className="relative inline-block text-left ml-2">
-      <DropdownMenu.Button 
-        className="inline-flex items-center px-2 py-1 text-base font-semibold text-gray-800 bg-transparent border-none shadow-none hover:bg-gray-100 hover:bg-opacity-20 focus:outline-none transition-all duration-200 ease-in-out rounded-md"
-        disabled={isChanging}
-      >
-        {isChanging ? (
-          <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2"></div>
-        ) : (
-          current
-        )}
-        <svg className="ml-2 h-4 w-4 text-gray-500 transition-transform duration-200 ease-in-out group-hover:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7l3 3 3-3" />
-        </svg>
-      </DropdownMenu.Button>
-      <Transition
-        as={React.Fragment}
-        enter="transition ease-out duration-300"
-        enterFrom="transform opacity-0 scale-95 translate-y-2"
-        enterTo="transform opacity-100 scale-100 translate-y-0"
-        leave="transition ease-in duration-200"
-        leaveFrom="transform opacity-100 scale-100 translate-y-0"
-        leaveTo="transform opacity-0 scale-95 translate-y-2"
-      >
-        <DropdownMenu.Items className="origin-top-right absolute right-0 mt-2 w-28 rounded-xl shadow-lg bg-gray-800 ring-1 ring-gray-700 ring-opacity-5 focus:outline-none z-50 p-2">
-          <div className="space-y-1">
-            <DropdownMenu.Item>
-              {({ active }) => (
-                <button
-                  onClick={() => handleLanguageChange('en')}
-                  disabled={isChanging || i18n.language === 'en'}
-                  className={`w-full text-left px-3 py-2 text-base transition-all duration-300 ease-out rounded-lg transform hover:scale-105 ${i18n.language === 'en' ? 'font-bold text-emerald-400' : 'text-gray-200'} ${active ? 'bg-gray-600' : 'hover:bg-gray-600'}`}
-                >
-                  EN
-                </button>
-              )}
-            </DropdownMenu.Item>
-            <DropdownMenu.Item>
-              {({ active }) => (
-                <button
-                  onClick={() => handleLanguageChange('id')}
-                  disabled={isChanging || i18n.language === 'id'}
-                  className={`w-full text-left px-3 py-2 text-base transition-all duration-300 ease-out rounded-lg transform hover:scale-105 ${i18n.language === 'id' ? 'font-bold text-emerald-400' : 'text-gray-200'} ${active ? 'bg-gray-600' : 'hover:bg-gray-600'}`}
-                >
-                  ID
-                </button>
-              )}
-            </DropdownMenu.Item>
-          </div>
-        </DropdownMenu.Items>
-      </Transition>
-    </DropdownMenu>
-  );
-};
 
 const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const pathname = usePathname();
   const { profile } = useAuth();
-  const { t } = useTranslation();
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -134,10 +46,10 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIs
   }
 
   const navItems = [
-    { href: '/dashboard', label: t('navigation.dashboard'), icon: Home },
-    { href: '/students', label: t('navigation.students'), icon: Users },
-    { href: '/tests/manage', label: t('navigation.tests'), icon: BookMarked },
-    { href: '/profile', label: t('navigation.profile'), icon: UserCircle },
+    { href: '/dashboard', label: 'Dashboard', icon: Home },
+    { href: '/students', label: 'Students', icon: Users },
+    { href: '/tests/manage', label: 'Tests', icon: BookMarked },
+    { href: '/profile', label: 'Profile', icon: UserCircle },
   ];
 
   return (
@@ -220,7 +132,6 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIs
               <span className="text-sm font-medium">{profile?.full_name}</span>
               <span className="text-xs text-muted-foreground capitalize">{profile?.role}</span>
             </div>
-            <LanguageSwitcher />
           </div>
         </Link>
       </aside>

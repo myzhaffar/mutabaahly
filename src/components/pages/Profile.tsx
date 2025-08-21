@@ -3,13 +3,15 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Mail, Shield, MoreVertical, Pencil, Trash2, LogOut, ChevronLeft } from 'lucide-react';
+import { User, Mail, Shield, MoreVertical, Pencil, Trash2, LogOut, ChevronLeft, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ProfileLayout from '@/components/layouts/ProfileLayout';
 import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
 import { DeleteProfileDialog } from '@/components/profile/DeleteProfileDialog';
+import { useTranslation } from 'react-i18next';
+import '@/i18n';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,7 +35,9 @@ const Profile: React.FC = () => {
   const { user, profile, signOut } = useAuth();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isChanging, setIsChanging] = useState(false);
   const router = useRouter();
+  const { i18n } = useTranslation();
 
   const breadcrumbs = [
     { label: 'Dashboard', href: '/dashboard' },
@@ -55,6 +59,23 @@ const Profile: React.FC = () => {
   const handleSignOut = async () => {
     await signOut();
     router.push('/');
+  };
+
+  const handleLanguageChange = async (language: string) => {
+    if (isChanging || i18n.language === language) return;
+    
+    setIsChanging(true);
+    try {
+      i18n.changeLanguage(language, (err) => {
+        if (!err) {
+          localStorage.setItem('i18nextLng', language);
+        }
+      });
+    } catch (error) {
+      console.error('Error changing language:', error);
+    } finally {
+      setIsChanging(false);
+    }
   };
 
   if (!profile) {
@@ -151,6 +172,37 @@ const Profile: React.FC = () => {
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-500">Role</p>
                     <p className="font-medium text-gray-900 capitalize text-sm sm:text-base">{profile?.role || 'Not set'}</p>
+                  </div>
+                </div>
+                {/* Language Settings */}
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Globe className="h-5 w-5 text-teal-500 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm text-gray-500">Language</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium text-gray-700">EN</span>
+                    <button
+                      onClick={() => handleLanguageChange(i18n.language === 'en' ? 'id' : 'en')}
+                      disabled={isChanging}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
+                        i18n.language === 'en' ? 'bg-teal-500' : 'bg-gray-200'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          i18n.language === 'en' ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                      {isChanging && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        </div>
+                      )}
+                    </button>
+                    <span className="text-sm font-medium text-gray-700">ID</span>
                   </div>
                 </div>
               </CardContent>
@@ -264,6 +316,37 @@ const Profile: React.FC = () => {
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-500">Role</p>
                     <p className="font-medium text-gray-900 capitalize text-sm sm:text-base">{profile?.role || 'Not set'}</p>
+                  </div>
+                </div>
+                {/* Language Settings */}
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Globe className="h-5 w-5 text-teal-500 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm text-gray-500">Language</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium text-gray-700">EN</span>
+                    <button
+                      onClick={() => handleLanguageChange(i18n.language === 'en' ? 'id' : 'en')}
+                      disabled={isChanging}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
+                        i18n.language === 'en' ? 'bg-teal-500' : 'bg-gray-200'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          i18n.language === 'en' ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                      {isChanging && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        </div>
+                      )}
+                    </button>
+                    <span className="text-sm font-medium text-gray-700">ID</span>
                   </div>
                 </div>
               </CardContent>
