@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/useAuth';
 import { Home, Users, BookMarked, UserCircle } from 'lucide-react';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useTranslation } from 'react-i18next';
 import '@/i18n';
 import { Menu as DropdownMenu, Transition } from '@headlessui/react';
@@ -204,10 +204,17 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIs
           })}
         </nav>
         {/* User Profile Section */}
-        <div className="absolute bottom-0 left-0 right-0 px-5 py-4 bg-teal-600/30">
+        <Link 
+          href="/profile" 
+          className="absolute bottom-0 left-0 right-0 px-5 py-4 bg-teal-600/30 hover:bg-teal-600/50 transition-all duration-300 ease-out cursor-pointer"
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
           <div className="flex items-center space-x-4 p-2">
             <Avatar className="h-10 w-10">
-              <AvatarFallback>{profile?.full_name?.charAt(0) || "U"}</AvatarFallback>
+              <AvatarImage src={profile?.avatar_url || undefined} />
+              <AvatarFallback className="bg-gradient-to-r from-green-400 to-teal-500 text-white text-sm">
+                {profile?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase()}
+              </AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
               <span className="text-sm font-medium">{profile?.full_name}</span>
@@ -215,7 +222,7 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIs
             </div>
             <LanguageSwitcher />
           </div>
-        </div>
+        </Link>
       </aside>
     </>
   );
