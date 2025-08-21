@@ -67,12 +67,25 @@ export default function SelectRolePage() {
     setLoading(true);
     
     try {
-      const { error } = await updateUserRole(selectedRole as 'teacher' | 'parent');
+      // Add a timeout to prevent indefinite hanging
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Role update timeout after 15 seconds')), 15000);
+      });
+      
+      const roleUpdatePromise = updateUserRole(selectedRole as 'teacher' | 'parent');
+      
+      // Race between timeout and role update
+      const { error } = await Promise.race([roleUpdatePromise, timeoutPromise]) as { error: string | Error | null };
       
       if (error) {
         const errorMessage = typeof error === 'string' ? error : error.message || 'Unknown error';
         console.error('Role update failed:', error);
         toast.error("Failed to update role: " + errorMessage);
+        
+        // If it's a timeout, offer manual redirect
+        if (typeof error === 'string' ? error.includes('timeout') : error.message?.includes('timeout')) {
+          toast.error("Role update timed out. You can try refreshing the page or contact support.");
+        }
       } else {
         console.log('Role update successful, redirecting to dashboard');
         toast.success("Role updated successfully!");
@@ -83,7 +96,13 @@ export default function SelectRolePage() {
       }
     } catch (error) {
       console.error('Unexpected error during role update:', error);
-      toast.error("An unexpected error occurred. Please try again.");
+      
+      // Check if it's a timeout error
+      if (error instanceof Error && error.message.includes('timeout')) {
+        toast.error("Role update timed out. You can try refreshing the page or contact support.");
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

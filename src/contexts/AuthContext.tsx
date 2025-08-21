@@ -307,61 +307,85 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateUserRole = async (role: 'teacher' | 'parent') => {
     if (!user) return { error: 'No user found' };
 
+    // Add timeout to prevent hanging
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Role update timeout after 10 seconds')), 10000);
+    });
+
     try {
+      console.log('=== ROLE UPDATE START ===');
       console.log('Updating user role to:', role);
       console.log('Current user state:', { userId: user.id, currentProfile: profile });
+      console.log('User metadata before update:', user.user_metadata);
       
-      // Update user metadata
-      console.log('Step 1: Updating user metadata...');
-      const { error: metadataError } = await supabase.auth.updateUser({
-        data: { role: role }
-      });
-
-      if (metadataError) {
-        console.error('Error updating user metadata:', metadataError);
-        return { error: metadataError };
-      }
-      console.log('Step 1 completed: User metadata updated successfully');
-
-      // Update profile in database
-      console.log('Step 2: Updating profile in database...');
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ role: role })
-        .eq('id', user.id);
-
-      if (profileError) {
-        console.error('Error updating profile:', profileError);
-        return { error: profileError };
-      }
-      console.log('Step 2 completed: Profile updated in database successfully');
-
-      // Update local profile state directly instead of calling fetchProfile
-      console.log('Step 3: Updating local profile state...');
-      if (profile) {
-        console.log('Updating existing profile state with new role');
-        setProfile({
-          ...profile,
-          role: role
+      // Race between timeout and actual update
+      const updatePromise = (async () => {
+        // Update user metadata
+        console.log('Step 1: Updating user metadata...');
+        const metadataResult = await supabase.auth.updateUser({
+          data: { role: role }
         });
-      } else {
-        console.log('Profile is null, creating new profile state with role');
-        // Create a basic profile state since the profile is null
-        setProfile({
-          id: user.id,
-          full_name: user.user_metadata?.full_name || user.user_metadata?.name || '',
-          role: role,
-          email: user.email || undefined,
-          avatar_url: user.user_metadata?.avatar_url || null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        });
-      }
+        
+        console.log('Metadata update result:', metadataResult);
+        
+        if (metadataResult.error) {
+          console.error('Error updating user metadata:', metadataResult.error);
+          throw metadataResult.error;
+        }
+        console.log('Step 1 completed: User metadata updated successfully');
+
+        // Update profile in database
+        console.log('Step 2: Updating profile in database...');
+        const profileResult = await supabase
+          .from('profiles')
+          .update({ role: role })
+          .eq('id', user.id);
+
+        console.log('Profile update result:', profileResult);
+        
+        if (profileResult.error) {
+          console.error('Error updating profile:', profileResult.error);
+          throw profileResult.error;
+        }
+        console.log('Step 2 completed: Profile updated in database successfully');
+
+        // Update local profile state directly instead of calling fetchProfile
+        console.log('Step 3: Updating local profile state...');
+        if (profile) {
+          console.log('Updating existing profile state with new role');
+          const updatedProfile = {
+            ...profile,
+            role: role
+          };
+          console.log('New profile state:', updatedProfile);
+          setProfile(updatedProfile);
+        } else {
+          console.log('Profile is null, creating new profile state with role');
+          // Create a basic profile state since the profile is null
+          const newProfile = {
+            id: user.id,
+            full_name: user.user_metadata?.full_name || user.user_metadata?.name || '',
+            role: role,
+            email: user.email || undefined,
+            avatar_url: user.user_metadata?.avatar_url || null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          };
+          console.log('New profile state:', newProfile);
+          setProfile(newProfile);
+        }
+        
+        console.log('Step 3 completed: Local profile state updated');
+        console.log('=== ROLE UPDATE COMPLETED SUCCESSFULLY ===');
+        return { error: null };
+      })();
+
+      // Race between timeout and update
+      const result = await Promise.race([updatePromise, timeoutPromise]) as { error: string | AuthError | PostgrestError | null; };
+      return result;
       
-      console.log('Step 3 completed: Local profile state updated');
-      console.log('User role updated successfully');
-      return { error: null };
     } catch (error) {
+      console.error('=== ROLE UPDATE FAILED ===');
       console.error('Error updating user role:', error);
       return { error: error as AuthError | string };
     }
