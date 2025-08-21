@@ -317,22 +317,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('Updating user role to:', role);
       console.log('Current user state:', { userId: user.id, currentProfile: profile });
       console.log('User metadata before update:', user.user_metadata);
+      console.log('Is OAuth user:', user.app_metadata?.provider === 'google');
       
       // Race between timeout and actual update
       const updatePromise = (async () => {
-        // Update user metadata
-        console.log('Step 1: Updating user metadata...');
-        const metadataResult = await supabase.auth.updateUser({
-          data: { role: role }
-        });
+        const isOAuthUser = user.app_metadata?.provider === 'google';
         
-        console.log('Metadata update result:', metadataResult);
-        
-        if (metadataResult.error) {
-          console.error('Error updating user metadata:', metadataResult.error);
-          throw metadataResult.error;
+        // For OAuth users, skip metadata update as it might be causing timeouts
+        if (!isOAuthUser) {
+          // Update user metadata only for non-OAuth users
+          console.log('Step 1: Updating user metadata (non-OAuth user)...');
+          const metadataResult = await supabase.auth.updateUser({
+            data: { role: role }
+          });
+          
+          console.log('Metadata update result:', metadataResult);
+          
+          if (metadataResult.error) {
+            console.error('Error updating user metadata:', metadataResult.error);
+            throw metadataResult.error;
+          }
+          console.log('Step 1 completed: User metadata updated successfully');
+        } else {
+          console.log('Step 1: Skipping user metadata update for OAuth user');
         }
-        console.log('Step 1 completed: User metadata updated successfully');
 
         // Update profile in database
         console.log('Step 2: Updating profile in database...');
