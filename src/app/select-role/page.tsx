@@ -15,24 +15,14 @@ export default function SelectRolePage() {
   const [selectedRole, setSelectedRole] = useState<string>("");
 
   useEffect(() => {
-    console.log('SelectRole useEffect triggered:', {
-      user: user?.id,
-      profile: profile,
-      profileRole: profile?.role,
-      loading,
-      hasProvider: user?.app_metadata?.provider
-    });
-    
     // If not logged in, redirect to auth
     if (!user && !loading) {
-      console.log('No user, redirecting to auth');
       router.replace("/auth");
       return;
     }
     
     // If user already has a role, redirect to dashboard
     if (profile && (profile.role === "teacher" || profile.role === "parent")) {
-      console.log('User has role, redirecting to dashboard');
       router.replace("/dashboard");
       return;
     }
@@ -40,7 +30,6 @@ export default function SelectRolePage() {
     // If user is not an OAuth user (email signup), redirect to dashboard
     // OAuth users have provider in app_metadata, email users don't
     if (user && !user.app_metadata.provider) {
-      console.log('Not OAuth user, redirecting to dashboard');
       router.replace("/dashboard");
       return;
     }
@@ -58,12 +47,6 @@ export default function SelectRolePage() {
       return;
     }
     
-    console.log('Starting role update process:', {
-      userId: user.id,
-      selectedRole: selectedRole,
-      currentProfile: profile
-    });
-    
     setLoading(true);
     
     try {
@@ -79,7 +62,6 @@ export default function SelectRolePage() {
       
       if (error) {
         const errorMessage = typeof error === 'string' ? error : error.message || 'Unknown error';
-        console.error('Role update failed:', error);
         toast.error("Failed to update role: " + errorMessage);
         
         // If it's a timeout, offer manual redirect
@@ -87,7 +69,6 @@ export default function SelectRolePage() {
           toast.error("Role update timed out. You can try refreshing the page or contact support.");
         }
       } else {
-        console.log('Role update successful, redirecting to dashboard');
         toast.success("Role updated successfully!");
         // Add a small delay to ensure state propagation
         setTimeout(() => {
@@ -95,8 +76,6 @@ export default function SelectRolePage() {
         }, 100);
       }
     } catch (error) {
-      console.error('Unexpected error during role update:', error);
-      
       // Check if it's a timeout error
       if (error instanceof Error && error.message.includes('timeout')) {
         toast.error("Role update timed out. You can try refreshing the page or contact support.");

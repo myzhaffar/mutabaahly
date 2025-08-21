@@ -30,13 +30,3 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   }
 });
 
-// Add error logging for debugging
-supabase.auth.onAuthStateChange((event, _session) => {
-  if (event === 'SIGNED_IN') {
-    console.log('Supabase auth: User signed in successfully');
-  } else if (event === 'SIGNED_OUT') {
-    console.log('Supabase auth: User signed out');
-  } else if (event === 'TOKEN_REFRESHED') {
-    console.log('Supabase auth: Token refreshed');
-  }
-});
