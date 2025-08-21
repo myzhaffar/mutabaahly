@@ -58,6 +58,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
+      console.log(`Attempting to fetch profile for user: ${userId} (attempt ${retryAttempt + 1})`);
+      
       const { data: profileData, error } = await supabase
         .from('profiles')
         .select('*')
@@ -69,15 +71,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // If profile doesn't exist, create it
         if (error.code === 'PGRST116') {
+          console.log('Profile not found, attempting to create one...');
           setProfileCreating(true);
           
           try {
+            // Add a small delay to ensure user is fully authenticated
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
             // Get current user to determine if this is OAuth or email user
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { user }, error: userError } = await supabase.auth.getUser();
+            
+            if (userError) {
+              console.error('Error getting current user:', userError);
+              setProfile(null);
+              return;
+            }
             
             if (user) {
+              console.log('Current user data:', {
+                id: user.id,
+                email: user.email,
+                provider: user.app_metadata.provider,
+                metadata: user.user_metadata
+              });
+              
               const isOAuthUser = user.app_metadata.provider === 'google';
               const userRole = isOAuthUser ? null : user.user_metadata.role;
+              
+              console.log('Creating profile with data:', {
+                id: userId,
+                full_name: user.user_metadata.full_name || user.user_metadata.name || '',
+                role: userRole,
+                email: user.email,
+                provider: user.app_metadata.provider
+              });
               
               // Use upsert instead of insert to handle potential duplicates gracefully
               const { data: newProfile, error: insertError } = await supabase
@@ -130,6 +157,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   setProfile(null);
                 }
               } else if (newProfile) {
+                console.log('Profile created successfully:', newProfile);
                 // Set the profile directly instead of calling fetchProfile again
                 const typedProfile: Profile = {
                   id: newProfile.id,
@@ -142,6 +170,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 };
                 setProfile(typedProfile);
               }
+            } else {
+              console.error('No user data available for profile creation');
+              setProfile(null);
             }
           } finally {
             setProfileCreating(false);
@@ -161,6 +192,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setProfile(null);
         }
       } else if (profileData) {
+        console.log('Profile found successfully:', profileData);
         // Type assertion for the database response
         const dbProfile = profileData as {
           id: string;

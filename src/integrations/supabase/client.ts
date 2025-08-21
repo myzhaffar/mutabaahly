@@ -13,4 +13,30 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  },
+  db: {
+    schema: 'public'
+  },
+  global: {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  }
+});
+
+// Add error logging for debugging
+supabase.auth.onAuthStateChange((event, _session) => {
+  if (event === 'SIGNED_IN') {
+    console.log('Supabase auth: User signed in successfully');
+  } else if (event === 'SIGNED_OUT') {
+    console.log('Supabase auth: User signed out');
+  } else if (event === 'TOKEN_REFRESHED') {
+    console.log('Supabase auth: Token refreshed');
+  }
+});
