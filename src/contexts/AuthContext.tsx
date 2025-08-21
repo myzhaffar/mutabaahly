@@ -309,8 +309,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       console.log('Updating user role to:', role);
+      console.log('Current user state:', { userId: user.id, currentProfile: profile });
       
       // Update user metadata
+      console.log('Step 1: Updating user metadata...');
       const { error: metadataError } = await supabase.auth.updateUser({
         data: { role: role }
       });
@@ -319,8 +321,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Error updating user metadata:', metadataError);
         return { error: metadataError };
       }
+      console.log('Step 1 completed: User metadata updated successfully');
 
       // Update profile in database
+      console.log('Step 2: Updating profile in database...');
       const { error: profileError } = await supabase
         .from('profiles')
         .update({ role: role })
@@ -330,15 +334,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Error updating profile:', profileError);
         return { error: profileError };
       }
+      console.log('Step 2 completed: Profile updated in database successfully');
 
       // Update local profile state directly instead of calling fetchProfile
+      console.log('Step 3: Updating local profile state...');
       if (profile) {
+        console.log('Updating existing profile state with new role');
         setProfile({
           ...profile,
           role: role
         });
+      } else {
+        console.log('Profile is null, creating new profile state with role');
+        // Create a basic profile state since the profile is null
+        setProfile({
+          id: user.id,
+          full_name: user.user_metadata?.full_name || user.user_metadata?.name || '',
+          role: role,
+          email: user.email || undefined,
+          avatar_url: user.user_metadata?.avatar_url || null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
       }
       
+      console.log('Step 3 completed: Local profile state updated');
       console.log('User role updated successfully');
       return { error: null };
     } catch (error) {

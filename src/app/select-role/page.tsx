@@ -15,14 +15,24 @@ export default function SelectRolePage() {
   const [selectedRole, setSelectedRole] = useState<string>("");
 
   useEffect(() => {
+    console.log('SelectRole useEffect triggered:', {
+      user: user?.id,
+      profile: profile,
+      profileRole: profile?.role,
+      loading,
+      hasProvider: user?.app_metadata?.provider
+    });
+    
     // If not logged in, redirect to auth
     if (!user && !loading) {
+      console.log('No user, redirecting to auth');
       router.replace("/auth");
       return;
     }
     
     // If user already has a role, redirect to dashboard
     if (profile && (profile.role === "teacher" || profile.role === "parent")) {
+      console.log('User has role, redirecting to dashboard');
       router.replace("/dashboard");
       return;
     }
@@ -30,6 +40,7 @@ export default function SelectRolePage() {
     // If user is not an OAuth user (email signup), redirect to dashboard
     // OAuth users have provider in app_metadata, email users don't
     if (user && !user.app_metadata.provider) {
+      console.log('Not OAuth user, redirecting to dashboard');
       router.replace("/dashboard");
       return;
     }
@@ -65,7 +76,10 @@ export default function SelectRolePage() {
       } else {
         console.log('Role update successful, redirecting to dashboard');
         toast.success("Role updated successfully!");
-        router.replace("/dashboard");
+        // Add a small delay to ensure state propagation
+        setTimeout(() => {
+          router.replace("/dashboard");
+        }, 100);
       }
     } catch (error) {
       console.error('Unexpected error during role update:', error);
