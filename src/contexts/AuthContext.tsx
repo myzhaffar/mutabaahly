@@ -43,10 +43,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [profileCreating, setProfileCreating] = useState(false);
 
-  const fetchProfile = useCallback(async (userId: string) => {
+  const fetchProfile = useCallback(async (userId: string, retryAttempt = 0) => {
     // Prevent multiple simultaneous profile creation attempts
     if (profileCreating) {
       console.log('Profile creation already in progress, skipping...');
+      return;
+    }
+
+    // Prevent infinite retry loops
+    if (retryAttempt > 3) {
+      console.error('Max retry attempts reached for profile fetch');
+      setProfile(null);
       return;
     }
 
@@ -139,8 +146,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           } finally {
             setProfileCreating(false);
           }
+        } else if (error.code === '406') {
+          // Handle 406 Not Acceptable error - this might be a temporary issue
+          console.warn(`Profile fetch returned 406 (attempt ${retryAttempt + 1}/3), retrying in 1 second...`);
+          
+          // Retry after 1 second
+          setTimeout(() => {
+            fetchProfile(userId, retryAttempt + 1);
+          }, 1000);
+          
+          return;
         } else {
-          console.error('Profile fetch error (not PGRST116):', error);
+          console.error('Profile fetch error (not PGRST116 or 406):', error);
           setProfile(null);
         }
       } else if (profileData) {
@@ -180,13 +197,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const loadingTimeout = setTimeout(() => {
       console.warn('Auth loading timeout - forcing loading to false');
       setLoading(false);
-    }, 10000); // 10 seconds timeout
+    }, 5000); // Reduced from 10 seconds to 5 seconds
 
     let isInitialized = false;
 
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_, session) => {
+      async (event, session) => {
+        console.log('Auth state change:', event, session?.user?.id);
+        
         setSession(session);
         setUser(session?.user ?? null);
         
