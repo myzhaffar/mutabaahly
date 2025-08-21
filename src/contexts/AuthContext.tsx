@@ -331,8 +331,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { error: profileError };
       }
 
-      // Refresh the profile
-      await fetchProfile(user.id);
+      // Update local profile state directly instead of calling fetchProfile
+      if (profile) {
+        setProfile({
+          ...profile,
+          role: role
+        });
+      }
       
       console.log('User role updated successfully');
       return { error: null };

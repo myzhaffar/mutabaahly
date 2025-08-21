@@ -46,17 +46,32 @@ export default function SelectRolePage() {
       router.replace("/auth");
       return;
     }
+    
+    console.log('Starting role update process:', {
+      userId: user.id,
+      selectedRole: selectedRole,
+      currentProfile: profile
+    });
+    
     setLoading(true);
     
-    const { error } = await updateUserRole(selectedRole as 'teacher' | 'parent');
-    
-    setLoading(false);
-    if (error) {
-      const errorMessage = typeof error === 'string' ? error : error.message || 'Unknown error';
-      toast.error("Failed to update role: " + errorMessage);
-    } else {
-      toast.success("Role updated successfully!");
-      router.replace("/dashboard");
+    try {
+      const { error } = await updateUserRole(selectedRole as 'teacher' | 'parent');
+      
+      if (error) {
+        const errorMessage = typeof error === 'string' ? error : error.message || 'Unknown error';
+        console.error('Role update failed:', error);
+        toast.error("Failed to update role: " + errorMessage);
+      } else {
+        console.log('Role update successful, redirecting to dashboard');
+        toast.success("Role updated successfully!");
+        router.replace("/dashboard");
+      }
+    } catch (error) {
+      console.error('Unexpected error during role update:', error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
