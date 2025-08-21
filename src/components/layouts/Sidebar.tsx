@@ -83,6 +83,20 @@ export function Sidebar({ className }: { className?: string }) {
   return (
     <>
       <div>SIDEBAR TEST</div>
+      
+      {/* Backdrop */}
+      <div 
+        className={`
+          lg:hidden fixed inset-0 bg-black z-40 transition-all duration-500 ease-out
+          ${isOpen 
+            ? 'bg-opacity-50 pointer-events-auto' 
+            : 'bg-opacity-0 pointer-events-none'
+          }
+        `}
+        onClick={() => setIsOpen(false)}
+        aria-hidden="true"
+      />
+      
       <Button
         variant="ghost"
         size="icon"
@@ -94,8 +108,8 @@ export function Sidebar({ className }: { className?: string }) {
 
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 bg-background border-r transform transition-transform duration-200 ease-in-out lg:translate-x-0",
-          isOpen ? "translate-x-0" : "-translate-x-full",
+          "fixed inset-y-0 left-0 z-40 w-64 bg-background border-r transform transition-all duration-500 ease-out lg:translate-x-0 shadow-lg",
+          isOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full",
           className
         )}
       >
@@ -125,10 +139,10 @@ export function Sidebar({ className }: { className?: string }) {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                      "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-300 ease-out transform hover:scale-105",
                       isActive(item.href)
-                        ? "bg-primary text-primary-foreground"
-                        : "hover:bg-muted"
+                        ? "bg-primary text-primary-foreground scale-105 shadow-md"
+                        : "hover:bg-muted hover:shadow-sm"
                     )}
                   >
                     {item.icon}
@@ -141,7 +155,7 @@ export function Sidebar({ className }: { className?: string }) {
           <div className="border-t p-4">
             <Button
               variant="ghost"
-              className="w-full justify-start space-x-3"
+              className="w-full justify-start space-x-3 transition-all duration-300 ease-out hover:scale-105 transform"
               onClick={signOut}
             >
               <LogOut className="h-5 w-5" />

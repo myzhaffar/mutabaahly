@@ -65,12 +65,12 @@ const LanguageSwitcher = () => {
       </DropdownMenu.Button>
       <Transition
         as={React.Fragment}
-        enter="transition ease-out duration-100"
-        enterFrom="transform opacity-0 scale-95"
-        enterTo="transform opacity-100 scale-100"
-        leave="transition ease-in duration-75"
-        leaveFrom="transform opacity-100 scale-100"
-        leaveTo="transform opacity-0 scale-95"
+        enter="transition ease-out duration-300"
+        enterFrom="transform opacity-0 scale-95 translate-y-2"
+        enterTo="transform opacity-100 scale-100 translate-y-0"
+        leave="transition ease-in duration-200"
+        leaveFrom="transform opacity-100 scale-100 translate-y-0"
+        leaveTo="transform opacity-0 scale-95 translate-y-2"
       >
         <DropdownMenu.Items className="origin-top-right absolute right-0 mt-2 w-28 rounded-xl shadow-lg bg-gray-800 ring-1 ring-gray-700 ring-opacity-5 focus:outline-none z-50 p-2">
           <div className="space-y-1">
@@ -79,7 +79,7 @@ const LanguageSwitcher = () => {
                 <button
                   onClick={() => handleLanguageChange('en')}
                   disabled={isChanging || i18n.language === 'en'}
-                  className={`w-full text-left px-3 py-2 text-base transition-all duration-200 ease-in-out rounded-lg ${i18n.language === 'en' ? 'font-bold text-emerald-400' : 'text-gray-200'} ${active ? 'bg-gray-600' : 'hover:bg-gray-600'}`}
+                  className={`w-full text-left px-3 py-2 text-base transition-all duration-300 ease-out rounded-lg transform hover:scale-105 ${i18n.language === 'en' ? 'font-bold text-emerald-400' : 'text-gray-200'} ${active ? 'bg-gray-600' : 'hover:bg-gray-600'}`}
                 >
                   EN
                 </button>
@@ -90,7 +90,7 @@ const LanguageSwitcher = () => {
                 <button
                   onClick={() => handleLanguageChange('id')}
                   disabled={isChanging || i18n.language === 'id'}
-                  className={`w-full text-left px-3 py-2 text-base transition-all duration-200 ease-in-out rounded-lg ${i18n.language === 'id' ? 'font-bold text-emerald-400' : 'text-gray-200'} ${active ? 'bg-gray-600' : 'hover:bg-gray-600'}`}
+                  className={`w-full text-left px-3 py-2 text-base transition-all duration-300 ease-out rounded-lg transform hover:scale-105 ${i18n.language === 'id' ? 'font-bold text-emerald-400' : 'text-gray-200'} ${active ? 'bg-gray-600' : 'hover:bg-gray-600'}`}
                 >
                   ID
                 </button>
@@ -148,21 +148,26 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIs
     <>
       {/* Mobile Menu Button (now handled by header) */}
       {/* Backdrop */}
-      {isMobileMenuOpen && (
-        <div 
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
-          onClick={() => setIsMobileMenuOpen(false)}
-          aria-hidden="true"
-        />
-      )}
+      <div 
+        className={`
+          lg:hidden fixed inset-0 bg-black z-40 transition-all duration-500 ease-out
+          ${isMobileMenuOpen 
+            ? 'bg-opacity-50 pointer-events-auto' 
+            : 'bg-opacity-0 pointer-events-none'
+          }
+        `}
+        onClick={() => setIsMobileMenuOpen(false)}
+        aria-hidden="true"
+      />
       {/* Sidebar */}
       <aside
         id="teacher-sidebar"
         className={`
           w-64 min-h-screen bg-gradient-to-r from-green-400 to-teal-500 text-white shadow-lg 
-          fixed top-0 left-0 z-40 transform transition-transform duration-300 ease-in-out
+          fixed top-0 left-0 z-40 transform transition-all duration-500 ease-out
           lg:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
           overflow-y-auto scrollbar-thin scrollbar-thumb-teal-600 scrollbar-track-transparent
+          ${isMobileMenuOpen ? 'shadow-2xl' : 'shadow-lg'}
         `}
       >
         <div className="sticky top-0 bg-gradient-to-r from-green-400 to-teal-500 pt-6 pb-4 px-5">
@@ -191,8 +196,9 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIs
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`
                   flex items-center space-x-3 p-3 rounded-xl text-gray-200 
-                  hover:bg-teal-600/50 hover:text-white transition-all duration-150 ease-in-out
-                  ${isActive ? 'bg-teal-600/70 text-white shadow-md' : ''}
+                  hover:bg-teal-600/50 hover:text-white transition-all duration-300 ease-out
+                  hover:scale-105 hover:shadow-lg transform
+                  ${isActive ? 'bg-teal-600/70 text-white shadow-md scale-105' : ''}
                 `}
               >
                 <Icon className="h-5 w-5 flex-shrink-0" />
@@ -215,7 +221,7 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIs
           </div>
           <Button
             variant="ghost"
-            className="w-full justify-start text-gray-200 hover:text-white hover:bg-teal-600/50"
+            className="w-full justify-start text-gray-200 hover:text-white hover:bg-teal-600/50 transition-all duration-300 ease-out hover:scale-105 transform"
             onClick={handleSignOut}
           >
             <LogOut className="h-4 w-4 mr-2" />
