@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/useAuth';
 import UnifiedSidebar from '@/components/layouts/UnifiedSidebar';
+import MobileBottomNav from '@/components/layouts/MobileBottomNav';
 import Breadcrumbs, { BreadcrumbItem } from '@/components/ui/Breadcrumbs';
 
 interface TeacherLayoutProps {
@@ -29,10 +30,6 @@ const TeacherLayout: React.FC<TeacherLayoutProps> = ({ children, breadcrumbs }) 
     return null;
   }
 
-  const toggleSidebar = () => {
-    setSidebarCollapsed(!sidebarCollapsed);
-  };
-
   return (
     <div className="min-h-screen bg-gray-100">
       <UnifiedSidebar 
@@ -42,8 +39,9 @@ const TeacherLayout: React.FC<TeacherLayoutProps> = ({ children, breadcrumbs }) 
         setIsCollapsed={setSidebarCollapsed}
         role="teacher"
       />
+      <MobileBottomNav role="teacher" />
       
-      <main className={`min-h-screen ${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}> {/* Adjust padding based on sidebar state */}
+      <main className={`min-h-screen ${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'} pb-16 lg:pb-0`}> {/* Added pb-16 for mobile bottom nav */}
         {breadcrumbs && <div className="pt-6 px-4 lg:px-8"><Breadcrumbs items={breadcrumbs} /></div>}
         <div className="container mx-auto pt-2 pb-6 px-4 lg:px-8">
           <div className="bg-white rounded-lg shadow-sm p-4">
