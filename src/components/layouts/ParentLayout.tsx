@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/useAuth';
+import UnifiedSidebar from '@/components/layouts/UnifiedSidebar';
 import Breadcrumbs, { BreadcrumbItem } from '@/components/ui/Breadcrumbs';
-import ParentNavbar from '@/components/ParentNavbar';
 
 interface ParentLayoutProps {
   children: React.ReactNode;
@@ -12,6 +12,8 @@ interface ParentLayoutProps {
 
 const ParentLayout: React.FC<ParentLayoutProps> = ({ children, breadcrumbs }) => {
   const { profile, loading } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Show loading state while auth is being determined
   if (loading) {
@@ -28,12 +30,21 @@ const ParentLayout: React.FC<ParentLayoutProps> = ({ children, breadcrumbs }) =>
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 pt-0">
-      <ParentNavbar />
-      {breadcrumbs && <div className="pt-6 px-4 lg:px-8"><Breadcrumbs items={breadcrumbs} /></div>}
-      <main className="container mx-auto pt-2 pb-6 px-4 lg:px-8">
-        <div className="bg-white rounded-lg shadow-sm p-4">
-          {children}
+    <div className="min-h-screen bg-gray-100">
+      <UnifiedSidebar 
+        isMobileMenuOpen={sidebarOpen} 
+        setIsMobileMenuOpen={setSidebarOpen} 
+        isCollapsed={sidebarCollapsed}
+        setIsCollapsed={setSidebarCollapsed}
+        role="parent"
+      />
+      
+      <main className={`min-h-screen ${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}> {/* Adjust padding based on sidebar state */}
+        {breadcrumbs && <div className="pt-6 px-4 lg:px-8"><Breadcrumbs items={breadcrumbs} /></div>}
+        <div className="container mx-auto pt-2 pb-6 px-4 lg:px-8">
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            {children}
+          </div>
         </div>
       </main>
     </div>

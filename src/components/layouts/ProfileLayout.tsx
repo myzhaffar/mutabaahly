@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/useAuth';
 import { useRouter } from 'next/navigation';
-import TeacherSidebar from '@/components/TeacherSidebar';
+import UnifiedSidebar from '@/components/layouts/UnifiedSidebar';
 import Breadcrumbs, { BreadcrumbItem } from '@/components/ui/Breadcrumbs';
 
 interface ProfileLayoutProps {
@@ -14,7 +14,8 @@ interface ProfileLayoutProps {
 const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children, breadcrumbs }) => {
   const { profile, loading } = useAuth();
   const router = useRouter();
-  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   React.useEffect(() => {
     if (!loading && !profile) {
@@ -34,49 +35,26 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children, breadcrumbs }) 
     return null;
   }
 
-  // If user is a teacher, show the teacher layout with sidebar
-  if (profile.role === 'teacher') {
-    return (
-      <div className="min-h-screen bg-gray-100">
-        {/* Top Header: only show on mobile (below lg) */}
-        <header className="sticky top-0 z-40 bg-white shadow-sm flex items-center justify-between h-16 px-4 lg:px-8 lg:hidden">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-teal-500 to-green-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">M</span>
-            </div>
-            <span className="font-semibold text-lg text-gray-900 hidden sm:inline">Mutabaahly</span>
-          </div>
-          <button
-            className="lg:hidden p-2 rounded-md text-teal-700 hover:bg-teal-50"
-            onClick={() => setSidebarOpen((open) => !open)}
-          >
-            <svg className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-          </button>
-        </header>
-        <TeacherSidebar isMobileMenuOpen={sidebarOpen} setIsMobileMenuOpen={setSidebarOpen} />
-        <main className="lg:pl-64 min-h-screen">
-          {breadcrumbs && <div className="pt-6 px-4 lg:px-8"><Breadcrumbs items={breadcrumbs} /></div>}
-          <div className="container mx-auto pt-2 pb-6 px-4 lg:px-8">
-            <div className="bg-white rounded-lg shadow-sm p-4">
-              {children}
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // If user is a parent, show a simpler layout
   return (
     <div className="min-h-screen bg-gray-100">
-      {breadcrumbs && <div className="pt-6 px-4 lg:px-8"><Breadcrumbs items={breadcrumbs} /></div>}
-      <main className="container mx-auto pt-2 pb-6 px-4 lg:px-8">
-        <div className="bg-white rounded-lg shadow-sm p-4">
-          {children}
+      <UnifiedSidebar 
+        isMobileMenuOpen={sidebarOpen} 
+        setIsMobileMenuOpen={setSidebarOpen} 
+        isCollapsed={sidebarCollapsed}
+        setIsCollapsed={setSidebarCollapsed}
+        role={profile.role as "teacher" | "parent"}
+      />
+      
+      <main className={`min-h-screen ${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}> {/* Adjust padding based on sidebar state */}
+        {breadcrumbs && <div className="pt-6 px-4 lg:px-8"><Breadcrumbs items={breadcrumbs} /></div>}
+        <div className="container mx-auto pt-2 pb-6 px-4 lg:px-8">
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            {children}
+          </div>
         </div>
       </main>
     </div>
   );
 };
 
-export default ProfileLayout; 
+export default ProfileLayout;

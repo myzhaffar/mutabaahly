@@ -8,11 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Home,
-  BookOpen,
+  Users,
+  BookMarked,
   UserCircle,
   LogOut,
   ChevronDown,
-  Award
+  Menu
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -21,11 +22,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const ParentNavbar = () => {
+const TeacherNavbar = ({ toggleSidebar }: { toggleSidebar?: () => void }) => {
   const { profile, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-
 
   const handleSignOut = async () => {
     await signOut();
@@ -34,8 +34,8 @@ const ParentNavbar = () => {
 
   // Removed dashboard from navigation items
   const navItems = [
-    { href: '/students', label: 'Student Rankings', mobileLabel: 'Student Ranks', icon: Award },
-    { href: '/tests/view', label: 'Test Results', icon: BookOpen },
+    { href: '/students', label: 'Students', icon: Users },
+    { href: '/tests/manage', label: 'Tests', icon: BookMarked },
     { href: '/profile', label: 'Profile', icon: UserCircle },
   ];
 
@@ -49,6 +49,13 @@ const ParentNavbar = () => {
       <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
         <nav className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between md:justify-between">
+            {/* Hamburger Menu Button - Only visible on desktop */}
+            <div className="hidden lg:flex items-center">
+              <Button variant="ghost" size="icon" onClick={toggleSidebar} className="mr-2">
+                <Menu className="h-6 w-6 text-teal-700" />
+              </Button>
+            </div>
+            
             {/* Logo Section - center on mobile, left on desktop */}
             <div className="flex-1 flex justify-center md:justify-start items-center gap-2">
               <Link href="/dashboard" className="flex items-center space-x-2">
@@ -127,7 +134,7 @@ const ParentNavbar = () => {
               }`}
             >
               <item.icon className={`h-6 w-6 mb-0.5 ${isActive(item.href) ? 'text-teal-600' : 'text-gray-400'}`} />
-              <span className="text-xs font-medium">{item.mobileLabel || item.label}</span>
+              <span className="text-xs font-medium">{item.label}</span>
             </Link>
           ))}
         </div>
@@ -136,4 +143,4 @@ const ParentNavbar = () => {
   );
 };
 
-export default ParentNavbar;
+export default TeacherNavbar;
