@@ -36,7 +36,15 @@ const EditTestDialog: React.FC<EditTestDialogProps> = ({ test, onTestUpdated }) 
     try {
       const { data } = await supabase
         .from('tilawati_level_tests')
-        .update(formData)
+        .update({
+          student_id: formData.student_id,
+          class_name: formData.class_name,
+          tilawati_level: formData.tilawati_level as string,
+          date: formData.date,
+          munaqisy: formData.munaqisy,
+          status: formData.status as "scheduled" | "passed" | "failed" | "pending_retake" | "cancelled",
+          notes: formData.notes
+        })
         .eq('id', test.id);
 
       if (data) {

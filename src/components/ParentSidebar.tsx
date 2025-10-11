@@ -4,19 +4,16 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/useAuth';
-import { Home, Users, BookMarked, UserCircle } from 'lucide-react';
+import { Home, Award, BookOpen, UserCircle } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-
-interface TeacherSidebarProps {
+interface ParentSidebarProps {
   isMobileMenuOpen: boolean;
   setIsMobileMenuOpen: (open: boolean) => void;
 }
 
-
-
-const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
+const ParentSidebar: React.FC<ParentSidebarProps> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const pathname = usePathname();
   const { profile } = useAuth();
 
@@ -28,7 +25,7 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIs
   // Close mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const sidebar = document.getElementById('teacher-sidebar');
+      const sidebar = document.getElementById('parent-sidebar');
       if (isMobileMenuOpen && sidebar) {
         if (!sidebar.contains(event.target as Node)) {
           setIsMobileMenuOpen(false);
@@ -39,22 +36,19 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIs
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMobileMenuOpen, setIsMobileMenuOpen]);
 
-
-
-  if (profile?.role !== 'teacher') {
+  if (profile?.role !== 'parent') {
     return null;
   }
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
-    { href: '/students', label: 'Students', icon: Users },
-    { href: '/tests/manage', label: 'Tests', icon: BookMarked },
+    { href: '/students', label: 'Student Rankings', icon: Award },
+    { href: '/tests/view', label: 'Test Results', icon: BookOpen },
     { href: '/profile', label: 'Profile', icon: UserCircle },
   ];
 
   return (
     <>
-      {/* Mobile Menu Button (now handled by header) */}
       {/* Backdrop */}
       <div 
         className={`
@@ -69,7 +63,7 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIs
       />
       {/* Sidebar */}
       <aside
-        id="teacher-sidebar"
+        id="parent-sidebar"
         className={`
           w-64 min-h-screen bg-gradient-to-r from-green-400 to-teal-500 text-white shadow-lg 
           fixed top-0 left-0 z-40 transform transition-all duration-500 ease-out
@@ -139,4 +133,4 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIs
   );
 };
 
-export default TeacherSidebar;
+export default ParentSidebar;

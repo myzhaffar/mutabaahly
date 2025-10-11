@@ -48,7 +48,7 @@ export const calculateTilawatiEligibility = async (
       .select('*')
       .eq('student_id', studentId)
       .eq('type', 'tilawah')
-      .eq('surah_or_jilid', actualLevel)
+      .eq('surah_or_jilid', actualLevel || '')
       .order('date', { ascending: false });
 
     // Calculate pages completed
@@ -77,7 +77,7 @@ export const calculateTilawatiEligibility = async (
       .select('*')
       .eq('student_id', studentId)
       .eq('status', 'scheduled')
-      .eq('tilawati_level', actualLevel);
+      .eq('tilawati_level', actualLevel || '');
 
     const hasPendingTest = (pendingTests?.length || 0) > 0;
 
@@ -87,7 +87,7 @@ export const calculateTilawatiEligibility = async (
       .select('*')
       .eq('student_id', studentId)
       .eq('status', 'passed')
-      .eq('tilawati_level', actualLevel);
+      .eq('tilawati_level', actualLevel || '');
 
     const hasPassedTest = (passedTests?.length || 0) > 0;
 
@@ -97,7 +97,7 @@ export const calculateTilawatiEligibility = async (
       .select('*')
       .eq('student_id', studentId)
       .eq('status', 'failed')
-      .eq('tilawati_level', actualLevel)
+      .eq('tilawati_level', actualLevel || '')
       .order('date', { ascending: false });
 
     const lastFailedDate = failedTests && failedTests.length > 0 

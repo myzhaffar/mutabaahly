@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/useAuth';
 import { useRouter } from 'next/navigation';
-import UnifiedSidebar from '@/components/layouts/UnifiedSidebar';
-import MobileBottomNav from '@/components/layouts/MobileBottomNav';
+import TeacherSidebarWithBottomNav from '@/components/TeacherSidebarWithBottomNav';
+import ParentSidebarWithBottomNav from '@/components/ParentSidebarWithBottomNav';
 import Breadcrumbs, { BreadcrumbItem } from '@/components/ui/Breadcrumbs';
 
 interface ProfileLayoutProps {
@@ -16,7 +16,6 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children, breadcrumbs }) 
   const { profile, loading } = useAuth();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   React.useEffect(() => {
     if (!loading && !profile) {
@@ -36,27 +35,59 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children, breadcrumbs }) 
     return null;
   }
 
+  // If user is a teacher, show the teacher layout with sidebar
+  if (profile.role === 'teacher') {
+    return (
+      <div className="min-h-screen bg-gray-100">
+        <TeacherSidebarWithBottomNav 
+          isMobileMenuOpen={sidebarOpen} 
+          setIsMobileMenuOpen={setSidebarOpen} 
+        />
+        
+        <main className="lg:pl-64 min-h-screen">
+          {breadcrumbs && <div className="pt-6 px-4 lg:px-8"><Breadcrumbs items={breadcrumbs} /></div>}
+          <div className="container mx-auto pt-2 pb-6 px-4 lg:px-8">
+            <div className="bg-white rounded-lg shadow-sm p-4">
+              {children}
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // If user is a parent, show the parent layout with sidebar
+  if (profile.role === 'parent') {
+    return (
+      <div className="min-h-screen bg-gray-100">
+        <ParentSidebarWithBottomNav 
+          isMobileMenuOpen={sidebarOpen} 
+          setIsMobileMenuOpen={setSidebarOpen} 
+        />
+        
+        <main className="lg:pl-64 min-h-screen">
+          {breadcrumbs && <div className="pt-6 px-4 lg:px-8"><Breadcrumbs items={breadcrumbs} /></div>}
+          <div className="container mx-auto pt-2 pb-6 px-4 lg:px-8">
+            <div className="bg-white rounded-lg shadow-sm p-4">
+              {children}
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Fallback for unknown roles
   return (
     <div className="min-h-screen bg-gray-100">
-      <UnifiedSidebar 
-        isMobileMenuOpen={sidebarOpen} 
-        setIsMobileMenuOpen={setSidebarOpen} 
-        isCollapsed={sidebarCollapsed}
-        setIsCollapsed={setSidebarCollapsed}
-        role={profile.role as "teacher" | "parent"}
-      />
-      <MobileBottomNav role={profile.role as "teacher" | "parent"} />
-      
-      <main className={`min-h-screen ${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'} pb-16 lg:pb-0`}> {/* Added pb-16 for mobile bottom nav */}
-        {breadcrumbs && <div className="pt-6 px-4 lg:px-8"><Breadcrumbs items={breadcrumbs} /></div>}
-        <div className="container mx-auto pt-2 pb-6 px-4 lg:px-8">
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            {children}
-          </div>
+      {breadcrumbs && <div className="pt-6 px-4 lg:px-8"><Breadcrumbs items={breadcrumbs} /></div>}
+      <main className="container mx-auto pt-2 pb-6 px-4 lg:px-8">
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          {children}
         </div>
       </main>
     </div>
   );
 };
 
-export default ProfileLayout;
+export default ProfileLayout; 

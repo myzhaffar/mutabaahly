@@ -58,7 +58,15 @@ const ParentTestView: React.FC = () => {
         throw error;
       }
 
-      return data || [];
+      // Convert the data to match TilawatiTest type
+      return data?.map(test => ({
+        ...test,
+        tilawati_level: test.tilawati_level as TilawatiJilid,
+        status: test.status as TestStatus,
+        notes: test.notes || undefined,
+        created_at: test.created_at || '',
+        updated_at: test.updated_at || ''
+      })) || [];
     },
   });
 

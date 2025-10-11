@@ -32,8 +32,8 @@ const ParentNavbar = () => {
     router.push('/');
   };
 
-  // Removed dashboard from navigation items
   const navItems = [
+    { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/students', label: 'Student Rankings', mobileLabel: 'Student Ranks', icon: Award },
     { href: '/tests/view', label: 'Test Results', icon: BookOpen },
     { href: '/profile', label: 'Profile', icon: UserCircle },
@@ -61,7 +61,7 @@ const ParentNavbar = () => {
               </Link>
             </div>
 
-            {/* Desktop Navigation - without dashboard */}
+            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-6">
               {navItems.map((item) => (
                 <Link
@@ -113,7 +113,7 @@ const ParentNavbar = () => {
         </nav>
       </header>
 
-      {/* Bottom Navigation Bar for Mobile - without dashboard */}
+      {/* Bottom Navigation Bar for Mobile */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t shadow-lg">
         <div className="flex justify-around items-center h-14">
           {navItems.map((item) => (
@@ -136,4 +136,4 @@ const ParentNavbar = () => {
   );
 };
 
-export default ParentNavbar;
+export default ParentNavbar; 

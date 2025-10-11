@@ -4,24 +4,55 @@ import type { TilawatiTest, TilawatiJilid, TestStatus } from '@/types/tilawati';
 export interface TestRecord {
   id: string;
   student_id: string;
-  current_jilid: string;
-  target_jilid: string;
-  test_date: string;
-  examiner_name: string;
+  class_name: string;
+  tilawati_level: string;
+  date: string;
+  munaqisy: string;
   status: 'scheduled' | 'passed' | 'failed' | 'pending_retake' | 'cancelled';
-  score?: number;
-  notes: string;
-  created_at: string;
-  updated_at: string;
-  student_name?: string;
-  class_name?: string;
+  notes: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  created_by: string | null;
+  student?: {
+    id: string;
+    name: string;
+    teacher?: string;
+    parent_id?: string | null;
+  };
 }
 
 export const fetchTestsForTeacher = async (teacherId: string): Promise<TestRecord[]> => {
   try {
-    const { data, error } = await supabase.rpc('get_tests_for_teacher', {
-      teacher_id: teacherId
-    });
+    // First get students for this teacher
+    const { data: students, error: studentsError } = await supabase
+      .from('students')
+      .select('id')
+      .eq('teacher', teacherId);
+
+    if (studentsError) {
+      console.error('Error fetching students:', studentsError);
+      throw studentsError;
+    }
+
+    if (!students || students.length === 0) {
+      return [];
+    }
+
+    const studentIds = students.map(s => s.id);
+
+    // Then get tests for those students
+    const { data, error } = await supabase
+      .from('tilawati_level_tests')
+      .select(`
+        *,
+        student:student_id (
+          id,
+          name,
+          teacher
+        )
+      `)
+      .in('student_id', studentIds)
+      .order('date', { ascending: false });
 
     if (error) {
       console.error('Error fetching tests:', error);
@@ -37,12 +68,39 @@ export const fetchTestsForTeacher = async (teacherId: string): Promise<TestRecor
 
 export const fetchTestsForParent = async (parentId: string): Promise<TestRecord[]> => {
   try {
-    const { data, error } = await supabase.rpc('get_tests_for_parent', {
-      parent_id: parentId
-    });
+    // First get students for this parent
+    const { data: students, error: studentsError } = await supabase
+      .from('students')
+      .select('id')
+      .eq('parent_id', parentId);
+
+    if (studentsError) {
+      console.error('Error fetching students:', studentsError);
+      throw studentsError;
+    }
+
+    if (!students || students.length === 0) {
+      return [];
+    }
+
+    const studentIds = students.map(s => s.id);
+
+    // Then get tests for those students
+    const { data, error } = await supabase
+      .from('tilawati_level_tests')
+      .select(`
+        *,
+        student:student_id (
+          id,
+          name,
+          parent_id
+        )
+      `)
+      .in('student_id', studentIds)
+      .order('date', { ascending: false });
 
     if (error) {
-      console.error('Error fetching tests for parent:', error);
+      console.error('Error fetching tests:', error);
       throw error;
     }
 
@@ -104,7 +162,15 @@ export const fetchTestsWithFilters = async (filters: TestFilters): Promise<Tilaw
       throw error;
     }
 
-    return data || [];
+    // Convert the data to match TilawatiTest type
+    return data?.map(test => ({
+      ...test,
+      tilawati_level: test.tilawati_level as TilawatiJilid,
+      status: test.status as TestStatus,
+      notes: test.notes || undefined,
+      created_at: test.created_at || '',
+      updated_at: test.updated_at || ''
+    })) || [];
   } catch (error) {
     console.error('Error in fetchTestsWithFilters:', error);
     throw error;
@@ -135,7 +201,14 @@ export const saveTest = async (testData: {
         throw error;
       }
 
-      return data;
+      return {
+        ...data,
+        tilawati_level: data.tilawati_level as TilawatiJilid,
+        status: data.status as TestStatus,
+        notes: data.notes || undefined,
+        created_at: data.created_at || '',
+        updated_at: data.updated_at || ''
+      };
     } else {
       // Create new test
       const { data, error } = await supabase
@@ -149,7 +222,14 @@ export const saveTest = async (testData: {
         throw error;
       }
 
-      return data;
+      return {
+        ...data,
+        tilawati_level: data.tilawati_level as TilawatiJilid,
+        status: data.status as TestStatus,
+        notes: data.notes || undefined,
+        created_at: data.created_at || '',
+        updated_at: data.updated_at || ''
+      };
     }
   } catch (error) {
     console.error('Error in saveTest:', error);
@@ -159,11 +239,11 @@ export const saveTest = async (testData: {
 
 export const createTest = async (testData: {
   student_id: string;
-  current_jilid: string;
-  target_jilid: string;
-  test_date: string;
-  examiner_name: string;
-  status: string;
+  class_name: string;
+  tilawati_level: string;
+  date: string;
+  munaqisy: string;
+  status: 'scheduled' | 'passed' | 'failed' | 'pending_retake' | 'cancelled';
   notes: string;
 }): Promise<TestRecord> => {
   try {
@@ -190,12 +270,11 @@ export const createTest = async (testData: {
 };
 
 export const updateTest = async (testId: string, updates: {
-  current_jilid?: string;
-  target_jilid?: string;
-  test_date?: string;
-  examiner_name?: string;
-  status?: string;
-  score?: number;
+  class_name?: string;
+  tilawati_level?: string;
+  date?: string;
+  munaqisy?: string;
+  status?: 'scheduled' | 'passed' | 'failed' | 'pending_retake' | 'cancelled';
   notes?: string;
 }): Promise<TestRecord> => {
   try {
