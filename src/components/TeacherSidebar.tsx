@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/useAuth';
-import { Home, Users, BookMarked, UserCircle } from 'lucide-react';
+import { Home, Award, BookMarked, UserCircle } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -47,7 +47,7 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ isMobileMenuOpen, setIs
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
-    { href: '/students', label: 'Students', icon: Users },
+    { href: '/students', label: 'Student Rankings', mobileLabel: 'Rankings', icon: Award },
     { href: '/tests/manage', label: 'Tests', icon: BookMarked },
     { href: '/profile', label: 'Profile', icon: UserCircle },
   ];

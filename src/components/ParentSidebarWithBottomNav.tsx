@@ -23,7 +23,7 @@ const ParentSidebarWithBottomNav: React.FC<ParentSidebarWithBottomNavProps> = ()
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
-    { href: '/students', label: 'Student Rankings', mobileLabel: 'Student Ranks', icon: Award },
+    { href: '/students', label: 'Student Rankings', mobileLabel: 'Rankings', icon: Award },
     { href: '/tests/view', label: 'Test Results', icon: BookOpen },
     { href: '/profile', label: 'Profile', icon: UserCircle },
   ];
@@ -106,8 +106,8 @@ const ParentSidebarWithBottomNav: React.FC<ParentSidebarWithBottomNavProps> = ()
                   : 'text-gray-400 hover:text-teal-500'
               }`}
             >
-              <item.icon className={`h-6 w-6 mb-0.5 ${isActive(item.href) ? 'text-teal-600' : 'text-gray-400'}`} />
-              <span className="text-xs font-medium">{item.mobileLabel || item.label}</span>
+              <item.icon className={`h-5 w-5 mb-0.5 ${isActive(item.href) ? 'text-teal-600' : 'text-gray-400'}`} />
+              <span className="text-xs font-medium whitespace-nowrap overflow-hidden text-ellipsis px-1">{item.mobileLabel || item.label}</span>
             </Link>
           ))}
         </div>
