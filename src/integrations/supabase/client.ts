@@ -3,10 +3,11 @@ import { createClient } from '@supabase/supabase-js';
 // Use a direct relative path to ensure correct type resolution
 import type { Database } from './types';
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_SUPABASE_KEY;
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const SUPABASE_PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_SUPABASE_KEY || '';
 
-if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+// Only throw error in browser environment when variables are actually needed
+if (typeof window !== 'undefined' && (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY)) {
   throw new Error('Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_KEY.');
 }
 
@@ -29,4 +30,3 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     }
   }
 });
-
