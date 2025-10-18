@@ -10,12 +10,16 @@ import { useStudentDetails } from '@/hooks/useStudentDetails';
 import { useAuth } from '@/contexts/useAuth';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
 import ParentLayout from '@/components/layouts/ParentLayout';
+import { useSwipeBack } from '@/hooks/useSwipeBack';
 
 const StudentDetails = () => {
   const params = useParams();
   const id = params?.id as string;
   const router = useRouter();
   const { profile } = useAuth();
+  
+  // Add swipe back functionality
+  useSwipeBack();
   
   const {
     student,

@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Filter } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 const TestFilters: React.FC = () => {
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const { t } = useTranslation();
 
   return (
     <Card className="mb-6">
@@ -20,11 +18,10 @@ const TestFilters: React.FC = () => {
               <Filter className="h-4 w-4 text-gray-600" />
             </div>
             <div className="flex-1 text-left">
-              <h3 className="font-semibold text-gray-900 text-base sm:text-lg">{t('filters.title')}</h3>
-              <p className="text-xs sm:text-sm text-gray-500">{t('filters.description')}</p>
-
+              <h3 className="font-semibold text-gray-900 text-base sm:text-lg">Filters</h3>
+              <p className="text-xs sm:text-sm text-gray-500">Refine your search results</p>
             </div>
-            <span className="ml-auto text-xs text-gray-500">{filtersOpen ? t('filters.hide') : t('filters.show')}</span>
+            <span className="ml-auto text-xs text-gray-500">{filtersOpen ? 'Hide' : 'Show'}</span>
           </div>
         </button>
       </CardHeader>

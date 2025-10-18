@@ -8,6 +8,7 @@ import { ChevronLeft } from 'lucide-react';
 import type { TilawatiTest, TestStatus, TilawatiJilid } from '@/types/tilawati';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+import { useSwipeBack } from '@/hooks/useSwipeBack';
 
 const STATUS_TABS = [
   { value: 'all', label: 'All' },
@@ -32,6 +33,9 @@ const ParentTestView: React.FC = () => {
     status: [], 
     jilidLevel: [] 
   });
+  
+  // Add swipe back functionality
+  useSwipeBack();
 
   const breadcrumbs = [
     { label: 'Dashboard', href: '/dashboard' },

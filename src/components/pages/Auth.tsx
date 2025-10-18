@@ -13,8 +13,6 @@ import { Home, Eye } from 'lucide-react';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import Image from 'next/image';
-import { useTranslation } from 'react-i18next';
-import '@/i18n';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -29,11 +27,13 @@ const Auth = () => {
 
   const { toast } = useToast();
   const router = useRouter();
-  const { t } = useTranslation();
 
-  const allowedRoles = ['teacher', 'parent'];
-
-  const quotes = t('auth.quotes', { returnObjects: true }) as string[];
+  const quotes = [
+    "Stay connect with Al Qur'an",
+    "The best among you are those who learn the Qur'an and teach it.",
+    "Let the Qur'an be your companion every day.",
+    "Knowledge is light, and the Qur'an is its source."
+  ];
   const [quoteIndex, setQuoteIndex] = useState(0);
   useEffect(() => {
     const interval = setInterval(() => {
@@ -55,7 +55,7 @@ const Auth = () => {
     setLoading(true);
 
     // Validate role selection
-    if (!isLogin && !allowedRoles.includes(role)) {
+    if (!isLogin && !['teacher', 'parent'].includes(role)) {
       toast({
         title: 'Role Required',
         description: 'Please select your role (Teacher or Parent) to continue.',
@@ -136,49 +136,49 @@ const Auth = () => {
               onClick={handleGoogleLogin}
             >
               <Image src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width={20} height={20} className="h-5 w-5" />
-              {t('auth.continueWithGoogle')}
+              Continue with Google
             </button>
             <div className="flex items-center my-6">
               <div className="flex-1 h-px bg-gray-200" />
-              <span className="mx-3 text-gray-400 text-sm">{t('auth.orContinueWithEmail')}</span>
+              <span className="mx-3 text-gray-400 text-sm">Or continue with email</span>
               <div className="flex-1 h-px bg-gray-200" />
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               { !isLogin && (
                 <div className="space-y-2">
-                  <Label htmlFor="fullName">{t('auth.fullName')}</Label>
+                  <Label htmlFor="fullName">Full Name</Label>
                   <Input
                     id="fullName"
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder={t('auth.fullName')}
+                    placeholder="Full Name"
                     required={!isLogin}
                     className="w-full"
                   />
                 </div>
               )}
               <div className="space-y-2">
-                <Label htmlFor="email">{t('auth.email')}</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder={t('auth.email')}
+                  placeholder="Email"
                   required
                   className="w-full"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">{t('auth.password')}</Label>
+                <Label htmlFor="password">Password</Label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder={t('auth.password')}
+                    placeholder="Password"
                     required
                     className="w-full pr-10"
                   />
@@ -193,17 +193,14 @@ const Auth = () => {
               </div>
               { !isLogin && (
                 <div className="space-y-2">
-                  <Label htmlFor="role">{t('auth.role')}</Label>
+                  <Label htmlFor="role">Role</Label>
                   <Select value={role} onValueChange={setRole}>
                     <SelectTrigger>
-                      <SelectValue placeholder={t('auth.selectRole')} />
+                      <SelectValue placeholder="Select Role" />
                     </SelectTrigger>
                     <SelectContent>
-                      {allowedRoles.map((roleOption) => (
-                        <SelectItem key={roleOption} value={roleOption}>
-                          {roleOption === 'teacher' ? t('auth.teacher') : t('auth.parent')}
-                        </SelectItem>
-                      ))}
+                      <SelectItem value="teacher">Teacher</SelectItem>
+                      <SelectItem value="parent">Parent</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -214,7 +211,7 @@ const Auth = () => {
                   ${isLogin ? 'bg-gradient-to-r from-emerald-500 to-teal-400 hover:opacity-90' : 'bg-gradient-to-r from-orange-400 to-orange-600 hover:opacity-90'}`}
                 disabled={loading}
               >
-                {loading ? t('auth.pleaseWait') : (isLogin ? (<><span>{t('auth.signIn')}</span></>) : (<><span>{t('auth.signUp')}</span></>))}
+                {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Sign Up')}
               </Button>
             </form>
             <div className="mt-4 text-center">
@@ -224,8 +221,8 @@ const Auth = () => {
                 className="text-blue-600 hover:underline text-sm font-medium"
               >
                 {isLogin 
-                  ? t('auth.dontHaveAccount')
-                  : t('auth.alreadyHaveAccount')}
+                  ? "Don't have an account? Sign up"
+                  : "Already have an account? Sign in"}
               </button>
             </div>
             <div className="mt-8">
@@ -235,7 +232,7 @@ const Auth = () => {
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-gray-700 border-gray-300"
                 onClick={() => router.push('/')}
               >
-                <Home className="h-5 w-5 mr-1" /> {t('auth.backToHome')}
+                <Home className="h-5 w-5 mr-1" /> Back to Home
               </Button>
             </div>
           </CardContent>

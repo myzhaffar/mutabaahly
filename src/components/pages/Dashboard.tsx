@@ -11,8 +11,6 @@ import BulkUploadStudentsDialog from '@/components/BulkUploadStudentsDialog';
 import ClassCard from '@/components/dashboard/ClassCard';
 import ParentLayout from '@/components/layouts/ParentLayout';
 import { useStudentProgressSummary } from '@/hooks/useStudentProgressSummary';
-import { useTranslation } from 'react-i18next';
-import '@/i18n';
 
 // Skeleton components
 const StatsCardsSkeleton = () => (
@@ -34,7 +32,6 @@ const StudentGridSkeleton = () => (
 const Dashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
   const router = useRouter();
-  const { t } = useTranslation();
 
   const {
     summaryStats: stats,
@@ -83,7 +80,7 @@ const Dashboard = () => {
 
   // Teacher view
   if (profile?.role === 'teacher') {
-    const breadcrumbs = [{ label: t('navigation.dashboard') }];
+    const breadcrumbs = [{ label: 'Dashboard' }];
     return (
       <TeacherLayout breadcrumbs={breadcrumbs}>
         <div className="container mx-auto px-0 py-0 md:px-6 md:py-6">
@@ -91,9 +88,9 @@ const Dashboard = () => {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4 pt-2">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-                  {t('dashboard.welcome').replace('{name}', profile?.full_name || 'User')}
+                  Welcome back, {profile?.full_name || 'User'}
                 </h1>
-                <p className="text-gray-600">{t('dashboard.teacherDashboard')}</p>
+                <p className="text-gray-600">Teacher Dashboard</p>
               </div>
               <div className="flex justify-center gap-2 sm:justify-end">
                 <BulkUploadStudentsDialog onStudentsAdded={handleStudentAdded} />
@@ -116,7 +113,7 @@ const Dashboard = () => {
   }
 
   // Parent view
-  const breadcrumbs = [{ label: t('navigation.dashboard') }];
+  const breadcrumbs = [{ label: 'Dashboard' }];
 
   return (
     <ParentLayout breadcrumbs={breadcrumbs}>
@@ -125,9 +122,9 @@ const Dashboard = () => {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4 pt-2">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-                {t('dashboard.welcome').replace('{name}', profile?.full_name || 'User')}
+                Welcome back, {profile?.full_name || 'User'}
               </h1>
-              <p className="text-gray-600">{t('dashboard.parentDashboard')}</p>
+              <p className="text-gray-600">Parent Dashboard</p>
             </div>
           </div>
           {/* Stats Section */}
@@ -168,4 +165,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
- 

@@ -1,8 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { BookOpen, Award, TrendingUp } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import '@/i18n';
 
 interface StatsCardsProps {
   stats: {
@@ -14,32 +12,30 @@ interface StatsCardsProps {
 }
 
 const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
-  const { t } = useTranslation();
-
   const cards = [
     {
-      title: t('dashboard.stats.totalStudents'),
+      title: 'Total Students',
       value: stats.totalStudents,
       icon: BookOpen,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50'
     },
     {
-          title: t('dashboard.stats.avgTahfidzProgress'),
-    value: `${Math.round(stats.avgTahfidzProgress)}%`,
+      title: 'Avg. Tahfidz Progress',
+      value: `${Math.round(stats.avgTahfidzProgress)}%`,
       icon: Award,
       color: 'text-green-600',
       bgColor: 'bg-green-50'
     },
     {
-      title: t('dashboard.stats.avgTilawahProgress'),
+      title: 'Avg. Tilawah Progress',
       value: `${Math.round(stats.avgTilawahProgress)}%`,
       icon: TrendingUp,
       color: 'text-purple-600',
       bgColor: 'bg-purple-50'
     },
     {
-      title: t('dashboard.stats.completedStudents'),
+      title: 'Completed Students',
       value: stats.completedStudents,
       icon: Award,
       color: 'text-orange-600',

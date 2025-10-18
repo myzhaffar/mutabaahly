@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import ProgressEntriesTable from './ProgressEntriesTable';
 import ExportProgressDialog from './ExportProgressDialog';
-import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -36,7 +35,6 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
 }) => {
   const [tab, setTab] = useState(activeTab);
   const [exportOpen, setExportOpen] = useState(false);
-  const { t } = useTranslation();
   const { toast } = useToast();
 
   // Update internal tab state when activeTab prop changes
@@ -94,9 +92,9 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>{t('tabs.dailyProgress')}</CardTitle>
+        <CardTitle>Daily Progress Records</CardTitle>
         <Button variant="outline" onClick={() => setExportOpen(true)}>
-          {t('tabs.export')}
+          Export
         </Button>
         <ExportProgressDialog
           open={exportOpen}
@@ -112,13 +110,13 @@ const DailyProgressTabs: React.FC<DailyProgressTabsProps> = ({
               value="tahfidz"
               className="data-[state=active]:bg-green-100 data-[state=active]:text-green-700"
             >
-              {t('tabs.tahfidz')}
+              Tahfidz
             </TabsTrigger>
             <TabsTrigger
               value="tilawah"
               className="data-[state=active]:bg-orange-100 data-[state=active]:text-orange-700"
             >
-              {t('tabs.tahsin')}
+              Tahsin
             </TabsTrigger>
           </TabsList>
           

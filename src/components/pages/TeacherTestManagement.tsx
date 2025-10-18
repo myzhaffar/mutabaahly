@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import TeacherLayout from '@/components/layouts/TeacherLayout';
 import TestTable from '@/components/test-management/TestTable';
 import AddTestDialog from '@/components/AddTestDialog';
+import { useSwipeBack } from '@/hooks/useSwipeBack';
 
 import { fetchTestsWithFilters } from '@/utils/testQueries';
 import { GradientButton } from '@/components/ui/gradient-button';
@@ -47,6 +48,9 @@ const TeacherTestManagement: React.FC = () => {
   const queryClient = useQueryClient();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [filters, setFilters] = useState<TestFilters>({ status: [], jilidLevel: [] });
+  
+  // Add swipe back functionality
+  useSwipeBack();
 
   const breadcrumbs = [
     { label: 'Dashboard', href: '/dashboard' },

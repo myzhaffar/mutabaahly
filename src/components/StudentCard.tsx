@@ -4,7 +4,6 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Award, BookOpen, User } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 interface StudentCardProps {
   student: {
@@ -30,8 +29,6 @@ interface StudentCardProps {
 }
 
 const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails, selected = false, onSelect }) => {
-  const { t } = useTranslation();
-
   const getStatusVariant = (status: string) => {
     switch (status) {
       case 'completed':
@@ -48,11 +45,11 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails, selec
   const getStatusText = (status: string) => {
     switch (status) {
       case 'completed':
-        return t('cards.studentCard.completed');
+        return 'Completed';
       case 'inProgress':
-        return t('cards.studentCard.inProgress');
+        return 'In Progress';
       case 'notStarted':
-        return t('cards.studentCard.notStarted');
+        return 'Not Started';
       default:
         return status;
     }
@@ -74,7 +71,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails, selec
           checked={selected}
           onChange={e => onSelect(e.target.checked)}
           className="absolute top-3 left-3 z-10 w-5 h-5 accent-emerald-500 rounded focus:ring-2 focus:ring-emerald-400"
-          aria-label={selected ? t('cards.studentCard.deselectStudent') : t('cards.studentCard.selectStudent')}
+          aria-label={selected ? "Deselect student" : "Select student"}
         />
       )}
       <CardHeader className="p-4 sm:p-6 pb-4 bg-gradient-to-r from-islamic-50 to-accent-50">
@@ -114,7 +111,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails, selec
             <div className="flex items-center space-x-2">
               <Award className="h-5 w-5 text-islamic-600" />
               <span className="text-sm font-semibold text-gray-800">
-                {t('cards.studentCard.tahfidzAlQuran')}
+                Tahfidz Al-Quran
               </span>
             </div>
             <Badge 
@@ -128,7 +125,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails, selec
           
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-xs text-gray-600">{t('cards.studentCard.progress')}</span>
+              <span className="text-xs text-gray-600">Progress</span>
               <span className="text-xs font-bold text-gray-800">
                 {student.memorization.progress}%
               </span>
@@ -140,7 +137,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails, selec
               />
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              {t('cards.studentCard.current')}: {student.memorization.currentSurah}
+              Current: {student.memorization.currentSurah}
             </p>
           </div>
         </div>
@@ -151,7 +148,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails, selec
             <div className="flex items-center space-x-2">
               <BookOpen className="h-5 w-5 text-accent-600" />
               <span className="text-sm font-semibold text-gray-800">
-                {t('cards.studentCard.tahsinTilawati')}
+                Tahsin/Tilawati
               </span>
             </div>
             <Badge 
@@ -165,7 +162,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails, selec
           
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-xs text-gray-600">{t('cards.studentCard.progress')}</span>
+              <span className="text-xs text-gray-600">Progress</span>
               <span className="text-xs font-bold text-gray-800">
                 {student.tilawati.progress}%
               </span>
@@ -177,7 +174,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails, selec
               />
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              {t('cards.studentCard.level')}: {student.tilawati.currentLevel}
+              Level: {student.tilawati.currentLevel}
             </p>
           </div>
         </div>
@@ -188,7 +185,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onViewDetails, selec
             onClick={() => onViewDetails(student.id)}
             className="w-full bg-gradient-to-r from-emerald-500 to-teal-400 hover:opacity-90 text-white"
           >
-            {t('buttons.viewDetails')}
+            View Details
           </Button>
         </div>
       </CardContent>

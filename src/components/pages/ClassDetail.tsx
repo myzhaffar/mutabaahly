@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FIXED_TEACHERS } from '@/utils/rankingDataService';
+import { useSwipeBack } from '@/hooks/useSwipeBack';
 // Removed unused ProgressEntry import
 
 interface ClassStudent {
@@ -44,6 +45,10 @@ const ClassDetail: React.FC = () => {
   const className = decodeURIComponent(params?.className as string);
   const { profile } = useAuth();
   const router = useRouter();
+  
+  // Add swipe back functionality
+  useSwipeBack();
+  
   const [students, setStudents] = useState<ClassStudent[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
