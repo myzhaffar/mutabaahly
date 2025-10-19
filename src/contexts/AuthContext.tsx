@@ -1,432 +1,319 @@
+/**
+ * AuthProvider - Authentication and user profile management
+ * 
+ * Note: Context has been moved to separate file to fix Fast Refresh warning
+ */
+
 'use client';
 
-import React, { createContext, useState, useEffect, useCallback } from 'react';
-import { User, Session, AuthError, PostgrestError } from '@supabase/supabase-js';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { AuthContext, Profile, mapDbProfileToProfile, AuthResponse } from './auth-context';
 
-interface Profile {
-  id: string;
-  full_name: string;
-  role: "parent" | "teacher" | null;
-  email?: string;
-  avatar_url?: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-interface AuthResponse {
-  data: {
-    user: User | null;
-    session: Session | null;
-  };
-  error: AuthError | null;
-}
-
-interface AuthContextType {
-  user: User | null;
-  session: Session | null;
-  profile: Profile | null;
-  loading: boolean;
-  signIn: (email: string, password: string) => Promise<AuthResponse>;
-  signUp: (email: string, password: string, fullName: string, role: 'teacher' | 'parent') => Promise<AuthResponse>;
-  signOut: () => Promise<{ error: AuthError | null }>;
-  refreshProfile: () => Promise<void>;
-  updateUserRole: (role: 'teacher' | 'parent') => Promise<{ error: AuthError | PostgrestError | string | null }>;
-}
-
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// ============================================================================
+// Context Provider
+// ============================================================================
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [profileCreating, setProfileCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Ref to track if component is mounted (prevent memory leaks)
+  const isMountedRef = useRef(true);
+  const initializingRef = useRef(false);
 
-  const fetchProfile = useCallback(async (userId: string, retryAttempt = 0) => {
-    // Prevent multiple simultaneous profile creation attempts
-    if (profileCreating) {
-      console.log('Profile creation already in progress, skipping...');
-      return;
-    }
-
-    // Prevent infinite retry loops
-    if (retryAttempt > 3) {
-      setProfile(null);
-      return;
-    }
-
+  const fetchProfile = useCallback(async (userId: string, signal?: AbortSignal) => {
     try {
-      const { data: profileData, error } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
-      
-      if (error) {
-        // If profile doesn't exist, create it
-        if (error.code === 'PGRST116') {
-          setProfileCreating(true);
-          
-          try {
-            // Add a small delay to ensure user is fully authenticated
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // Get current user to determine if this is OAuth or email user
-            const { data: { user }, error: userError } = await supabase.auth.getUser();
-            
-            if (userError) {
-              setProfile(null);
-              return;
-            }
-            
-            if (user) {
-              const isOAuthUser = user.app_metadata.provider === 'google';
-              const userRole = isOAuthUser ? null : user.user_metadata.role;
-              
-              // Use upsert instead of insert to handle potential duplicates gracefully
-              const { data: newProfile, error: insertError } = await supabase
-                .from('profiles')
-                .upsert([
-                  {
-                    id: userId,
-                    full_name: user.user_metadata.full_name || user.user_metadata.name || '',
-                    role: userRole, // OAuth users get null, email users get their role
-                    email: user.email || undefined,
-                    avatar_url: user.user_metadata.avatar_url || null,
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                  },
-                ], {
-                  onConflict: 'id', // Handle conflicts on the primary key
-                  ignoreDuplicates: false // Update if exists, insert if not
-                })
-                .select()
-                .single();
-              
-              if (insertError) {
-                // If it's a duplicate key error, try to fetch the existing profile
-                if (insertError.code === '23505') {
-                  const { data: existingProfile, error: fetchError } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', userId)
-                    .single();
-                  
-                  if (fetchError) {
-                    setProfile(null);
-                  } else if (existingProfile) {
-                    const typedProfile: Profile = {
-                      id: existingProfile.id,
-                      full_name: existingProfile.full_name,
-                      role: existingProfile.role as 'teacher' | 'parent' | null,
-                      email: (existingProfile as { email?: string }).email, // Type assertion for email field
-                      avatar_url: existingProfile.avatar_url,
-                      created_at: existingProfile.created_at,
-                      updated_at: existingProfile.updated_at,
-                    };
-                    setProfile(typedProfile);
-                  }
-                } else {
-                  setProfile(null);
-                }
-              } else if (newProfile) {
-                // Set the profile directly instead of calling fetchProfile again
-                const typedProfile: Profile = {
-                  id: newProfile.id,
-                  full_name: newProfile.full_name,
-                  role: newProfile.role as 'teacher' | 'parent' | null,
-                  email: (newProfile as { email?: string }).email, // Type assertion for email field
-                  avatar_url: newProfile.avatar_url,
-                  created_at: newProfile.created_at,
-                  updated_at: newProfile.updated_at,
-                };
-                setProfile(typedProfile);
-              }
-            } else {
-              console.error('No user data available for profile creation');
-              setProfile(null);
-            }
-          } finally {
-            setProfileCreating(false);
-          }
-        } else if (error.code === '406') {
-          // Handle 406 Not Acceptable error - this might be a temporary issue
-          // Retry after 1 second
-          setTimeout(() => {
-            fetchProfile(userId, retryAttempt + 1);
-          }, 1000);
-          
-          return;
-        } else {
+        .maybeSingle(); // Use maybeSingle instead of single to avoid errors when not found
+
+      if (signal?.aborted) return;
+
+      if (profileError) {
+        throw profileError;
+      }
+
+      if (profileData) {
+        const mappedProfile = mapDbProfileToProfile(profileData);
+        if (isMountedRef.current) {
+          setProfile(mappedProfile);
+          setError(null);
+        }
+      } else {
+        if (isMountedRef.current) {
           setProfile(null);
         }
-      } else if (profileData) {
-        // Type assertion for the database response
-        const dbProfile = profileData as {
-          id: string;
-          full_name: string;
-          role: string;
-          email?: string;
-          avatar_url?: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-
-        // Ensure all required fields are present
-        const typedProfile: Profile = {
-          id: dbProfile.id,
-          full_name: dbProfile.full_name,
-          role: dbProfile.role as 'teacher' | 'parent' | null,
-          email: dbProfile.email,
-          avatar_url: dbProfile.avatar_url,
-          created_at: dbProfile.created_at,
-          updated_at: dbProfile.updated_at,
-        };
-        setProfile(typedProfile);
-      } else {
+      }
+    } catch (err) {
+      if (!signal?.aborted && isMountedRef.current) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch profile';
+        setError(errorMessage);
         setProfile(null);
       }
-    } catch (error) {
-      setProfile(null);
     }
-  }, [profileCreating]);
+  }, []);
+
+  const refreshProfile = useCallback(async () => {
+    if (user) {
+      await fetchProfile(user.id);
+    }
+  }, [user, fetchProfile]);
+
+
+  const signIn = async (email: string, password: string): Promise<AuthResponse> => {
+    try {
+      setError(null);
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        setError(signInError.message);
+      }
+
+      return { data, error: signInError };
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Sign in failed';
+      setError(errorMessage);
+      return {
+        data: { user: null, session: null },
+        error: err as AuthError,
+      };
+    }
+  };
+
+  const signUp = async (
+    email: string,
+    password: string,
+    fullName: string,
+    role: 'teacher' | 'parent'
+  ): Promise<AuthResponse> => {
+    try {
+      setError(null);
+      
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            role: role,
+          },
+        },
+      });
+
+      if (signUpError) {
+        setError(signUpError.message);
+        return { data, error: signUpError };
+      }
+
+      return { data, error: null };
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Sign up failed';
+      setError(errorMessage);
+      return {
+        data: { user: null, session: null },
+        error: err as AuthError,
+      };
+    }
+  };
+
+  const signOut = async (): Promise<{ error: AuthError | null }> => {
+    try {
+      setError(null);
+      
+      // Clear local state first for immediate UI response
+      if (isMountedRef.current) {
+        setUser(null);
+        setSession(null);
+        setProfile(null);
+      }
+
+      const { error: signOutError } = await supabase.auth.signOut();
+      
+      if (signOutError) {
+        setError(signOutError.message);
+        return { error: signOutError };
+      }
+
+      return { error: null };
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Sign out failed';
+      setError(errorMessage);
+      return { error: err as AuthError };
+    }
+  };
+
+  const updateUserRole = async (role: 'teacher' | 'parent'): Promise<{ error: string | null }> => {
+    if (!user) {
+      const errorMsg = 'No authenticated user found';
+      setError(errorMsg);
+      return { error: errorMsg };
+    }
+
+    try {
+      setError(null);
+
+      // Update profile in database
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ role })
+        .eq('id', user.id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Update local state optimistically
+      if (profile && isMountedRef.current) {
+        setProfile({ ...profile, role });
+      }
+
+      // Optionally update user metadata for non-OAuth users
+      const isOAuthUser = user.app_metadata?.provider !== 'email';
+      if (!isOAuthUser) {
+        // Fire and forget - don't wait for this
+        supabase.auth.updateUser({ data: { role } });
+      }
+
+      return { error: null };
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update role';
+      setError(errorMessage);
+      return { error: errorMessage };
+    }
+  };
+
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
 
   useEffect(() => {
-    // Set a timeout to prevent infinite loading
-    const loadingTimeout = setTimeout(() => {
-      console.warn('Auth loading timeout - forcing loading to false');
-      setLoading(false);
-    }, 5000); // Reduced from 10 seconds to 5 seconds
+    isMountedRef.current = true;
+    const abortController = new AbortController();
 
-    let isInitialized = false;
+    // Local function to fetch profile (avoids dependency issues)
+    const fetchProfileLocal = async (userId: string, signal?: AbortSignal) => {
+      try {
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .maybeSingle();
 
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          try {
-            await fetchProfile(session.user.id);
-          } catch (error) {
-            setProfile(null);
+        if (signal?.aborted) return;
+
+        if (profileError) {
+          throw profileError;
+        }
+
+        if (profileData) {
+          const mappedProfile = mapDbProfileToProfile(profileData);
+          if (isMountedRef.current) {
+            setProfile(mappedProfile);
+            setError(null);
           }
         } else {
+          if (isMountedRef.current) {
+            setProfile(null);
+          }
+        }
+      } catch (err) {
+        if (!signal?.aborted && isMountedRef.current) {
+          const errorMessage = err instanceof Error ? err.message : 'Failed to fetch profile';
+          setError(errorMessage);
           setProfile(null);
-        }
-        
-        // Only set loading to false after profile is processed
-        if (!isInitialized) {
-          isInitialized = true;
-          setLoading(false);
-        }
-      }
-    );
-
-    // Check for existing session
-    const initializeAuth = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          // Handle session error silently
-        }
-        
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          await fetchProfile(session.user.id);
-        }
-        
-        // Set loading to false after initial session check and profile fetch
-        if (!isInitialized) {
-          isInitialized = true;
-          setLoading(false);
-        }
-      } catch (error) {
-        if (!isInitialized) {
-          isInitialized = true;
-          setLoading(false);
         }
       }
     };
+
+    const initializeAuth = async () => {
+      // Prevent multiple simultaneous initializations
+      if (initializingRef.current) return;
+      initializingRef.current = true;
+
+      try {
+        const { data: { session: currentSession }, error: sessionError } = 
+          await supabase.auth.getSession();
+
+        if (abortController.signal.aborted || !isMountedRef.current) return;
+
+        if (sessionError) {
+          setError(sessionError.message);
+        }
+
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+
+        if (currentSession?.user) {
+          await fetchProfileLocal(currentSession.user.id, abortController.signal);
+        }
+      } catch (err) {
+        if (!abortController.signal.aborted && isMountedRef.current) {
+          const errorMessage = err instanceof Error ? err.message : 'Auth initialization failed';
+          setError(errorMessage);
+        }
+      } finally {
+        if (isMountedRef.current) {
+          setLoading(false);
+          initializingRef.current = false;
+        }
+      }
+    };
+
+    // Set up auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, currentSession) => {
+        if (!isMountedRef.current) return;
+
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+
+        if (currentSession?.user) {
+          await fetchProfileLocal(currentSession.user.id, abortController.signal);
+        } else {
+          setProfile(null);
+        }
+
+        // Ensure loading is set to false after auth state changes
+        setLoading(false);
+      }
+    );
 
     initializeAuth();
 
     return () => {
-      clearTimeout(loadingTimeout);
+      isMountedRef.current = false;
+      abortController.abort();
       subscription.unsubscribe();
     };
-  }, [fetchProfile]);
-
-  const refreshProfile = async () => {
-    if (user) {
-      await fetchProfile(user.id);
-    }
-  };
-
-  const updateUserRole = async (role: 'teacher' | 'parent') => {
-    if (!user) return { error: 'No user found' };
-
-    // Add timeout to prevent hanging
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Role update timeout after 10 seconds')), 10000);
-    });
-
-    try {
-      // Race between timeout and actual update
-      const updatePromise = (async () => {
-        const isOAuthUser = user.app_metadata?.provider === 'google';
-        
-        // For OAuth users, skip metadata update as it might be causing timeouts
-        if (!isOAuthUser) {
-          // Update user metadata only for non-OAuth users
-          const metadataResult = await supabase.auth.updateUser({
-            data: { role: role }
-          });
-          
-          if (metadataResult.error) {
-            throw metadataResult.error;
-          }
-        }
-
-        // Update profile in database
-        const profileResult = await supabase
-          .from('profiles')
-          .update({ role: role })
-          .eq('id', user.id);
-
-        if (profileResult.error) {
-          throw profileResult.error;
-        }
-
-        // Update local profile state directly instead of calling fetchProfile
-        if (profile) {
-          const updatedProfile = {
-            ...profile,
-            role: role
-          };
-          setProfile(updatedProfile);
-        } else {
-          // Create a basic profile state since the profile is null
-          const newProfile = {
-            id: user.id,
-            full_name: user.user_metadata?.full_name || user.user_metadata?.name || '',
-            role: role,
-            email: user.email || undefined,
-            avatar_url: user.user_metadata?.avatar_url || null,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          };
-          setProfile(newProfile);
-        }
-        
-        return { error: null };
-      })();
-
-      // Race between timeout and update
-      const result = await Promise.race([updatePromise, timeoutPromise]) as { error: string | AuthError | PostgrestError | null; };
-      return result;
-      
-    } catch (error) {
-      return { error: error as AuthError | string };
-    }
-  };
-
-  const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { data, error };
-  };
-
-  const signUp = async (email: string, password: string, fullName: string, role: 'teacher' | 'parent') => {
-    console.log('Starting email signup process for:', email, 'with role:', role);
-    
-    // Create the user account
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-          role: role, // Store role in user metadata for email signups
-        },
-      },
-    });
-
-    if (error) {
-      console.error('Signup error:', error);
-      return { data, error };
-    }
-
-    console.log('User created successfully:', data.user?.id);
-
-    // If signup was successful, send confirmation email
-    if (data.user) {
-      try {
-        console.log('User created successfully, sending confirmation email');
-        
-        // Send confirmation email via Resend
-        const response = await fetch('/api/send-confirmation-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email }),
-        });
-
-        if (!response.ok) {
-          console.error('Failed to send confirmation email via Resend');
-        } else {
-          console.log('Confirmation email sent successfully via Resend');
-        }
-      } catch (emailError) {
-        console.error('Error sending confirmation email:', emailError);
-      }
-    }
-
-    return { data, error };
-  };
-
-  const signOut = async () => {
-    try {
-      // Clear local state immediately for instant UI response
-      setUser(null);
-      setSession(null);
-      setProfile(null);
-      setLoading(false);
-      
-      // Sign out from Supabase in background
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
-      return { error: null };
-    } catch (error) {
-      console.error('Error signing out:', error);
-      return { error: error as AuthError | null };
-    }
-  };
+  }, []);
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      session,
-      profile,
-      loading,
-      signIn,
-      signUp,
-      signOut,
-      refreshProfile,
-      updateUserRole,
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        session,
+        profile,
+        loading,
+        error,
+        signIn,
+        signUp,
+        signOut,
+        refreshProfile,
+        updateUserRole,
+        clearError,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
-
-
